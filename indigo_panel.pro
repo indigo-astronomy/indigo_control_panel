@@ -5,15 +5,12 @@ CONFIG += c++11
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the
 # deprecated API to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS QZEROCONF_STATIC
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-INCLUDEPATH += "/usr/local/include" "/Users/dave/dave-equinox/DEV/indigo-ozbandit/indigo_libs"
-LIBS += -L"/usr/local/lib" -L"/Users/dave/dave-equinox/DEV/indigo-ozbandit/build/lib" -lqmdnsengine -lindigo
 
 SOURCES += \
         main.cpp \
@@ -23,7 +20,7 @@ SOURCES += \
     propertymodel.cpp \
     indigoclient.cpp
 
-RESOURCES += qml.qrc qdarkstyle/style.qrc led-red.png led-grey.png led-green.png led-orange.png
+RESOURCES += qdarkstyle/style.qrc led-red.png led-grey.png led-green.png led-orange.png
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -42,3 +39,18 @@ HEADERS += \
     indigoservice.h \
     propertymodel.h \
     indigoclient.h
+
+include(qtzeroconf/qtzeroconf.pri)
+
+unix:!mac {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += indigo
+}
+
+unix:mac {
+    INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
+    LIBS += -L"$${PWD}/indigo/build/lib" -lindigo
+}
+
+DISTFILES += \
+    README.md

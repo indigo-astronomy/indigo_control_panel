@@ -2,15 +2,13 @@
 #include "servicemodel.h"
 #include <indigo_client.h>
 
-Q_DECLARE_METATYPE(QMdnsEngine::Service)
 
 ServiceModel::ServiceModel(const QByteArray &type)
-    : mServer(),
-      mBrowser(&mServer, type, &cache)
 {
-    connect(&mBrowser, &QMdnsEngine::Browser::serviceAdded, this, &ServiceModel::onServiceAdded);
-    connect(&mBrowser, &QMdnsEngine::Browser::serviceUpdated, this, &ServiceModel::onServiceUpdated);
-    connect(&mBrowser, &QMdnsEngine::Browser::serviceRemoved, this, &ServiceModel::onServiceRemoved);
+    connect(&zeroConf, &QZeroConf::error, this, &ServiceModel::onServiceError);
+    connect(&zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
+    connect(&zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
+    zeroConf.startBrowser(type);
 }
 
 int
@@ -32,7 +30,7 @@ ServiceModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case Qt::DisplayRole:
         return QString("%1:%2")
-            .arg(QString(service->service.hostname()))
+            .arg(QString(service->service.host()))
             .arg(service->service.port());
     case Qt::UserRole:
         return QVariant();
@@ -41,19 +39,28 @@ ServiceModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-
-void ServiceModel::onServiceAdded(const QMdnsEngine::Service &service)
+void
+ServiceModel::onServiceError(QZeroConf::error_t e)
 {
+    fprintf(stderr, "ZEROCONF ERROR %d", e);
+}
+
+void
+ServiceModel::onServiceAdded(QZeroConfService service)
+{
+    fprintf(stderr, "SERVICE ADDED [%s]\n", service.name().toUtf8().constData());
+
     qDebug() << service.name() << "discovered on port" << service.port() << "!";
     beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
     IndigoService* indigo_service = new IndigoService(service);
     mServices.append(indigo_service);
     endInsertRows();
 
-    indigo_connect_server(service.name(), service.hostname(), service.port(), &indigo_service->server_entry);
+    indigo_connect_server(service.name().toUtf8().constData(), service.host().toUtf8().constData(), service.port(), &indigo_service->server_entry);
 }
 
-void ServiceModel::onServiceUpdated(const QMdnsEngine::Service &service)
+void
+ServiceModel::onServiceUpdated(QZeroConfService service)
 {
     qDebug() << "Service Updated " << service.name();
 //    int i = findService(service.name());
@@ -64,10 +71,13 @@ void ServiceModel::onServiceUpdated(const QMdnsEngine::Service &service)
 //    }
 }
 
-void ServiceModel::onServiceRemoved(const QMdnsEngine::Service &service)
+void
+ServiceModel::onServiceRemoved(QZeroConfService service)
 {
-qDebug() << "Service Removed " << service.name();
-    int i = findService(service.name());
+    fprintf(stderr, "SERVICE REMOVED [%s]\n", service.name().toUtf8().constData());
+
+    //qDebug() << "Service Removed " << service.name();
+    int i = findService(service.name().toUtf8());
     if (i != -1) {
         IndigoService* indigo_service = mServices.at(i);
 
@@ -80,7 +90,8 @@ qDebug() << "Service Removed " << service.name();
     }
 }
 
-int ServiceModel::findService(const QByteArray &name)
+int
+ServiceModel::findService(const QByteArray &name)
 {
     for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
         if ((*i)->service.name() == name) {

@@ -30,38 +30,18 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     widget->setLayout(rootLayout);
     setCentralWidget(widget);
 
-//        QCheckBox *any = new QCheckBox(tr("Any"));
+    //  Add basic vertical layout for form panel
+    form_panel = new QWidget();
+    QVBoxLayout* formLayout = new QVBoxLayout;
+    form_panel->setLayout(formLayout);
 
-//        QHBoxLayout *typeLayout = new QHBoxLayout;
-//        typeLayout->addWidget(mServiceType, 1);
-//        typeLayout->addWidget(any);
-//        typeLayout->addWidget(mStartStop);
-//        rootLayout->addLayout(typeLayout);
+    hSplitter = new QSplitter;
+    hSplitter->addWidget(mProperties);
+    hSplitter->addWidget(form_panel);
+    hSplitter->setOpaqueResize(false);
+    rootLayout->addWidget(hSplitter);
 
-        QSplitter *vSplitter = new QSplitter;
-        vSplitter->setOrientation(Qt::Vertical);
-//        vSplitter->addWidget(mAddresses);
-//        vSplitter->addWidget(mAttributes);
-
-
-        //  Add basic vertical layout for form panel
-        form_panel = new QWidget();
-        QVBoxLayout* formLayout = new QVBoxLayout;
-        form_panel->setLayout(formLayout);
-
-        hSplitter = new QSplitter;
-        hSplitter->addWidget(mProperties);
-        hSplitter->addWidget(form_panel);
-        hSplitter->setOpaqueResize(false);
-
-        //QHBoxLayout *servicesLayout = new QHBoxLayout;
-        //servicesLayout->addWidget(hSplitter);
-//        //hSplitter->addWidget(mServices);
-        //rootLayout->addLayout(servicesLayout);
-        rootLayout->addWidget(hSplitter);
-        //rootLayout->addWidget(mLog);
-
-    mServiceModel = new ServiceModel("_indigo._tcp.local.");
+    mServiceModel = new ServiceModel("_indigo._tcp");
     mServices->setModel(mServiceModel);
 
     mPropertyModel = new PropertyModel();
@@ -91,7 +71,6 @@ BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemS
     if (current_node != nullptr) {
         for (TreeIterator i = current_node->children.begin(); i != current_node->children.end(); i++) {
             ItemNode* item = reinterpret_cast<ItemNode*>(*i);
-            item->input_label = nullptr;
             item->input_control = nullptr;
         }
     }
@@ -215,27 +194,16 @@ BrowserWindow::build_switch_property_form(PropertyNode* p) {
 
     //  Build each item
     for (int row = 0; row < p->property->count; row++) {
-//fprintf(stderr, "Item label: [%s]   value: [%s]\n", p->items[row].label, p->items[row].text.value);
-        //if (p->rule == INDIGO_ANY_OF_MANY_RULE) {
-            QCheckBox* data = new QCheckBox(p->property->items[row].label);
-            data->setChecked(p->property->items[row].sw.value);
-            if (p->property->perm == INDIGO_RO_PERM)
-                data->setEnabled(false);
-            form_grid->addWidget(data, row, 0);
+        QCheckBox* data = new QCheckBox(p->property->items[row].label);
+        data->setChecked(p->property->items[row].sw.value);
+        if (p->property->perm == INDIGO_RO_PERM)
+            data->setEnabled(false);
+        form_grid->addWidget(data, row, 0);
 
-            ItemNode* item = reinterpret_cast<ItemNode*>(p->children[row]);
-            item->input_control = data;
+        ItemNode* item = reinterpret_cast<ItemNode*>(p->children[row]);
+        item->input_control = data;
 
-            //connect(data, &QCheckBox::stateChanged, this, &BrowserWindow::checkbox_toggle);
-//        }
-//        else {
-//            QRadioButton* data = new QRadioButton(p->items[row].label);
-//            if (p->items[row].sw.value)
-//                data->setChecked(true);
-//            if (p->perm == INDIGO_RO_PERM)
-//                data->setEnabled(false);
-//            form_grid->addWidget(data, row, 0);
-//        }
+        connect(data, &QCheckBox::clicked, item, &ItemNode::checkbox_clicked);
     }
 
     //  Return the form

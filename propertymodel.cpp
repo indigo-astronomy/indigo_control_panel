@@ -6,19 +6,59 @@
 
 TreeNode::~TreeNode()
 {
-//        for (std::vector<TreeNode*>::iterator i = children.begin(); i != children.end(); i++) {
-//            TreeNode* n = *i;
-//            children.erase(i);
-//            delete n;
-//        }
+    //fprintf(stderr, "~TreeNode: Releasing children %d\n", node_type);
+    for (TreeIterator i = children.begin(); i != children.end(); i++) {
+        TreeNode* n = *i;
+        //fprintf(stderr, "~TreeNode: Deleting child %d\n", n->node_type);
+        delete n;
+        //fprintf(stderr, "~TreeNode: Deleted child\n");
+    }
+    children.clear();
+    //fprintf(stderr, "~TreeNode: Released children\n");
+}
+
+PropertyNode::~PropertyNode()
+{
+//fprintf(stderr, "~PropertyNode: Releasing property\n");
+    indigo_release_property(property);
+//fprintf(stderr, "~PropertyNode: Released property\n");
+}
+
+ItemNode::~ItemNode()
+{
+    //fprintf(stderr, "~ItemNode: Releasing item\n");
 }
 
 
 ItemNode::ItemNode(indigo_item* i, PropertyNode* parent)
     : TreeNode(TREE_NODE_ITEM, parent), item(i)
 {
-    input_label = nullptr;
     input_control = nullptr;
+}
+
+void
+ItemNode::checkbox_clicked(bool checked)
+{
+    fprintf(stderr, "CHECK BOX TOGGLE  %d [%s]\n", checked, item->label);
+
+    //  Update the switch item
+    PropertyNode* p = reinterpret_cast<PropertyNode*>(TreeNode::parent);
+    indigo_set_switch(p->property, item, checked);
+
+    fprintf(stderr, "  update GUI controls\n");
+    //  Make the GUI controls consistent with the switches
+    for (TreeIterator i = p->children.begin(); i != p->children.end(); i++) {
+        ItemNode* x = reinterpret_cast<ItemNode*>(*i);
+        if (x->input_control) {
+            QCheckBox* cb = reinterpret_cast<QCheckBox*>(x->input_control);
+            cb->setCheckState(x->item->sw.value ? Qt::Checked : Qt::Unchecked);
+        }
+    }
+    fprintf(stderr, "  update indigo bus property\n");
+
+    //  Update the property on the bus
+    indigo_change_property(nullptr, p->property);
+    fprintf(stderr, "  done\n");
 }
 
 
@@ -42,10 +82,25 @@ PropertyModel::define_property(indigo_property* property)
         device_row++;
     }
     if (device == nullptr) {
-        beginInsertRows(QModelIndex(), device_row, device_row);
+        //  Insert the device in alphabetical order
         device = new DeviceNode(property->device, &root);
-        root.children.push_back(device);
-        endInsertRows();
+        device_row = 0;
+        bool inserted = false;
+        for (TreeIterator i = root.children.begin(); i != root.children.end(); i++) {
+            if ((*i)->label() > property->device) {
+                beginInsertRows(QModelIndex(), device_row, device_row);
+                root.children.insert(i, device);
+                endInsertRows();
+                inserted = true;
+                break;
+            }
+            device_row++;
+        }
+        if (!inserted) {
+            beginInsertRows(QModelIndex(), device_row, device_row);
+            root.children.push_back(device);
+            endInsertRows();
+        }
     }
 
     //  Find or create TreeNode within device for property->group
@@ -59,13 +114,28 @@ PropertyModel::define_property(indigo_property* property)
         group_row++;
     }
     if (group == nullptr) {
-        beginInsertRows(createIndex(device_row, 0, device), group_row, group_row);
+        //  Insert the group in alphabetical order
         group = new GroupNode(property->group, device);
-        device->children.push_back(group);
-        endInsertRows();
+        group_row = 0;
+        bool inserted = false;
+        for (TreeIterator i = device->children.begin(); i != device->children.end(); i++) {
+            if ((*i)->label() > property->group) {
+                beginInsertRows(createIndex(device_row, 0, device), group_row, group_row);
+                device->children.insert(i, group);
+                endInsertRows();
+                inserted = true;
+                break;
+            }
+            group_row++;
+        }
+        if (!inserted) {
+            beginInsertRows(createIndex(device_row, 0, device), group_row, group_row);
+            device->children.push_back(group);
+            endInsertRows();
+        }
     }
 
-    //  Find or create TreeNode within group fro property->name
+    //  Find or create TreeNode within group for property->name
     int property_row = 0;
     PropertyNode* p = nullptr;
     for (TreeIterator i = group->children.begin(); i != group->children.end(); i++) {
@@ -76,10 +146,25 @@ PropertyModel::define_property(indigo_property* property)
         property_row++;
     }
     if (p == nullptr) {
-        beginInsertRows(createIndex(group_row, 0, group), property_row, property_row);
+        //  Insert the property in alphabetical order
         p = new PropertyNode(property, group);
-        group->children.push_back(p);
-        endInsertRows();
+        property_row = 0;
+        bool inserted = false;
+        for (TreeIterator i = group->children.begin(); i != group->children.end(); i++) {
+            if ((*i)->label() > property->label) {
+                beginInsertRows(createIndex(group_row, 0, group), property_row, property_row);
+                group->children.insert(i, p);
+                endInsertRows();
+                inserted = true;
+                break;
+            }
+            group_row++;
+        }
+        if (!inserted) {
+            beginInsertRows(createIndex(group_row, 0, group), property_row, property_row);
+            group->children.push_back(p);
+            endInsertRows();
+        }
 
         //  Create the ItemNodes
         for (int i = 0; i < property->count; i++) {
@@ -87,9 +172,6 @@ PropertyModel::define_property(indigo_property* property)
             p->children.push_back(item);
         }
     }
-
-    //  Sort
-    sort(0);
 }
 
 void
@@ -141,24 +223,31 @@ PropertyModel::update_property(indigo_property* property)
 fprintf(stderr, "UPDATING [%s]\n", p->label().c_str());
     char buffer[50];
     QLineEdit* e;
+    QCheckBox* cb;
     for (TreeIterator i = p->children.begin(); i != p->children.end(); i++) {
         ItemNode* item = reinterpret_cast<ItemNode*>(*i);
         if (item->input_control != nullptr) {
             switch (p->property->type) {
+            case INDIGO_TEXT_VECTOR:
+                e = reinterpret_cast<QLineEdit*>(item->input_control);
+                e->setText(item->item->text.value);
+                break;
             case INDIGO_NUMBER_VECTOR:
                 sprintf(buffer, item->item->number.format, item->item->number.value);
                 e = reinterpret_cast<QLineEdit*>(item->input_control);
                 e->setText(buffer);
                 break;
+            case INDIGO_SWITCH_VECTOR:
+                cb = reinterpret_cast<QCheckBox*>(item->input_control);
+                cb->setCheckState(item->item->sw.value ? Qt::Checked : Qt::Unchecked);
+                break;
             default:
                 break;
             }
-            //  Update the control with the new data
-            //  Call a method on the control to set the new data
         }
     }
 
-
+    //  Emit a data changed signal so the tree can update (mainly for status LEDs)
     QModelIndex index = createIndex(row, 0, p);
     emit(dataChanged(index, index));
 }
@@ -225,27 +314,27 @@ PropertyModel::delete_property(indigo_property* property)
     int property_row = 0;
     PropertyNode* p = nullptr;
     for (TreeIterator i = group->children.begin(); i != group->children.end(); i++) {
-        if ((*i)->label() == property->name) {
+        if (strcmp(reinterpret_cast<PropertyNode*>(*i)->property->name, property->name) == 0) {
             p = reinterpret_cast<PropertyNode*>(*i);
 
             //  Remove the property
             beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
-            //beginResetModel();
             group->children.erase(i);
-            endRemoveRows();
-            //endResetModel();
-            indigo_release_property(p->property);
+            fprintf(stderr, "Erasing property [%s]\n", property->name);
             delete p;
+            endRemoveRows();
 
             fprintf(stderr, "Erased property [%s]\n", property->name);
 
             //  Remove the group if empty
-            if (group->children.empty()) {
+            if (false || group->children.empty()) {
+            fprintf(stderr, "--- REMOVING EMOTY GROUP [%s]\n", property->group);
                 beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
                 device->children.erase(gi);
-                endRemoveRows();
                 delete group;
+                endRemoveRows();
                 group = nullptr;
+                fprintf(stderr, "--- REMOVED EMOTY GROUP [%s]\n", property->group);
             }
 
             break;

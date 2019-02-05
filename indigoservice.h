@@ -2,14 +2,14 @@
 #define INDIGOSERVICE_H
 
 #include <QObject>
-#include <qmdnsengine/service.h>
+#include <qzeroconf.h>
 #include <indigo_client.h>
 
 
 class IndigoService
 {
 public:
-    IndigoService(const QMdnsEngine::Service& _service);
+    IndigoService(const QZeroConfService& _service);
     IndigoService(const IndigoService &other);
     virtual ~IndigoService();
 
@@ -21,7 +21,7 @@ public:
     QByteArray name() const;
 
 public:
-    QMdnsEngine::Service service;
+    QZeroConfService service;
     indigo_server_entry* server_entry;
 };
 

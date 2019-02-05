@@ -15,7 +15,7 @@ enum TreeNodeType {
 };
 
 struct TreeNode {
-    TreeNode(/*const char* node_name, */enum TreeNodeType type, TreeNode* _parent) : /*name(node_name), state(INDIGO_IDLE_STATE),*/ parent(_parent), children(), node_type(type) {}
+    TreeNode(enum TreeNodeType type, TreeNode* _parent) : parent(_parent), children(), node_type(type) {}
     virtual ~TreeNode();
 
     virtual std::string& label() { static std::string name; return name; }
@@ -23,11 +23,6 @@ struct TreeNode {
     TreeNode* parent;
     std::vector<TreeNode*> children;
     enum TreeNodeType node_type;
-
-//    std::string name;
-//    indigo_property_state state;
-
-//    indigo_property* property;      //  Only for node_type == TREE_NODE_PROPERTY
 };
 
 typedef std::vector<TreeNode*>::iterator TreeIterator;
@@ -52,6 +47,8 @@ struct GroupNode : public TreeNode {
 
 struct PropertyNode : public TreeNode {
     PropertyNode(indigo_property* p, GroupNode* parent) : TreeNode(TREE_NODE_PROPERTY, parent), name(p->label), property(p) {}
+    virtual ~PropertyNode();
+
 
     virtual std::string& label() { return name; }
 
@@ -59,12 +56,16 @@ struct PropertyNode : public TreeNode {
     indigo_property* property;      //  Only for node_type == TREE_NODE_PROPERTY
 };
 
-struct ItemNode : public TreeNode {
+struct ItemNode : public TreeNode, public QObject {
+public:
     ItemNode(indigo_item* i, PropertyNode* parent);
+    virtual ~ItemNode();
 
-    QLabel* input_label;
     QWidget* input_control;
     indigo_item* item;
+
+public slots:
+    void checkbox_clicked(bool checked);
 };
 
 

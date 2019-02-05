@@ -1,6 +1,6 @@
 #include "indigoservice.h"
 
-IndigoService::IndigoService(const QMdnsEngine::Service& _service)
+IndigoService::IndigoService(const QZeroConfService& _service)
     : service(_service), server_entry(nullptr)
 {
 
@@ -37,5 +37,5 @@ IndigoService::operator!=(const IndigoService &other) const
 QByteArray
 IndigoService::name() const
 {
-    return service.name();
+    return service.name().toUtf8();
 }

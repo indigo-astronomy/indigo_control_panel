@@ -2,7 +2,6 @@
 #define BROWSERWINDOW_H
 
 #include <QMainWindow>
-#include <qmdnsengine/server.h>
 #include <indigo_bus.h>
 
 
@@ -14,8 +13,8 @@ class QItemSelection;
 class QVBoxLayout;
 class QGridLayout;
 class QSplitter;
-class PropertyNode;
-class TreeNode;
+struct PropertyNode;
+struct TreeNode;
 
 
 class BrowserWindow : public QMainWindow
