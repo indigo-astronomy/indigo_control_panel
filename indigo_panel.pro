@@ -18,7 +18,12 @@ SOURCES += \
     browserwindow.cpp \
     indigoservice.cpp \
     propertymodel.cpp \
-    indigoclient.cpp
+    indigoclient.cpp \
+    qindigoproperty.cpp \
+    qindigoswitch.cpp \
+    qindigotext.cpp \
+    qindigonumber.cpp \
+    qindigolight.cpp
 
 RESOURCES += qdarkstyle/style.qrc led-red.png led-grey.png led-green.png led-orange.png
 
@@ -38,7 +43,12 @@ HEADERS += \
     browserwindow.h \
     indigoservice.h \
     propertymodel.h \
-    indigoclient.h
+    indigoclient.h \
+    qindigoproperty.h \
+    qindigoswitch.h \
+    qindigotext.h \
+    qindigonumber.h \
+    qindigolight.h
 
 include(qtzeroconf/qtzeroconf.pri)
 

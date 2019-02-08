@@ -27,6 +27,7 @@ public:
     QGridLayout* build_text_property_form(PropertyNode* p);
     QGridLayout* build_number_property_form(PropertyNode* p);
     QGridLayout* build_switch_property_form(PropertyNode* p);
+    QGridLayout* build_light_property_form(PropertyNode* p);
 
 public slots:
     void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);
@@ -42,7 +43,7 @@ private:
 
     ServiceModel* mServiceModel;
     PropertyModel* mPropertyModel;
-    TreeNode* current_node;
+    PropertyNode* current_node;
 };
 
 #endif // BROWSERWINDOW_H
