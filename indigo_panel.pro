@@ -52,12 +52,12 @@ HEADERS += \
 
 include(qtzeroconf/qtzeroconf.pri)
 
-unix:!mac {
-    CONFIG += link_pkgconfig
-    PKGCONFIG += indigo
-}
+#unix:!mac {
+#    CONFIG += link_pkgconfig
+#    PKGCONFIG += indigo
+#}
 
-unix:mac {
+unix {
     INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
     LIBS += -L"$${PWD}/indigo/build/lib" -lindigo
 }

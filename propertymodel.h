@@ -4,7 +4,7 @@
 #include <QAbstractItemModel>
 #include <QLabel>
 #include <indigo_bus.h>
-
+#include <assert.h>
 
 enum TreeNodeType {
     TREE_NODE_ROOT,
