@@ -13,7 +13,8 @@ public:
     QIndigoItem(QIndigoProperty* p, indigo_property* property, indigo_item* item) : m_parent(p), m_property(property), m_item(item) {}
     virtual ~QIndigoItem();
     virtual void update() = 0;
-
+    virtual void reset() {}
+    virtual void apply() {}
 
 //protected:
     QIndigoProperty* m_parent;

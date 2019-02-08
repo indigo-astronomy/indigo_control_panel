@@ -15,14 +15,18 @@ public:
     virtual ~QIndigoText();
 
     virtual void update();
+    virtual void reset();
+    virtual void apply();
 
 signals:
 
 public slots:
+    void dirty();
 
 private:
     QLabel* label;
     QLineEdit* text;
+    bool m_dirty;
 };
 
 #endif // QINDIGOTEXT_H

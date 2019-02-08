@@ -18,14 +18,19 @@ public:
     virtual ~QIndigoNumber();
 
     virtual void update();
+    virtual void reset();
+    virtual void apply();
 
 signals:
 
 public slots:
+    void dirty();
 
 private:
     QLabel* label;
-    QLineEdit* text;
+    QLineEdit* text_value;
+    QLineEdit* text_target;
+    bool m_dirty;
 };
 
 #endif // QINDIGONUMBER_H

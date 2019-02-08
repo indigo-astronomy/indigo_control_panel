@@ -24,12 +24,15 @@ private:
     void build_number_property_form(QVBoxLayout* layout);
     void build_switch_property_form(QVBoxLayout* layout);
     void build_light_property_form(QVBoxLayout* layout);
+    void build_buttons(QVBoxLayout* layout);
 
 signals:
 
 public slots:
     void update();
     void property_update(indigo_property* property);
+    void set_clicked();
+    void reset_clicked();
 
 private:
     indigo_property* m_property;

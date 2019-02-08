@@ -60,6 +60,22 @@ QIndigoProperty::property_update(indigo_property* property) {
     update_controls();
 }
 
+void
+QIndigoProperty::set_clicked() {
+    //  Apply all dirty controls
+    for (int i = 0; i < m_property->count; i++)
+        m_controls[i]->apply();
+
+    //  Update property on indigo bus
+    indigo_change_property(nullptr, m_property);
+}
+
+void
+QIndigoProperty::reset_clicked() {
+    //  Revert all dirty controls to clean
+    for (int i = 0; i < m_property->count; i++)
+        m_controls[i]->reset();
+}
 
 void
 QIndigoProperty::build_property_form(QVBoxLayout* layout) {
@@ -110,16 +126,13 @@ QIndigoProperty::build_property_form(QVBoxLayout* layout) {
         fprintf(stderr, "BUILD BLOB FORM\n");
         break;
     }
+
+    //  Build buttons (if appropriate)
+    build_buttons(layout);
 }
 
 void
 QIndigoProperty::build_text_property_form(QVBoxLayout* layout) {
-    //  Create grid for the items
-    QGridLayout* form_grid = new QGridLayout;
-    form_grid->setColumnStretch(0, 35);
-    form_grid->setColumnStretch(1, 65);
-    layout->addLayout(form_grid);
-
     //  Build each item
     for (int row = 0; row < m_property->count; row++) {
         indigo_item& i = m_property->items[row];
@@ -130,14 +143,6 @@ QIndigoProperty::build_text_property_form(QVBoxLayout* layout) {
         layout->addWidget(data);
     }
 
-    if (m_property->perm != INDIGO_RO_PERM) {
-        //  Add buttons
-        QPushButton* set = new QPushButton("Set");
-        QPushButton* reset = new QPushButton("Reset");
-        layout->addWidget(reset);
-        layout->addWidget(set);
-    }
-
     //  We want to button press signal to cause the form fields to update to the property and send on bus
     //  To do this, we have to know which property is selected, and then we find the PropertyNode for it.
     //  We then run through the ItemNodes and copy any modified fields to the Items.
@@ -146,14 +151,7 @@ QIndigoProperty::build_text_property_form(QVBoxLayout* layout) {
 
 void
 QIndigoProperty::build_number_property_form(QVBoxLayout* layout) {
-    //  Create grid for the items
-//    QGridLayout* form_grid = new QGridLayout;
-//    form_grid->setColumnStretch(0, 35);
-//    form_grid->setColumnStretch(1, 65);
-//    layout->addLayout(form_grid);
-
     //  Build each item
-    char buffer[50];
     for (int row = 0; row < m_property->count; row++) {
         indigo_item& i = m_property->items[row];
 
@@ -162,22 +160,10 @@ QIndigoProperty::build_number_property_form(QVBoxLayout* layout) {
 
         layout->addWidget(data);
     }
-
-    if (m_property->perm != INDIGO_RO_PERM) {
-        //  Add buttons
-        QPushButton* button = new QPushButton("Set");
-        layout->addWidget(button);
-    }
 }
 
 void
 QIndigoProperty::build_switch_property_form(QVBoxLayout* layout) {
-    //  Create grid for the items
-//    QGridLayout* form_grid = new QGridLayout;
-//    form_grid->setColumnStretch(0, 35);
-//    form_grid->setColumnStretch(1, 65);
-//    layout->addLayout(form_grid);
-
     //  Build each item
     for (int row = 0; row < m_property->count; row++) {
         indigo_item& i = m_property->items[row];
@@ -193,12 +179,6 @@ QIndigoProperty::build_switch_property_form(QVBoxLayout* layout) {
 
 void
 QIndigoProperty::build_light_property_form(QVBoxLayout* layout) {
-    //  Create grid for the items
-//    QGridLayout* form_grid = new QGridLayout;
-//    form_grid->setColumnStretch(0, 5);
-//    form_grid->setColumnStretch(1, 95);
-//    layout->addLayout(form_grid);
-
     //  Build each item
     for (int row = 0; row < m_property->count; row++) {
         indigo_item& i = m_property->items[row];
@@ -208,4 +188,35 @@ QIndigoProperty::build_light_property_form(QVBoxLayout* layout) {
 
         layout->addWidget(light);
     }
+}
+
+void
+QIndigoProperty::build_buttons(QVBoxLayout* layout) {
+    //  Buttons only for TEXT and NUMBER
+    if (m_property->type != INDIGO_TEXT_VECTOR && m_property->type != INDIGO_NUMBER_VECTOR)
+        return;
+
+    //  No buttons if RO
+    if (m_property->perm == INDIGO_RO_PERM)
+        return;
+
+    //  Create a button box
+    QHBoxLayout* hbox = new QHBoxLayout();
+    layout->addLayout(hbox);
+    hbox->setAlignment(Qt::AlignRight);
+    hbox->setSpacing(10);
+    hbox->setMargin(0);
+
+    //  Add buttons
+    QPushButton* set = new QPushButton("Set");
+    QPushButton* reset = new QPushButton("Reset");
+    set->setDefault(true);
+    set->setMinimumWidth(75);
+    reset->setMinimumWidth(75);
+    hbox->addWidget(reset);
+    hbox->addWidget(set);
+
+    //  Connect signals
+    connect(set, &QPushButton::clicked, this, &QIndigoProperty::set_clicked);
+    connect(reset, &QPushButton::clicked, this, &QIndigoProperty::reset_clicked);
 }
