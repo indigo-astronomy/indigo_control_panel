@@ -80,18 +80,40 @@ QIndigoProperty::reset_clicked() {
 void
 QIndigoProperty::build_property_form(QVBoxLayout* layout) {
     //  Build the header
-    QHBoxLayout* hbox = new QHBoxLayout();
-    layout->addLayout(hbox);
-    hbox->setAlignment(Qt::AlignLeft);
-    hbox->setMargin(10);
-    hbox->setSpacing(5);
 
-    char title[1025];
-    sprintf(title, "%s -> %s", m_property->device, m_property->label);
+	QFrame *frame = new QFrame();
+	frame->setFrameShadow(QFrame::Raised);
+	frame->setFrameShape(QFrame::StyledPanel);
+
+	QVBoxLayout* vbox = new QVBoxLayout();
+	vbox->addWidget(frame);
+	layout->addLayout(vbox);
+
+    QVBoxLayout* frame_layout = new QVBoxLayout();
+	frame->setLayout(frame_layout);
+
+	QWidget *head = new QWidget();
+	frame_layout->addWidget(head);
+	QHBoxLayout* head_layout = new QHBoxLayout();
+	head->setLayout(head_layout);
+
+    head_layout->setAlignment(Qt::AlignLeft);
+    head_layout->setMargin(3);
+    head_layout->setSpacing(5);
+
+	char label[1025];
+    sprintf(label, "%s -> %s", m_property->device, m_property->label);
     QLabel* led = new QLabel();
-    QLabel* header = new QLabel(title);
-    hbox->addWidget(led);
-    hbox->addWidget(header);
+    QLabel* title = new QLabel(label);
+	title->setStyleSheet("font-weight: bold;");
+
+    head_layout->addWidget(led);
+    head_layout->addWidget(title);
+
+	QWidget *property_setings = new QWidget();
+	head_layout->addWidget(property_setings);
+	QVBoxLayout* property_layout = new QVBoxLayout();
+	property_setings->setLayout(property_layout);
 
     switch (m_property->state) {
     case INDIGO_IDLE_STATE:
@@ -111,16 +133,16 @@ QIndigoProperty::build_property_form(QVBoxLayout* layout) {
     //  Build the item fields
     switch (m_property->type) {
     case INDIGO_TEXT_VECTOR:
-        build_text_property_form(layout);
+        build_text_property_form(frame_layout);
         break;
     case INDIGO_NUMBER_VECTOR:
-        build_number_property_form(layout);
+        build_number_property_form(frame_layout);
         break;
     case INDIGO_SWITCH_VECTOR:
-        build_switch_property_form(layout);
+        build_switch_property_form(frame_layout);
         break;
     case INDIGO_LIGHT_VECTOR:
-        build_light_property_form(layout);
+        build_light_property_form(frame_layout);
         break;
     case INDIGO_BLOB_VECTOR:
         fprintf(stderr, "BUILD BLOB FORM\n");
@@ -128,7 +150,7 @@ QIndigoProperty::build_property_form(QVBoxLayout* layout) {
     }
 
     //  Build buttons (if appropriate)
-    build_buttons(layout);
+    build_buttons(frame_layout);
 }
 
 void

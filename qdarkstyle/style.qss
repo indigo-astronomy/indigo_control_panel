@@ -1890,5 +1890,3 @@ QAbstractView:selected {
     background: #1464A0;
     color: #32414B;
 }
-
-

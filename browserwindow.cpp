@@ -64,18 +64,24 @@ BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemS
 
     //  Deal with the outgoing selection
     if (current_node != nullptr) {
+		fprintf(stderr, "SELECTION CHANGED no current node\n");
     }
 
     if (selected.indexes().empty()) {
-        if (form_panel != nullptr)
+		fprintf(stderr, "SELECTION CHANGED selected.indexes().empty()\n");
+        if (form_panel != nullptr) {
+			fprintf(stderr, "SELECTION CHANGED delete form_panel \n");
             delete form_panel;
+		}
         current_node = nullptr;
         return;
     }
 
     QModelIndex s = selected.indexes().front();
     TreeNode* n = static_cast<TreeNode*>(s.internalPointer());
+	if (n != nullptr) fprintf(stderr, "SELECTION CHANGED n->node_type == %d\n", n->node_type);
     if (n != nullptr && n->node_type == TREE_NODE_PROPERTY) {
+		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_PROPERTY\n");
         PropertyNode* p = reinterpret_cast<PropertyNode*>(n);
         if (form_panel != nullptr)
             delete form_panel;
