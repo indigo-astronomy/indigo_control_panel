@@ -19,7 +19,7 @@ class QIndigoProperty;
 
 template <class T>
 class OrderedList {
-public:TreeNode
+public:
     OrderedList()
         : count(0), max(1)
     {
@@ -41,6 +41,8 @@ public:TreeNode
 
     void remove_index(int index) {
         //  Shift higher items down one
+        for (int i = index; i < count-1; i++)
+            nodes[i] = nodes[i+1];
 
         //  Reduce count
         count--;
@@ -134,7 +136,7 @@ struct TreeNodeWithParent : public TreeNode {
     ParentT* m_parent;
 };
 
-template <class ParentT, class ChildT>TREE_NODE_PROPERTY
+template <class ParentT, class ChildT>
 struct TreeNodeWithChildren : public TreeNodeWithParent<ParentT> {
     TreeNodeWithChildren(enum TreeNodeType type, ParentT* _parent) : TreeNodeWithParent<ParentT>(type, _parent), children() {}
     virtual ~TreeNodeWithChildren() {}
