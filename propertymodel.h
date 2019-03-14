@@ -28,11 +28,13 @@ public:
 
     ~OrderedList() {
         //  Delete the contents of the array
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++) {
             delete nodes[i];
-
+            nodes[i] = nullptr;
+        }
         //  Free up the array
         free(nodes);
+        nodes = nullptr;
     }
 
     int size() const { return count; }

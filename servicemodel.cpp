@@ -87,6 +87,7 @@ ServiceModel::onServiceRemoved(QZeroConfService service)
 
         indigo_disconnect_server(indigo_service->server_entry);
         delete indigo_service;
+        indigo_service = nullptr;
     }
 }
 
