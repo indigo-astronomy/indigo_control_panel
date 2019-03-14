@@ -257,6 +257,9 @@ PropertyModel::parent(const QModelIndex &child) const
     if (node->node_type == TREE_NODE_DEVICE)
         return QModelIndex();
 
+	if (!node->parent())
+		return QModelIndex();
+
     int row = node->parent()->index_of(node);
 //    fprintf(stderr, "  Yields row %d of parent of node type %d\n", row, node->parent()->node_type);
     return createIndex(row,0, node->parent());
