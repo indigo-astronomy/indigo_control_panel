@@ -131,6 +131,7 @@ PropertyModel::delete_property(indigo_property* property)
     if (device == nullptr) {
         fprintf(stderr, "Deleting property on device [%s] - NOT FOUND\n", property->device);
         delete property;
+		property = nullptr;
         return;
     }
 
@@ -140,7 +141,9 @@ PropertyModel::delete_property(indigo_property* property)
         root.children.remove_index(device_row);
         endRemoveRows();
         delete device;
+		device = nullptr;
         delete property;
+		property = nullptr;
         return;
     }
 
@@ -151,6 +154,7 @@ PropertyModel::delete_property(indigo_property* property)
     if (group == nullptr) {
         fprintf(stderr, "Deleting property in group [%s] - NOT FOUND\n", property->group);
         delete property;
+		property = nullptr;
         return;
     }
 
@@ -160,7 +164,9 @@ PropertyModel::delete_property(indigo_property* property)
         device->children.remove_index(group_row);
         endRemoveRows();
         delete group;
+		group = nullptr;
         delete property;
+		property = nullptr;
         return;
     }
 
@@ -171,6 +177,7 @@ PropertyModel::delete_property(indigo_property* property)
     if (p == nullptr) {
         fprintf(stderr, "Deleting property [%s] - NOT FOUND\n", property->name);
         delete property;
+		property = nullptr;
         return;
     }
 
@@ -180,6 +187,7 @@ PropertyModel::delete_property(indigo_property* property)
     endRemoveRows();
     fprintf(stderr, "Erasing property [%s]\n", property->name);
     delete p;
+	p = nullptr;
     fprintf(stderr, "Erased property [%s]\n", property->name);
 
     //  Remove the group if empty
@@ -189,6 +197,7 @@ PropertyModel::delete_property(indigo_property* property)
         device->children.remove_index(group_row);
         endRemoveRows();
         delete group;
+		group = nullptr;
         fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", property->group);
     }
 
@@ -199,11 +208,13 @@ PropertyModel::delete_property(indigo_property* property)
         root.children.remove_index(device_row);
         endRemoveRows();
         delete device;
+		device = nullptr;
         fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", property->device);
     }
 
     //  Cleanup
     delete property;
+	property = nullptr;
 }
 
 
@@ -228,16 +239,23 @@ PropertyModel::index(int row, int column, const QModelIndex &parent) const
     }
 }
 
+
+/* THIS fails:
+Process terminating with default action of signal 11 (SIGSEGV)
+==29106==  Access not within mapped region at address 0x0
+*/
 QModelIndex
 PropertyModel::parent(const QModelIndex &child) const
 {
     if(!child.isValid())
         return QModelIndex();
     TreeNode* node = reinterpret_cast<TreeNode*>(child.internalPointer());
-//    fprintf(stderr, "Parent of node type %d\n", node->node_type);
+	if (node == nullptr) {
+		fprintf(stderr, "node = %p\n", node);
+		return QModelIndex();
+	}
     if (node->node_type == TREE_NODE_DEVICE)
         return QModelIndex();
-
 
     int row = node->parent()->index_of(node);
 //    fprintf(stderr, "  Yields row %d of parent of node type %d\n", row, node->parent()->node_type);

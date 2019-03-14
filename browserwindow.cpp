@@ -69,10 +69,8 @@ BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemS
 
     if (selected.indexes().empty()) {
 		fprintf(stderr, "SELECTION CHANGED selected.indexes().empty()\n");
-        if (form_panel != nullptr) {
-			fprintf(stderr, "SELECTION CHANGED delete form_panel \n");
-            delete form_panel;
-		}
+		delete form_panel;
+		form_panel = nullptr;
         current_node = nullptr;
         return;
     }
@@ -83,9 +81,8 @@ BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemS
     if (n != nullptr && n->node_type == TREE_NODE_PROPERTY) {
 		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_PROPERTY\n");
         PropertyNode* p = reinterpret_cast<PropertyNode*>(n);
-        if (form_panel != nullptr)
-            delete form_panel;
-
+		delete form_panel;
+		form_panel = nullptr;
         QIndigoProperty* ip = new QIndigoProperty(p->property);
         current_node = p;
         form_panel = ip;
