@@ -107,7 +107,7 @@ public:
             func(nodes[i]);
     }
 
-private:
+//private:
     T** nodes;
     int count;
     int max;

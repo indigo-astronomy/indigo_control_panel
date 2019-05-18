@@ -23,7 +23,8 @@ SOURCES += \
     qindigoswitch.cpp \
     qindigotext.cpp \
     qindigonumber.cpp \
-    qindigolight.cpp
+    qindigolight.cpp \
+    qindigopropertypanel.cpp
 
 RESOURCES += qdarkstyle/style.qrc led-red.png led-grey.png led-green.png led-orange.png
 
@@ -48,7 +49,8 @@ HEADERS += \
     qindigoswitch.h \
     qindigotext.h \
     qindigonumber.h \
-    qindigolight.h
+    qindigolight.h \
+    qindigopropertypanel.h
 
 include(qtzeroconf/qtzeroconf.pri)
 

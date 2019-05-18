@@ -5,14 +5,14 @@
 #include <indigo_bus.h>
 
 
+class QStringListModel;
 class QListView;
 class QTreeView;
 class ServiceModel;
 class PropertyModel;
 class QItemSelection;
 class QVBoxLayout;
-class QGridLayout;
-class QSplitter;
+class QScrollArea;
 struct PropertyNode;
 struct TreeNode;
 
@@ -23,23 +23,16 @@ class BrowserWindow : public QMainWindow
 public:
     explicit BrowserWindow(QWidget *parent = nullptr);
 
-    QGridLayout* build_property_form(PropertyNode* p);
-    QGridLayout* build_text_property_form(PropertyNode* p);
-    QGridLayout* build_number_property_form(PropertyNode* p);
-    QGridLayout* build_switch_property_form(PropertyNode* p);
-    QGridLayout* build_light_property_form(PropertyNode* p);
-
 public slots:
     void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
+    QStringListModel* mLogList;
     QListView* mLog;
-    QListView* mServices;
     QTreeView* mProperties;
-    QVBoxLayout* formLayout;
-    QGridLayout* form_grid;
+    QScrollArea* mScrollArea;
     QWidget* form_panel;
-    QSplitter* hSplitter;
+    QVBoxLayout* form_layout;
 
     ServiceModel* mServiceModel;
     PropertyModel* mPropertyModel;

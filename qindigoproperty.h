@@ -9,7 +9,7 @@ class QVBoxLayout;
 class QIndigoItem;
 
 
-class QIndigoProperty : public QFrame
+class QIndigoProperty : public QWidget
 {
     Q_OBJECT
 public:

@@ -4,6 +4,7 @@
 #include <QCheckBox>
 #include "propertymodel.h"
 #include "qindigoproperty.h"
+#include <indigo_names.h>
 
 
 TreeNode::~TreeNode()
@@ -85,6 +86,14 @@ PropertyModel::define_property(indigo_property* property)
             ItemNode* item = new ItemNode(&property->items[i], p);
             p->children.insert_at(i, item);
         }
+
+        //  If this is a CONNECTION property - copy status to device node
+        if (strcmp(property->name, CONNECTION_PROPERTY_NAME) == 0) {
+            if (property->items[0].sw.value)
+                device->state = INDIGO_OK_STATE;
+            else
+                device->state = INDIGO_IDLE_STATE;
+        }
     }
     //fprintf(stderr, "Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 }
@@ -93,7 +102,8 @@ void
 PropertyModel::update_property(indigo_property* property)
 {
     //  Find TreeNode for property->device
-    DeviceNode* device = root.children.find_by_name(property->device);
+    int device_row = 0;
+    DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
     if (device == nullptr)
         return;
 
@@ -118,6 +128,17 @@ PropertyModel::update_property(indigo_property* property)
     //  Emit a data changed signal so the tree can update (mainly for status LEDs)
     QModelIndex index = createIndex(row, 0, p);
     emit(dataChanged(index, index));
+
+    //  If its a CONNECTION property - update device node also
+    if (strcmp(property->name, CONNECTION_PROPERTY_NAME) == 0) {
+        if (property->items[0].sw.value)
+            device->state = INDIGO_OK_STATE;
+        else
+            device->state = INDIGO_IDLE_STATE;
+
+        QModelIndex index = createIndex(device_row, 0, device);
+        emit(dataChanged(index, index));
+    }
 }
 
 void

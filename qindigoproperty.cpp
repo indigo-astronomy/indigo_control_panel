@@ -12,14 +12,14 @@
 
 
 QIndigoProperty::QIndigoProperty(indigo_property* property, QWidget *parent)
-    : QFrame(parent), m_property(property)
+    : QWidget(parent), m_property(property)
 {
     //  Set widget layout
     QVBoxLayout* formLayout = new QVBoxLayout;
     formLayout->setAlignment(Qt::AlignTop);
     setLayout(formLayout);
-    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-//    formLayout->setMargin(0);
+    //setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+    formLayout->setContentsMargins(0, 0, 0, 0);
 //    formLayout->setSpacing(0);
 
     //  Allocate storage for the controls
@@ -30,7 +30,7 @@ QIndigoProperty::QIndigoProperty(indigo_property* property, QWidget *parent)
 }
 
 QIndigoProperty::~QIndigoProperty() {
-    //free(controls);
+    free(m_controls);
 }
 
 void

@@ -7,7 +7,7 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 {
     label = new QLabel(m_item->label);
     text_value = new QLineEdit();
-    text_value->setDisabled(true);
+    text_value->setReadOnly(true);
     text_target = nullptr;
     if (m_property->perm != INDIGO_RO_PERM)
         text_target = new QLineEdit();
