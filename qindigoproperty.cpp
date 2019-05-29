@@ -41,9 +41,29 @@ QIndigoProperty::update_controls() {
 }
 
 void
+QIndigoProperty::update_led() {
+	switch (m_property->state) {
+	case INDIGO_IDLE_STATE:
+		m_led->setPixmap(QPixmap(":led-grey.png"));
+		break;
+	case INDIGO_BUSY_STATE:
+		m_led->setPixmap(QPixmap(":led-orange.png"));
+		break;
+	case INDIGO_ALERT_STATE:
+		m_led->setPixmap(QPixmap(":led-red.png"));
+		break;
+	case INDIGO_OK_STATE:
+		m_led->setPixmap(QPixmap(":led-green.png"));
+		break;
+	}
+	m_led->update();
+}
+
+void
 QIndigoProperty::update() {
     //  Update all the controls to the current state
     update_controls();
+	update_led();
 
     //  Update the property on the bus
     indigo_change_property(nullptr, m_property);
@@ -58,6 +78,7 @@ QIndigoProperty::property_update(indigo_property* property) {
     //  It's for us, so update!!
     //fprintf(stderr, "UPDATE TO [%s]    WE WANT [%s]\n", property->name, m_property->name);
     update_controls();
+	update_led();
 }
 
 void
@@ -103,11 +124,11 @@ QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 
 	char label[1025];
     sprintf(label, "%s -> %s", m_property->device, m_property->label);
-    QLabel* led = new QLabel();
+    m_led = new QLabel();
     QLabel* title = new QLabel(label);
 	title->setStyleSheet("font-weight: bold;");
 
-    head_layout->addWidget(led);
+    head_layout->addWidget(m_led);
     head_layout->addWidget(title);
 
 	QWidget *property_setings = new QWidget();
@@ -117,16 +138,16 @@ QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 
     switch (m_property->state) {
     case INDIGO_IDLE_STATE:
-        led->setPixmap(QPixmap(":led-grey.png"));
+        m_led->setPixmap(QPixmap(":led-grey.png"));
         break;
     case INDIGO_BUSY_STATE:
-        led->setPixmap(QPixmap(":led-orange.png"));
+        m_led->setPixmap(QPixmap(":led-orange.png"));
         break;
     case INDIGO_ALERT_STATE:
-        led->setPixmap(QPixmap(":led-red.png"));
+        m_led->setPixmap(QPixmap(":led-red.png"));
         break;
     case INDIGO_OK_STATE:
-        led->setPixmap(QPixmap(":led-green.png"));
+        m_led->setPixmap(QPixmap(":led-green.png"));
         break;
     }
 

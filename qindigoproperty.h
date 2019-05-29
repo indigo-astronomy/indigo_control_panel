@@ -2,6 +2,7 @@
 #define QINDIGOPROPERTY_H
 
 #include <QFrame>
+#include <QLabel>
 #include <indigo_bus.h>
 
 
@@ -17,6 +18,7 @@ public:
     virtual ~QIndigoProperty();
 
     void update_controls();
+	void update_led();
 
 private:
     void build_property_form(QVBoxLayout* layout);
@@ -36,6 +38,7 @@ public slots:
 
 private:
     indigo_property* m_property;
+	QLabel* m_led;
     QIndigoItem** m_controls;
 };
 

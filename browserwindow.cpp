@@ -193,6 +193,8 @@ BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemS
             //ip->setStyleSheet("background-color: blue");
             fprintf(stderr, "POPER\n");
             playout->addWidget(ip);
+			connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
+
         }//);
 
         mScrollArea->setWidget(ppanel);

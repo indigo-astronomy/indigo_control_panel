@@ -71,14 +71,12 @@ static indigo_client client = {
 };
 
 
-IndigoClient::IndigoClient()
-{    
+IndigoClient::IndigoClient() {
     indigo_set_log_level(INDIGO_LOG_DEBUG);
 }
 
 void
-IndigoClient::start()
-{
+IndigoClient::start() {
     indigo_start();
     indigo_attach_client(&client);
 }
