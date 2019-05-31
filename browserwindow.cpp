@@ -1,10 +1,10 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSplitter>
-#include <QListView>
 #include <QTreeView>
-#include <QStringListModel>
+#include <QPlainTextEdit>
 #include <QScrollArea>
+#include <sys/time.h>
 #include "browserwindow.h"
 #include "servicemodel.h"
 #include "propertymodel.h"
@@ -65,15 +65,9 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 //    ppanel->show();
 
     //  Create log viewer
-    mLog = new QListView;
+    mLog = new QPlainTextEdit;
+    mLog->setReadOnly(true);
     rootLayout->addWidget(mLog, 15);
-
-    QStringList* list = new QStringList();
-    mLogList = new QStringListModel();
-    mLogList->setStringList(*list);
-    mLog->setModel(mLogList);
-    list->append("Message in the log");
-    mLogList->setStringList(*list);
 
     mServiceModel = new ServiceModel("_indigo._tcp");
 
@@ -86,11 +80,31 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);
 
     connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
+    connect(mPropertyModel, &PropertyModel::property_updated, this, &BrowserWindow::on_property_log);
 
     current_node = nullptr;
 
     //  Start up the client
     IndigoClient::instance().start();
+}
+
+
+void
+BrowserWindow::on_property_log(indigo_property* property, const char *message) {
+	char timestamp[16];
+	char log_line[255];
+	struct timeval tmnow;
+
+	if (!message) return;
+
+	gettimeofday(&tmnow, NULL);
+        strftime(timestamp, 9, "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
+        snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%06ld", tmnow.tv_usec);
+
+	snprintf(log_line, sizeof(log_line), "%s %s(%d) - %s", timestamp, property->name, property->state, message);
+
+	mLog->appendPlainText(log_line); // Adds the message to the widget
+	//mLog->verticalScrollBar()->setValue(mLog->verticalScrollBar()->maximum());
 }
 
 void

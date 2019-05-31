@@ -17,9 +17,9 @@ public:
     void start();
 
 signals:
-    void property_defined(indigo_property* property);
-    void property_changed(indigo_property* property);
-    void property_deleted(indigo_property* property);
+    void property_defined(indigo_property* property, const char *message);
+    void property_changed(indigo_property* property, const char *message);
+    void property_deleted(indigo_property* property, const char *message);
 };
 
 inline IndigoClient&

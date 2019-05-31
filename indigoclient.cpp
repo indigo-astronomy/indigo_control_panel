@@ -29,13 +29,13 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
     }
     memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
 
-    emit(IndigoClient::instance().property_defined(p));
+    emit(IndigoClient::instance().property_defined(p, message));
     return INDIGO_OK;
 }
 
 
 static indigo_result client_update_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
-    emit(IndigoClient::instance().property_changed(property));
+    emit(IndigoClient::instance().property_changed(property, message));
     return INDIGO_OK;
 }
 
@@ -46,7 +46,7 @@ fprintf(stderr, "** Deleting property [%s] on device [%s]\n", property->name, pr
     strcpy(p->device, property->device);
     strcpy(p->group, property->group);
     strcpy(p->name, property->name);
-    emit(IndigoClient::instance().property_deleted(p));
+    emit(IndigoClient::instance().property_deleted(p, message));
 }
 
 static indigo_result client_send_message(indigo_client *client, indigo_device *device, const char *message) {

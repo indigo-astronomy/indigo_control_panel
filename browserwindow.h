@@ -4,9 +4,7 @@
 #include <QMainWindow>
 #include <indigo_bus.h>
 
-
-class QStringListModel;
-class QListView;
+class QPlainTextEdit;
 class QTreeView;
 class ServiceModel;
 class PropertyModel;
@@ -25,10 +23,10 @@ public:
 
 public slots:
     void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);
+    void on_property_log(indigo_property* property, const char *message);
 
 private:
-    QStringListModel* mLogList;
-    QListView* mLog;
+    QPlainTextEdit* mLog;
     QTreeView* mProperties;
     QScrollArea* mScrollArea;
     QWidget* form_panel;

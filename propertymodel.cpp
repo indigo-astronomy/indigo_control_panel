@@ -40,7 +40,7 @@ PropertyModel::PropertyModel()
 }
 
 void
-PropertyModel::define_property(indigo_property* property)
+PropertyModel::define_property(indigo_property* property, const char *message)
 {
     //  Find or create TreeNode for property->device
     //fprintf(stderr, "Defining device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
@@ -99,7 +99,7 @@ PropertyModel::define_property(indigo_property* property)
 }
 
 void
-PropertyModel::update_property(indigo_property* property)
+PropertyModel::update_property(indigo_property* property, const char *message)
 {
     //  Find TreeNode for property->device
     int device_row = 0;
@@ -123,7 +123,7 @@ PropertyModel::update_property(indigo_property* property)
     memcpy(p->property->items, property->items, sizeof(indigo_item) * property->count);
 
     //  If there is a property widget attached, update it
-    emit(property_updated(p->property));
+    emit(property_updated(p->property, message));
 
     //  Emit a data changed signal so the tree can update (mainly for status LEDs)
     QModelIndex index = createIndex(row, 0, p);
@@ -142,7 +142,7 @@ PropertyModel::update_property(indigo_property* property)
 }
 
 void
-PropertyModel::delete_property(indigo_property* property)
+PropertyModel::delete_property(indigo_property* property, const char *message)
 {
     fprintf(stderr, "Deleting property [%s] on device [%s]\n", property->name, property->device);
 

@@ -229,12 +229,12 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
-    void property_updated(indigo_property* property);
+    void property_updated(indigo_property* property, const char *message);
 
 public slots:
-    void define_property(indigo_property* property);
-    void update_property(indigo_property* property);
-    void delete_property(indigo_property* property);
+    void define_property(indigo_property* property, const char *message);
+    void update_property(indigo_property* property, const char *message);
+    void delete_property(indigo_property* property, const char *message);
 
 private:
     RootNode root;
