@@ -48,7 +48,13 @@ ServiceModel::onServiceError(QZeroConf::error_t e)
 void
 ServiceModel::onServiceAdded(QZeroConfService service)
 {
-    fprintf(stderr, "SERVICE ADDED [%s]\n", service.name().toUtf8().constData());
+	int i = findService(service.name().toUtf8());
+	if (i != -1) {
+		fprintf(stderr, "SERVICE DUPLICATE [%s]\n", service.name().toUtf8().constData());
+		return;
+	}
+
+	fprintf(stderr, "SERVICE ADDED [%s]\n", service.name().toUtf8().constData());
 
     qDebug() << service.name() << "discovered on port" << service.port() << "!";
     beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
