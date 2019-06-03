@@ -100,6 +100,8 @@ BrowserWindow::on_property_log(indigo_property* property, const char *message) {
 
 	if (!message) return;
 
+	printf("CCCCC-> %s\n", message);
+
 	gettimeofday(&tmnow, NULL);
         strftime(timestamp, 9, "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
         snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%06ld", tmnow.tv_usec);
@@ -184,41 +186,38 @@ BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemS
         //  Connect to update signals coming from indigo bus
         connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
     }
-    else if (n != nullptr && n->node_type == TREE_NODE_GROUP) {
-        fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_GROUP\n");
-        GroupNode* g = reinterpret_cast<GroupNode*>(n);
-        //current_node = g;
+	else if (n != nullptr && n->node_type == TREE_NODE_GROUP) {
+		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_GROUP\n");
+		GroupNode* g = reinterpret_cast<GroupNode*>(n);
+		//current_node = g;
 
-//        delete form_panel;
-//        form_panel = nullptr;
+		//delete form_panel;
+		//form_panel = nullptr;
 
-        //mScrollArea->setStyleSheet("background-color: green");
+		//mScrollArea->setStyleSheet("background-color: green");
 
-        QWidget* ppanel = new QWidget();
-        //ppanel->setStyleSheet("background-color: red");
-        QVBoxLayout* playout = new QVBoxLayout;
-        playout->setSpacing(10);
-        playout->setContentsMargins(10, 10, 25, 10);
-        playout->setSizeConstraint(QLayout::SetMinimumSize);
-        ppanel->setLayout(playout);
+		QWidget* ppanel = new QWidget();
+		//ppanel->setStyleSheet("background-color: red");
+		QVBoxLayout* playout = new QVBoxLayout;
+		playout->setSpacing(10);
+		playout->setContentsMargins(10, 10, 25, 10);
+		playout->setSizeConstraint(QLayout::SetMinimumSize);
+		ppanel->setLayout(playout);
 
-        //  Iterate properties
-        for (int i = 0; i < g->children.count; i++) {
-        //g->each_child([playout](PropertyNode* p){
-            PropertyNode* p = g->children.nodes[i];
-            QIndigoProperty* ip = new QIndigoProperty(p->property);
-            //ip->setStyleSheet("background-color: blue");
-            fprintf(stderr, "POPER\n");
-            playout->addWidget(ip);
+        	//  Iterate properties
+		for (int i = 0; i < g->children.count; i++) {
+			PropertyNode* p = g->children.nodes[i];
+			QIndigoProperty* ip = new QIndigoProperty(p->property);
+			//ip->setStyleSheet("background-color: blue");
+			fprintf(stderr, "POPER\n");
+			playout->addWidget(ip);
 			connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
 
-        }//);
+		}
+		playout->addStretch(); // Fill the vertical space available
 
-        mScrollArea->setWidget(ppanel);
-        mScrollArea->setWidgetResizable(true);
-        ppanel->show();
-
-        //QIndigoProperty* ip = new QIndigoProperty(p->property);
-
-    }
+		mScrollArea->setWidget(ppanel);
+		mScrollArea->setWidgetResizable(true);
+		ppanel->show();
+	}
 }

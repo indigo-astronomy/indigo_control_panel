@@ -152,7 +152,7 @@ PropertyModel::delete_property(indigo_property* property, const char *message)
     if (device == nullptr) {
         fprintf(stderr, "Deleting property on device [%s] - NOT FOUND\n", property->device);
         delete property;
-		property = nullptr;
+	property = nullptr;
         return;
     }
 
@@ -275,6 +275,7 @@ PropertyModel::parent(const QModelIndex &child) const
 		fprintf(stderr, "node = %p\n", node);
 		return QModelIndex();
 	}
+
     if (node->node_type == TREE_NODE_DEVICE)
         return QModelIndex();
 
