@@ -8,16 +8,25 @@
 
 
 TreeNode::~TreeNode()
-{}
+{
+	printf("CALLED: %s\n", __FUNCTION__);
+}
 
 DeviceNode::~DeviceNode()
-{}
+{
+	printf("CALLED: %s\n", __FUNCTION__);
+	printf("=== relese DEVICE\n");
+}
 
 GroupNode::~GroupNode()
-{}
+{
+	printf("CALLED: %s\n", __FUNCTION__);
+	printf("=== release GROUP\n");
+}
 
 PropertyNode::~PropertyNode()
 {
+	printf("CALLED: %s\n", __FUNCTION__);
     indigo_release_property(property);
 }
 
@@ -28,15 +37,18 @@ ItemNode::ItemNode(indigo_item* i, PropertyNode* parent)
 }
 
 ItemNode::~ItemNode()
-{}
+{
+	printf("CALLED: %s\n", __FUNCTION__);
+}
 
 RootNode::~RootNode()
-{}
-
-
+{
+	printf("CALLED: %s\n", __FUNCTION__);
+}
 
 PropertyModel::PropertyModel()
 {
+	printf("CALLED: %s\n", __FUNCTION__);
 }
 
 void
@@ -144,97 +156,99 @@ PropertyModel::update_property(indigo_property* property, const char *message)
 void
 PropertyModel::delete_property(indigo_property* property, const char *message)
 {
-    fprintf(stderr, "Deleting property [%s] on device [%s]\n", property->name, property->device);
+	fprintf(stderr, "Deleting property [%s] on device [%s]\n", property->name, property->device);
 
-    //  Find TreeNode for property->device
-    int device_row = 0;
-    DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
-    if (device == nullptr) {
-        fprintf(stderr, "Deleting property on device [%s] - NOT FOUND\n", property->device);
-        delete property;
-	property = nullptr;
-        return;
-    }
+	//  Find TreeNode for property->device
+	int device_row = 0;
+	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
+	if (device == nullptr) {
+		fprintf(stderr, "Deleting property on device [%s] - NOT FOUND\n", property->device);
+		delete property;
+		property = nullptr;
+		return;
+	}
 
-    //  If we are deleting whole device - do that
-    if (strlen(property->group) == 0) {
-        beginRemoveRows(QModelIndex(), device_row, device_row);
-        root.children.remove_index(device_row);
-        endRemoveRows();
-        delete device;
+	//  If we are deleting whole device - do that
+	if (strlen(property->group) == 0) {
+		beginRemoveRows(QModelIndex(), device_row, device_row);
+		root.children.remove_index(device_row);
+		endRemoveRows();
+		delete device;
 		device = nullptr;
-        delete property;
+		delete property;
 		property = nullptr;
-        return;
-    }
+		return;
+	}
 
-    //  Find TreeNode within device for property->group
-    fprintf(stderr, "Deleting property in group [%s]\n", property->group);
-    int group_row = 0;
-    GroupNode* group = device->children.find_by_name_with_index(property->group, group_row);
-    if (group == nullptr) {
-        fprintf(stderr, "Deleting property in group [%s] - NOT FOUND\n", property->group);
-        delete property;
+	//  Find TreeNode within device for property->group
+	fprintf(stderr, "Deleting property in group [%s]\n", property->group);
+	int group_row = 0;
+	GroupNode* group = device->children.find_by_name_with_index(property->group, group_row);
+	if (group == nullptr) {
+		fprintf(stderr, "Deleting property in group [%s] - NOT FOUND\n", property->group);
+		delete property;
 		property = nullptr;
-        return;
-    }
+		return;
+	}
 
-    //  If we are deleting whole group - do that
-    if (strlen(property->name) == 0) {
-        beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
-        device->children.remove_index(group_row);
-        endRemoveRows();
-        delete group;
+	//  If we are deleting whole group - do that
+	if (strlen(property->name) == 0) {
+		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
+		device->children.remove_index(group_row);
+		endRemoveRows();
+		delete group;
 		group = nullptr;
-        delete property;
+		delete property;
 		property = nullptr;
-        return;
-    }
+		return;
+	}
 
-    //  Find or create TreeNode within group fro property->name
-    fprintf(stderr, "Deleting property [%s]\n", property->name);
-    int property_row = 0;
-    PropertyNode* p = group->children.find_by_name_with_index(property->name, property_row);
-    if (p == nullptr) {
-        fprintf(stderr, "Deleting property [%s] - NOT FOUND\n", property->name);
-        delete property;
+	//  Find or create TreeNode within group fro property->name
+	fprintf(stderr, "Deleting property [%s]\n", property->name);
+	int property_row = 0;
+	PropertyNode* p = group->children.find_by_name_with_index(property->name, property_row);
+	if (p == nullptr) {
+		fprintf(stderr, "Deleting property [%s] - NOT FOUND\n", property->name);
+		delete property;
 		property = nullptr;
-        return;
-    }
+		return;
+	}
 
-    //  Remove the property
-    beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
-    group->children.remove_index(property_row);
-    endRemoveRows();
-    fprintf(stderr, "Erasing property [%s]\n", property->name);
-    delete p;
+	//  Remove the property
+	beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
+	group->children.remove_index(property_row);
+	endRemoveRows();
+	fprintf(stderr, "Erasing property [%s]\n", property->name);
+	delete p;
 	p = nullptr;
-    fprintf(stderr, "Erased property [%s]\n", property->name);
+	fprintf(stderr, "Erased property [%s]\n", property->name);
 
-    //  Remove the group if empty
-    if (group->children.empty()) {
-        fprintf(stderr, "--- REMOVING EMPTY GROUP [%s]\n", property->group);
-        beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
-        device->children.remove_index(group_row);
-        endRemoveRows();
-        delete group;
+	//  Remove the group if empty
+	if (group->children.empty()) {
+		fprintf(stderr, "--- REMOVING EMPTY GROUP [%s]\n", property->group);
+		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
+		device->children.remove_index(group_row);
+		endRemoveRows();
+		// This causes SEGFAULT
+		//delete group;
 		group = nullptr;
-        fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", property->group);
-    }
+		fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", property->group);
+	}
 
-    //  Remove the device if empty
-    if (device->children.empty()) {
-        fprintf(stderr, "--- REMOVING EMPTY DEVICE [%s]\n", property->device);
-        beginRemoveRows(QModelIndex(), device_row, device_row);
-        root.children.remove_index(device_row);
-        endRemoveRows();
-        delete device;
+	//  Remove the device if empty
+	if (device->children.empty()) {
+		fprintf(stderr, "--- REMOVING EMPTY DEVICE [%s]\n", property->device);
+		beginRemoveRows(QModelIndex(), device_row, device_row);
+		root.children.remove_index(device_row);
+		endRemoveRows();
+		// This causes SEGFAULT
+		//delete device;
 		device = nullptr;
-        fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", property->device);
-    }
+		fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", property->device);
+	}
 
-    //  Cleanup
-    delete property;
+	//  Cleanup
+	delete property;
 	property = nullptr;
 }
 
