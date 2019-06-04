@@ -18,7 +18,7 @@ QIndigoProperty::QIndigoProperty(indigo_property* property, QWidget *parent) : Q
 	setLayout(formLayout);
 	//setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 	formLayout->setContentsMargins(0, 0, 0, 0);
-//	formLayout->setSpacing(0);
+	// formLayout->setSpacing(0);
 
 	//  Allocate storage for the controls
 	m_controls = reinterpret_cast<QIndigoItem**>(malloc(sizeof(QIndigoItem*) * property->count));
