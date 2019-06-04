@@ -92,13 +92,13 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 	if (!message) return;
 
-	printf("CCCCC-> %s\n", message);
+	//printf("CCCCC-> %s\n", message);
 
 	gettimeofday(&tmnow, NULL);
-        strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
-        snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%06ld", tmnow.tv_usec);
+	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
+	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%06ld", tmnow.tv_usec);
 
-	snprintf(log_line, 512, "%s - '%s'.%s : %s", timestamp, property->device, property->name, message);
+	snprintf(log_line, 512, "%s: '%s'.%s - %s", timestamp, property->device, property->name, message);
 
 	mLog->appendPlainText(log_line); // Adds the message to the widget
 }

@@ -211,7 +211,8 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	group->children.remove_index(property_row);
 	endRemoveRows();
 	fprintf(stderr, "Erasing property [%s]\n", property->name);
-	delete p;
+	// This causes SEGFAULT
+	//delete p;
 	p = nullptr;
 	fprintf(stderr, "Erased property [%s]\n", property->name);
 
