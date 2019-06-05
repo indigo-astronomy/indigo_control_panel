@@ -241,7 +241,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	}
 
 	//  Cleanup
-	delete property;
+	//delete property;
 	property = nullptr;
 }
 

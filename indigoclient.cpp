@@ -31,7 +31,7 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
 
 	if (message) {
-		char msg[INDIGO_VALUE_SIZE];
+		static char msg[INDIGO_VALUE_SIZE];
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
 		emit(IndigoClient::instance().property_defined(property, msg));
 	} else {
@@ -43,7 +43,7 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 
 static indigo_result client_update_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
 	if (message) {
-		char msg[INDIGO_VALUE_SIZE];
+		static char msg[INDIGO_VALUE_SIZE];
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
 		emit(IndigoClient::instance().property_changed(property, msg));
 	} else {
@@ -62,7 +62,7 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	strcpy(p->name, property->name);
 
 	if (message) {
-		char msg[INDIGO_VALUE_SIZE];
+		static char msg[INDIGO_VALUE_SIZE];
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
 		emit(IndigoClient::instance().property_deleted(property, msg));
 	} else {
