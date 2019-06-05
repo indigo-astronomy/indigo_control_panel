@@ -30,13 +30,25 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 	}
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
 
-	emit(IndigoClient::instance().property_defined(p, message));
+	if (message) {
+		char msg[INDIGO_VALUE_SIZE];
+		strncpy(msg, message, INDIGO_VALUE_SIZE);
+		emit(IndigoClient::instance().property_defined(property, msg));
+	} else {
+		emit(IndigoClient::instance().property_defined(property, NULL));
+	}
 	return INDIGO_OK;
 }
 
 
 static indigo_result client_update_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
-	emit(IndigoClient::instance().property_changed(property, message));
+	if (message) {
+		char msg[INDIGO_VALUE_SIZE];
+		strncpy(msg, message, INDIGO_VALUE_SIZE);
+		emit(IndigoClient::instance().property_changed(property, msg));
+	} else {
+		emit(IndigoClient::instance().property_changed(property, NULL));
+	}
 	return INDIGO_OK;
 }
 
@@ -48,7 +60,14 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	strcpy(p->device, property->device);
 	strcpy(p->group, property->group);
 	strcpy(p->name, property->name);
-	emit(IndigoClient::instance().property_deleted(p, message));
+
+	if (message) {
+		char msg[INDIGO_VALUE_SIZE];
+		strncpy(msg, message, INDIGO_VALUE_SIZE);
+		emit(IndigoClient::instance().property_deleted(property, msg));
+	} else {
+		emit(IndigoClient::instance().property_deleted(property, NULL));
+	}
 }
 
 
