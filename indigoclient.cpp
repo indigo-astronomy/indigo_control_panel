@@ -33,21 +33,41 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 	if (message) {
 		static char msg[INDIGO_VALUE_SIZE];
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
-		emit(IndigoClient::instance().property_defined(property, msg));
+		emit(IndigoClient::instance().property_defined(p, msg));
 	} else {
-		emit(IndigoClient::instance().property_defined(property, NULL));
+		emit(IndigoClient::instance().property_defined(p, NULL));
 	}
 	return INDIGO_OK;
 }
 
 
 static indigo_result client_update_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
+	indigo_property* p = nullptr;
+	switch (property->type) {
+	case INDIGO_TEXT_VECTOR:
+		p = indigo_init_text_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
+		break;
+	case INDIGO_NUMBER_VECTOR:
+		p = indigo_init_number_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
+		break;
+	case INDIGO_SWITCH_VECTOR:
+		p = indigo_init_switch_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->rule, property->count);
+		break;
+	case INDIGO_LIGHT_VECTOR:
+		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
+		break;
+	case INDIGO_BLOB_VECTOR:
+		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
+		break;
+	}
+
+	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
 	if (message) {
 		static char msg[INDIGO_VALUE_SIZE];
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
-		emit(IndigoClient::instance().property_changed(property, msg));
+		emit(IndigoClient::instance().property_changed(p, msg));
 	} else {
-		emit(IndigoClient::instance().property_changed(property, NULL));
+		emit(IndigoClient::instance().property_changed(p, NULL));
 	}
 	return INDIGO_OK;
 }
