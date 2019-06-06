@@ -64,9 +64,9 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	if (message) {
 		static char msg[INDIGO_VALUE_SIZE];
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
-		emit(IndigoClient::instance().property_deleted(property, msg));
+		emit(IndigoClient::instance().property_deleted(p, msg));
 	} else {
-		emit(IndigoClient::instance().property_deleted(property, NULL));
+		emit(IndigoClient::instance().property_deleted(p, NULL));
 	}
 }
 

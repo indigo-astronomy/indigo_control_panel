@@ -64,15 +64,17 @@ public:
     }
 
     T* find_by_name_with_index(const char* n, int& index) const {
-        for (int i = 0; i < count; i++) {
-            if (strcmp(nodes[i]->name(), n) == 0) {
-                index = i;
-                return nodes[i];
-            }
-        }
-        index = -1;
-        return nullptr;
-    }
+		if (n) {
+			for (int i = 0; i < count; i++) {
+				if (strcmp(nodes[i]->name(), n) == 0) {
+					index = i;
+					return nodes[i];
+				}
+			}
+		}
+		index = -1;
+		return nullptr;
+	}
 
     int find_insertion_index_by_label(const char* l) const {
         for (int i = 0; i < count; i++) {

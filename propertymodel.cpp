@@ -26,7 +26,10 @@ GroupNode::~GroupNode() {
 
 PropertyNode::~PropertyNode() {
 	printf("CALLED: %s\n", __FUNCTION__);
-	indigo_release_property(property);
+	if (property) {
+		indigo_release_property(property);
+		property = nullptr;
+	}
 }
 
 
@@ -161,7 +164,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	}
 
 	//  If we are deleting whole device - do that
-	if (strlen(property->group) == 0) {
+	if ((property) && (strlen(property->group) == 0)) {
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
@@ -176,7 +179,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	fprintf(stderr, "Deleting property in group [%s]\n", property->group);
 	int group_row = 0;
 	GroupNode* group = device->children.find_by_name_with_index(property->group, group_row);
-	if (group == nullptr) {
+	if ((property) && (group == nullptr)) {
 		fprintf(stderr, "Deleting property in group [%s] - NOT FOUND\n", property->group);
 		delete property;
 		property = nullptr;
