@@ -40,23 +40,23 @@ void QIndigoProperty::update_controls() {
 }
 
 
-void QIndigoProperty::update_led() {
+void QIndigoProperty::update_property_view() {
 	switch (m_property->state) {
 	case INDIGO_IDLE_STATE:
 		m_led->setPixmap(QPixmap(":led-grey.png"));
-		this->setStyleSheet("background-color: #19232D");
+		this->setStyleSheet("background-color: #202020");
 		break;
 	case INDIGO_BUSY_STATE:
 		m_led->setPixmap(QPixmap(":led-orange.png"));
-		this->setStyleSheet("background-color: #2D3623");
+		this->setStyleSheet("background-color: #353520");
 		break;
 	case INDIGO_ALERT_STATE:
 		m_led->setPixmap(QPixmap(":led-red.png"));
-		this->setStyleSheet("background-color: #362323");
+		this->setStyleSheet("background-color: #352020");
 		break;
 	case INDIGO_OK_STATE:
 		m_led->setPixmap(QPixmap(":led-green.png"));
-		this->setStyleSheet("background-color: #192D23");
+		this->setStyleSheet("background-color: #203220");
 		break;
 	}
 	m_led->update();
@@ -66,7 +66,7 @@ void QIndigoProperty::update_led() {
 void QIndigoProperty::update() {
 	//  Update all the controls to the current state
 	update_controls();
-	update_led();
+	update_property_view();
 
 	//  Update the property on the bus
 	indigo_change_property(nullptr, m_property);
@@ -81,7 +81,7 @@ void QIndigoProperty::property_update(indigo_property* property) {
 	//  It's for us, so update!!
 	//fprintf(stderr, "UPDATE TO [%s]	WE WANT [%s]\n", property->name, m_property->name);
 	update_controls();
-	update_led();
+	update_property_view();
 }
 
 
@@ -139,24 +139,7 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	QVBoxLayout* property_layout = new QVBoxLayout();
 	property_setings->setLayout(property_layout);
 
-	switch (m_property->state) {
-	case INDIGO_IDLE_STATE:
-		m_led->setPixmap(QPixmap(":led-grey.png"));
-		this->setStyleSheet("background-color: #19232D");
-		break;
-	case INDIGO_BUSY_STATE:
-		m_led->setPixmap(QPixmap(":led-orange.png"));
-		this->setStyleSheet("background-color: #2D3623");
-		break;
-	case INDIGO_ALERT_STATE:
-		m_led->setPixmap(QPixmap(":led-red.png"));
-		this->setStyleSheet("background-color: #362323");
-		break;
-	case INDIGO_OK_STATE:
-		m_led->setPixmap(QPixmap(":led-green.png"));
-		this->setStyleSheet("background-color: #192D23");
-		break;
-	}
+	update_property_view();
 
 	//  Build the item fields
 	switch (m_property->type) {

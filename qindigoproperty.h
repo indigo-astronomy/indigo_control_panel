@@ -18,7 +18,6 @@ public:
     virtual ~QIndigoProperty();
 
     void update_controls();
-	void update_led();
 
 private:
     void build_property_form(QVBoxLayout* layout);
@@ -27,6 +26,7 @@ private:
     void build_switch_property_form(QVBoxLayout* layout);
     void build_light_property_form(QVBoxLayout* layout);
     void build_buttons(QVBoxLayout* layout);
+	void update_property_view();
 
 signals:
 
