@@ -10,7 +10,7 @@ static indigo_result client_attach(indigo_client *client) {
 
 static indigo_result client_define_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
 	//  Deep copy the property so it won't disappear on us later
-	indigo_property* p = nullptr;
+	static indigo_property* p = nullptr;
 	switch (property->type) {
 	case INDIGO_TEXT_VECTOR:
 		p = indigo_init_text_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
@@ -42,7 +42,7 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 
 
 static indigo_result client_update_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
-	indigo_property* p = nullptr;
+	static indigo_property* p = nullptr;
 	switch (property->type) {
 	case INDIGO_TEXT_VECTOR:
 		p = indigo_init_text_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
