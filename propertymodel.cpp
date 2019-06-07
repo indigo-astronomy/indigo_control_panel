@@ -214,8 +214,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	group->children.remove_index(property_row);
 	endRemoveRows();
 	fprintf(stderr, "Erasing property [%s]\n", property->name);
-	// This causes SEGFAULT
-	//delete p;
+	delete p;
 	p = nullptr;
 	fprintf(stderr, "Erased property [%s]\n", property->name);
 
@@ -225,8 +224,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
-		// This causes SEGFAULT
-		//delete group;
+		delete group;
 		group = nullptr;
 		fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", property->group);
 	}
@@ -237,14 +235,13 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
-		// This causes SEGFAULT
-		//delete device;
+		delete device;
 		device = nullptr;
 		fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", property->device);
 	}
 
 	//  Cleanup
-	//delete property;
+	delete property;
 	property = nullptr;
 }
 
