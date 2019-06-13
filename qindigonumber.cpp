@@ -1,4 +1,5 @@
 #include <QHBoxLayout>
+#include <indigo_bus.h>
 #include "qindigonumber.h"
 
 
@@ -37,13 +38,21 @@ QIndigoNumber::~QIndigoNumber() {
 
 void
 QIndigoNumber::update() {
-    char buffer[50];
-    sprintf(buffer, "%g"/*m_item->number.format*/, m_item->number.value);
-    text_value->setText(buffer);
-    if (text_target && !m_dirty) {
-        sprintf(buffer, "%g"/*m_item->number.format*/, m_item->number.target);
-        text_target->setText(buffer);
-    }
+	char buffer[50];
+
+	if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm') {
+		strncpy(buffer, indigo_dtos(m_item->number.value, NULL), sizeof(buffer));
+	} else {
+		snprintf(buffer,  sizeof(buffer), m_item->number.format, m_item->number.value);
+	}
+	text_value->setText(buffer);
+	if (text_target && !m_dirty) {
+		if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm')
+			strncpy(buffer, indigo_dtos(m_item->number.target, NULL), sizeof(buffer));
+		else
+			snprintf(buffer, sizeof(buffer), m_item->number.format, m_item->number.value);
+		text_target->setText(buffer);
+	}
 }
 
 void
@@ -59,7 +68,7 @@ QIndigoNumber::reset() {
 void
 QIndigoNumber::apply() {
     if (text_target && m_dirty) {
-        m_item->number.value = m_item->number.target = text_target->text().toDouble();
+        m_item->number.value = m_item->number.target = indigo_stod((char*)text_target->text().toStdString().c_str());
         reset();
     }
 }
