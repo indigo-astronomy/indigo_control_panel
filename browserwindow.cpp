@@ -103,6 +103,15 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	mLog->appendPlainText(log_line); // Adds the message to the widget
 }
 
+void BrowserWindow::clear_window() {
+	QWidget* ppanel = new QWidget();
+	QVBoxLayout* playout = new QVBoxLayout;
+	playout->setSizeConstraint(QLayout::SetMinimumSize);
+	ppanel->setLayout(playout);
+	mScrollArea->setWidget(ppanel);
+	mScrollArea->setWidgetResizable(true);
+	ppanel->show();
+}
 
 void BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemSelection &) {
 	fprintf(stderr, "SELECTION CHANGED\n");
@@ -110,18 +119,22 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 	//  Deal with the outgoing selection
 	if (current_node != nullptr) {
 		fprintf(stderr, "SELECTION CHANGED no current node\n");
+		clear_window();
 	}
 
 	if (selected.indexes().empty()) {
 		fprintf(stderr, "SELECTION CHANGED selected.indexes().empty()\n");
+		clear_window();
 		current_node = nullptr;
 		return;
 	}
 
 	QModelIndex s = selected.indexes().front();
 	TreeNode* n = static_cast<TreeNode*>(s.internalPointer());
-	if (n != nullptr)
+	if (n != nullptr) {
 		fprintf(stderr, "SELECTION CHANGED n->node_type == %d\n", n->node_type);
+		clear_window();
+	}
 
 	if (n != nullptr && n->node_type == TREE_NODE_PROPERTY) {
 		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_PROPERTY\n");
@@ -168,14 +181,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		ppanel->show();
 	} else if (n != nullptr && n->node_type == TREE_NODE_DEVICE) {
 		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_DEVICE\n");
-
-		QWidget* ppanel = new QWidget();
-		QVBoxLayout* playout = new QVBoxLayout;
-                playout->setSizeConstraint(QLayout::SetMinimumSize);
-                ppanel->setLayout(playout);
-		mScrollArea->setWidget(ppanel);
-                mScrollArea->setWidgetResizable(true);
-		ppanel->show();
+		clear_window();
 
 		/*
 		GroupNode* d = reinterpret_cast<GroupNode*>(n);

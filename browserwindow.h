@@ -35,6 +35,7 @@ private:
     ServiceModel* mServiceModel;
     PropertyModel* mPropertyModel;
     PropertyNode* current_node;
+	void clear_window();
 };
 
 #endif // BROWSERWINDOW_H
