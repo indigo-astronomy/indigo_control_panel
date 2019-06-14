@@ -10,6 +10,7 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 	text_value = new QLineEdit();
 	text_value->setReadOnly(true);
 	text_target = nullptr;
+	m_dirty = false;
 	if (m_property->perm != INDIGO_RO_PERM)
 		text_target = new QLineEdit();
 	update();

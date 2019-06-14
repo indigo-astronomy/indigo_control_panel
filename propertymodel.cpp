@@ -2,30 +2,31 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
+#include <unistd.h>
 #include "propertymodel.h"
 #include "qindigoproperty.h"
 #include <indigo_names.h>
 
 
 TreeNode::~TreeNode() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	printf("CALLED: %s on %p\n", __FUNCTION__, this);
 }
 
 
 DeviceNode::~DeviceNode() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	printf("CALLED: %s on %p\n", __FUNCTION__, this);
 	printf("=== relese DEVICE\n");
 }
 
 
 GroupNode::~GroupNode() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	printf("CALLED: %s on %p\n", __FUNCTION__, this);
 	printf("=== release GROUP\n");
 }
 
 
 PropertyNode::~PropertyNode() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	printf("CALLED: %s on %p\n", __FUNCTION__, this);
 	if (property) {
 		indigo_release_property(property);
 		property = nullptr;
@@ -113,20 +114,20 @@ void PropertyModel::update_property(indigo_property* property, const char *messa
 	//  Find TreeNode for property->device
 	int device_row = 0;
 	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
-	if (device == nullptr)
+	if (device == nullptr) {
 		return;
-
+	}
 	//  Find TreeNode within device for property->group
 	GroupNode* group = device->children.find_by_name(property->group);
-	if (group == nullptr)
+	if (group == nullptr) {
 		return;
-
+	}
 	//  Find TreeNode within group for property->name
 	int row = 0;
 	PropertyNode* p = group->children.find_by_name_with_index(property->name, row);
-	if (p == nullptr)
+	if (p == nullptr) {
 		return;
-
+	}
 	//  Update property
 	p->property->state = property->state;
 	memcpy(p->property->items, property->items, sizeof(indigo_item) * property->count);
@@ -168,10 +169,10 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
-		delete device;
-		device = nullptr;
 		delete property;
 		property = nullptr;
+		delete device;
+		device = nullptr;
 		return;
 	}
 
@@ -191,10 +192,10 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
-		delete group;
-		group = nullptr;
 		delete property;
 		property = nullptr;
+		delete group;
+		group = nullptr;
 		return;
 	}
 
@@ -209,40 +210,49 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		return;
 	}
 
+	bool group_empty = false;
+	bool device_empty = false;
+
 	//  Remove the property
+	fprintf(stderr, "Erasing property [%s] in %p %p\n", property->name, device, group);
 	beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
 	group->children.remove_index(property_row);
 	endRemoveRows();
-	fprintf(stderr, "Erasing property [%s]\n", property->name);
-	delete p;
-	p = nullptr;
 	fprintf(stderr, "Erased property [%s]\n", property->name);
+
+
+	char devname[255];
+	char groupname[255];
+	strcpy(devname, property->device);
+	strcpy(groupname, property->group);
 
 	//  Remove the group if empty
 	if (group->children.empty()) {
-		fprintf(stderr, "--- REMOVING EMPTY GROUP [%s]\n", property->group);
+		fprintf(stderr, "--- REMOVING EMPTY GROUP %p -> [%s]\n", group, groupname);
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
-		delete group;
-		group = nullptr;
-		fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", property->group);
+		group_empty = true;
+		fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", groupname);
 	}
 
 	//  Remove the device if empty
 	if (device->children.empty()) {
-		fprintf(stderr, "--- REMOVING EMPTY DEVICE [%s]\n", property->device);
+		fprintf(stderr, "--- REMOVING EMPTY DEVICE %p -> [%s]\n", device, devname);
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
-		delete device;
-		device = nullptr;
-		fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", property->device);
+		device_empty = true;
+		//device = nullptr;
+		fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", devname);
 	}
 
-	//  Cleanup
+	delete p;
+	//p = nullptr;
 	delete property;
-	property = nullptr;
+
+	if (group_empty) delete group;
+	if (device_empty) delete device;
 }
 
 
@@ -276,10 +286,9 @@ QModelIndex PropertyModel::parent(const QModelIndex &child) const {
 
 	TreeNode* node = reinterpret_cast<TreeNode*>(child.internalPointer());
 	if (node == nullptr) {
-		fprintf(stderr, "node = %p\n", node);
 		return QModelIndex();
 	}
-
+	printf("*********************** child %p -> parent %p\n", child, node);
 	if (node->node_type == TREE_NODE_DEVICE)
 		return QModelIndex();
 
