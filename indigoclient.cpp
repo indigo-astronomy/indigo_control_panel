@@ -25,6 +25,17 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	case INDIGO_BLOB_VECTOR:
+		if (device->version >= INDIGO_VERSION_2_0)
+			indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_URL);
+		else
+			indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_ALSO);
+
+		if (property->state == INDIGO_OK_STATE) {
+			for (int row = 0; row < property->count; row++) {
+				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
+				}
+			}
+		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
 		break;
 	}
@@ -57,6 +68,13 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	case INDIGO_BLOB_VECTOR:
+		if (property->state == INDIGO_OK_STATE) {
+			for (int row = 0; row < property->count; row++) {
+				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
+					printf("image URL received (%s, %ld bytes)...", property->items[0].blob.url, property->items[0].blob.size);
+				}
+			}
+		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
 		break;
 	}
@@ -88,11 +106,13 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	} else {
 		emit(IndigoClient::instance().property_deleted(p, NULL));
 	}
+	return INDIGO_OK;
 }
 
 
 static indigo_result client_send_message(indigo_client *client, indigo_device *device, const char *message) {
 	//qDebug() << "BUS MSG: " << message;
+	return INDIGO_OK;
 }
 
 

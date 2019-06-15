@@ -171,7 +171,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		endRemoveRows();
 		delete property;
 		property = nullptr;
-		delete device;
+		//delete device;
 		device = nullptr;
 		return;
 	}
@@ -194,7 +194,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		endRemoveRows();
 		delete property;
 		property = nullptr;
-		delete group;
+		//delete group;
 		group = nullptr;
 		return;
 	}
@@ -251,8 +251,8 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	//p = nullptr;
 	delete property;
 
-	if (group_empty) delete group;
-	if (device_empty) delete device;
+	//if (group_empty) delete group;
+	//if (device_empty) delete device;
 }
 
 
@@ -288,7 +288,7 @@ QModelIndex PropertyModel::parent(const QModelIndex &child) const {
 	if (node == nullptr) {
 		return QModelIndex();
 	}
-	printf("*********************** child %p -> parent %p\n", child, node);
+	//printf("*********************** child %p -> parent %p\n", child, node);
 	if (node->node_type == TREE_NODE_DEVICE)
 		return QModelIndex();
 

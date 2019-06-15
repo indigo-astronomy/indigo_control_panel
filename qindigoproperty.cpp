@@ -9,6 +9,7 @@
 #include "qindigonumber.h"
 #include "qindigoswitch.h"
 #include "qindigolight.h"
+#include "qindigoblob.h"
 
 
 QIndigoProperty::QIndigoProperty(indigo_property* property, QWidget *parent) : QWidget(parent), m_property(property) {
@@ -156,7 +157,7 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 		build_light_property_form(frame_layout);
 		break;
 	case INDIGO_BLOB_VECTOR:
-		fprintf(stderr, "BUILD BLOB FORM\n");
+		build_blob_property_form(frame_layout);
 		break;
 	}
 
@@ -221,6 +222,37 @@ void QIndigoProperty::build_light_property_form(QVBoxLayout* layout) {
 
 		layout->addWidget(light);
 	}
+}
+
+void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
+	for (int row = 0; row < m_property->count; row++) {
+		indigo_item& i = m_property->items[row];
+
+		QIndigoBLOB* blob = new QIndigoBLOB(this, m_property, &i);
+		m_controls[row] = blob;
+
+		layout->addWidget(blob);
+		//  Create a button box
+		QHBoxLayout* hbox = new QHBoxLayout();
+		layout->addLayout(hbox);
+		hbox->setAlignment(Qt::AlignRight);
+		hbox->setSpacing(10);
+		hbox->setMargin(0);
+
+		//  Add buttons
+		QPushButton* saveb = new QPushButton("Save BLOB item");
+		saveb->setDefault(true);
+		saveb->setMinimumWidth(75);
+		hbox->addWidget(saveb);
+
+		//  Connect signals
+		connect(saveb, &QPushButton::clicked, blob, &QIndigoBLOB::save_blob_item);
+	}
+
+	//  We want to button press signal to cause the form fields to update to the property and send on bus
+	//  To do this, we have to know which property is selected, and then we find the PropertyNode for it.
+	//  We then run through the ItemNodes and copy any modified fields to the Items.
+	//  Finally we send a property update on the bus.
 }
 
 void QIndigoProperty::build_buttons(QVBoxLayout* layout) {

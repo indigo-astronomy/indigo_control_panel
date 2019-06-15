@@ -13,17 +13,18 @@ DEFINES += QT_DEPRECATED_WARNINGS QZEROCONF_STATIC
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        main.cpp \
-    servicemodel.cpp \
-    browserwindow.cpp \
-    indigoservice.cpp \
-    propertymodel.cpp \
-    indigoclient.cpp \
-    qindigoproperty.cpp \
-    qindigoswitch.cpp \
-    qindigotext.cpp \
-    qindigonumber.cpp \
-    qindigolight.cpp
+	main.cpp \
+	servicemodel.cpp \
+	browserwindow.cpp \
+	indigoservice.cpp \
+	propertymodel.cpp \
+	indigoclient.cpp \
+	qindigoproperty.cpp \
+	qindigoswitch.cpp \
+	qindigotext.cpp \
+	qindigonumber.cpp \
+	qindigolight.cpp \
+	qindigoblob.cpp
 
 RESOURCES += qdarkstyle/style.qrc led-red.png led-grey.png led-green.png led-orange.png
 
@@ -39,16 +40,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    servicemodel.h \
-    browserwindow.h \
-    indigoservice.h \
-    propertymodel.h \
-    indigoclient.h \
-    qindigoproperty.h \
-    qindigoswitch.h \
-    qindigotext.h \
-    qindigonumber.h \
-    qindigolight.h
+	servicemodel.h \
+	browserwindow.h \
+	indigoservice.h \
+	propertymodel.h \
+	indigoclient.h \
+	qindigoproperty.h \
+	qindigoswitch.h \
+	qindigotext.h \
+	qindigonumber.h \
+	qindigolight.h \
+	qindigoblob.h
 
 include(qtzeroconf/qtzeroconf.pri)
 
@@ -58,9 +60,9 @@ include(qtzeroconf/qtzeroconf.pri)
 #}
 
 unix {
-    INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
-    LIBS += -L"$${PWD}/indigo/build/lib" -lindigo
+	INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
+	LIBS += -L"$${PWD}/indigo/build/lib" -lindigo
 }
 
 DISTFILES += \
-    README.md
+	README.md
