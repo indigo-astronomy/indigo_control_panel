@@ -239,8 +239,8 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 		hbox->setSpacing(10);
 		hbox->setMargin(0);
 
-		//  Add buttons
-		QPushButton* saveb = new QPushButton("Save BLOB item");
+		//  Add Save button
+		QPushButton* saveb = new QPushButton("Save BLOB");
 		saveb->setDefault(true);
 		saveb->setMinimumWidth(75);
 		hbox->addWidget(saveb);

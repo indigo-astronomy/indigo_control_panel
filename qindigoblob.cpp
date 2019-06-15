@@ -16,8 +16,8 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	hbox->setAlignment(Qt::AlignLeft);
 	hbox->setMargin(0);
 	hbox->setSpacing(0);
-	hbox->addWidget(label, 35);
-	hbox->addWidget(text, 65);
+	hbox->addWidget(label, 20);
+	hbox->addWidget(text, 80);
 
 	connect(text, &QLineEdit::textEdited, this, &QIndigoBLOB::dirty);
 }
@@ -65,9 +65,14 @@ void QIndigoBLOB::dirty() {
 
 
 void QIndigoBLOB::save_blob_item(){
-	if ((m_property->state == INDIGO_OK_STATE)) {
+	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 		char name[32];
-		sprintf(name, "last.fits");
+
+		if(*m_item->blob.url) {
+			strncpy(name, basename(m_item->blob.url), 32);
+		} else {
+			sprintf(name, "last.fits");
+		}
 		FILE *f = fopen(name, "wb");
 		fwrite(m_item->blob.value, m_item->blob.size, 1, f);
 		fclose(f);
