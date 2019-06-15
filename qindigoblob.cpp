@@ -1,3 +1,6 @@
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 #include <QHBoxLayout>
 #include "qindigoblob.h"
 
@@ -63,19 +66,28 @@ void QIndigoBLOB::dirty() {
 	text->setStyleSheet("color: #CC0000");
 }
 
+/* C++ looks for method close - maybe name collision so... */
+void close_fd(int fd) {
+	close(fd);
+}
 
 void QIndigoBLOB::save_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-		char name[32];
+		char file_name[255];
+		int fd;
+		int file_no = 0;
 
-		if(*m_item->blob.url) {
-			strncpy(name, basename(m_item->blob.url), 32);
+		do {
+			sprintf(file_name, "blob_%03d.%s", file_no++, m_item->blob.format);
+			fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
+		} while ((fd < 0) && (errno == EEXIST));
+
+		if (fd < 0) {
+			indigo_log("Can not save %s...", file_name);
 		} else {
-			sprintf(name, "last.fits");
+			write(fd, m_item->blob.value, m_item->blob.size);
+			close_fd(fd);
+			indigo_log("ITEM image saved to %s...", file_name);
 		}
-		FILE *f = fopen(name, "wb");
-		fwrite(m_item->blob.value, m_item->blob.size, 1, f);
-		fclose(f);
-		indigo_log("ITEM image saved to %s...", name);
 	}
 }
