@@ -76,6 +76,7 @@ void close_fd(int fd) {
 void QIndigoBLOB::save_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 		char file_name[255];
+		char message[255];
 		int fd;
 		int file_no = 0;
 
@@ -85,12 +86,14 @@ void QIndigoBLOB::save_blob_item(){
 		} while ((fd < 0) && (errno == EEXIST));
 
 		if (fd < 0) {
-			indigo_log("Can not save %s...", file_name);
+			sprintf(message, "Can not save %s...", file_name);
+			m_logger->log(NULL, message);
 		} else {
 			write(fd, m_item->blob.value, m_item->blob.size);
 			close_fd(fd);
-			indigo_log("ITEM image saved to %s...", file_name);
-			m_logger->log(NULL, "ITEM image saved to...");
+
+			sprintf(message, "Image saved to %s...", file_name);
+			m_logger->log(NULL, message);
 		}
 	}
 }
