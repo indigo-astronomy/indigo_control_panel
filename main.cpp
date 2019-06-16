@@ -1,4 +1,3 @@
-#include <QApplication>
 #include <QFile>
 #include <QTextStream>
 #include <unistd.h>

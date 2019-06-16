@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QTreeView>
+#include <QMenuBar>
 #include <QPlainTextEdit>
 #include <QScrollArea>
 #include <sys/time.h>
@@ -20,6 +21,15 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	//  Set central widget of window
 	QWidget *widget = new QWidget;
 	setCentralWidget(widget);
+
+	// Create menubar
+	QMenuBar *menu = new QMenuBar(widget);
+	QMenu *file = new QMenu("&File");
+	QAction *exit_act = new QAction(tr("&Exit"), this);
+	file->addAction(exit_act);
+	menu->addMenu(file);
+
+	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 
 	//  Set the root layout to be a VBox
 	QVBoxLayout *rootLayout = new QVBoxLayout;
@@ -210,4 +220,8 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
                 ppanel->show();
 		*/
 	}
+}
+
+void BrowserWindow::on_exit_act() {
+	QApplication::quit();
 }
