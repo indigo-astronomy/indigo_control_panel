@@ -126,14 +126,17 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	head_layout->setMargin(3);
 	head_layout->setSpacing(5);
 
-	char label[1025];
-	sprintf(label, "%s -> %s", m_property->device, m_property->label);
+	char device_string[1025];
+	sprintf(device_string, "@ %s", m_property->device);
 	m_led = new QLabel();
-	QLabel* title = new QLabel(label);
-	title->setStyleSheet("font-weight: bold;");
+	QLabel* property_label = new QLabel(m_property->label);
+	property_label->setStyleSheet("font-weight: bold;");
+	QLabel* device_label = new QLabel(device_string);
 
 	head_layout->addWidget(m_led);
-	head_layout->addWidget(title);
+	head_layout->addWidget(property_label);
+	//head_layout->addStretch();
+	head_layout->addWidget(device_label);
 
 	QWidget *property_setings = new QWidget();
 	head_layout->addWidget(property_setings);

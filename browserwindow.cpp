@@ -99,11 +99,11 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 	gettimeofday(&tmnow, NULL);
 	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
-	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%06ld", tmnow.tv_usec);
+	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
 	if (property)
-		snprintf(log_line, 512, "%s: '%s'.%s - %s", timestamp, property->device, property->name, message);
+		snprintf(log_line, 512, "%s '%s'.%s - %s", timestamp, property->device, property->name, message);
 	else
-		snprintf(log_line, 512, "%s: %s", timestamp, message);
+		snprintf(log_line, 512, "%s %s", timestamp, message);
 
 	mLog->appendPlainText(log_line); // Adds the message to the widget
 }
@@ -174,7 +174,6 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		for (int i = 0; i < g->children.count; i++) {
 			PropertyNode* p = g->children.nodes[i];
 			QIndigoProperty* ip = new QIndigoProperty(p->property);
-			fprintf(stderr, "POPER\n");
 			playout->addWidget(ip);
 			connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
 
