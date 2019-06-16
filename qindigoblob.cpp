@@ -7,6 +7,8 @@
 
 QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent)
 	: QWidget(parent), QIndigoItem(p, property, item), m_dirty(false) {
+
+	m_logger = &Logger::instance();
 	label = new QLabel(m_item->label);
 	text = new QLineEdit();
 	if (m_property->perm == INDIGO_RO_PERM)
@@ -78,7 +80,7 @@ void QIndigoBLOB::save_blob_item(){
 		int file_no = 0;
 
 		do {
-			sprintf(file_name, "blob_%03d.%s", file_no++, m_item->blob.format);
+			sprintf(file_name, "blob_%03d%s", file_no++, m_item->blob.format);
 			fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
 		} while ((fd < 0) && (errno == EEXIST));
 
@@ -88,6 +90,7 @@ void QIndigoBLOB::save_blob_item(){
 			write(fd, m_item->blob.value, m_item->blob.size);
 			close_fd(fd);
 			indigo_log("ITEM image saved to %s...", file_name);
+			m_logger->log(NULL, "ITEM image saved to...");
 		}
 	}
 }

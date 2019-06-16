@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QWidget>
 #include "qindigoswitch.h"
+#include "logger.h"
 
 
 class QIndigoBLOB : public QWidget, public QIndigoItem {
@@ -24,6 +25,7 @@ public slots:
 	void save_blob_item();
 
 private:
+	Logger* m_logger;
 	QLabel* label;
 	QLineEdit* text;
 	bool m_dirty;

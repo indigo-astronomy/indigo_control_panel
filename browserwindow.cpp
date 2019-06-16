@@ -10,6 +10,7 @@
 #include "propertymodel.h"
 #include "indigoclient.h"
 #include "qindigoproperty.h"
+#include "logger.h"
 
 
 BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
@@ -75,6 +76,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_property_log);
+
+	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_property_log);
 
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
 
