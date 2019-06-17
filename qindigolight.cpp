@@ -29,16 +29,16 @@ void
 QIndigoLight::update() {
     switch (m_item->light.value) {
     case INDIGO_IDLE_STATE:
-        led->setPixmap(QPixmap(":led-grey.png"));
+        led->setPixmap(QPixmap(":resource/led-grey.png"));
         break;
     case INDIGO_BUSY_STATE:
-        led->setPixmap(QPixmap(":led-orange.png"));
+        led->setPixmap(QPixmap(":resource/led-orange.png"));
         break;
     case INDIGO_ALERT_STATE:
-        led->setPixmap(QPixmap(":led-red.png"));
+        led->setPixmap(QPixmap(":resource/led-red.png"));
         break;
     case INDIGO_OK_STATE:
-        led->setPixmap(QPixmap(":led-green.png"));
+        led->setPixmap(QPixmap(":resource/led-green.png"));
         break;
     }
 }

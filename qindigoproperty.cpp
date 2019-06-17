@@ -44,19 +44,19 @@ void QIndigoProperty::update_controls() {
 void QIndigoProperty::update_property_view() {
 	switch (m_property->state) {
 	case INDIGO_IDLE_STATE:
-		m_led->setPixmap(QPixmap(":led-grey.png"));
+		m_led->setPixmap(QPixmap(":resource/led-grey.png"));
 		this->setStyleSheet("background-color: #202020");
 		break;
 	case INDIGO_BUSY_STATE:
-		m_led->setPixmap(QPixmap(":led-orange.png"));
+		m_led->setPixmap(QPixmap(":resource/led-orange.png"));
 		this->setStyleSheet("background-color: #353520");
 		break;
 	case INDIGO_ALERT_STATE:
-		m_led->setPixmap(QPixmap(":led-red.png"));
+		m_led->setPixmap(QPixmap(":resource/led-red.png"));
 		this->setStyleSheet("background-color: #352020");
 		break;
 	case INDIGO_OK_STATE:
-		m_led->setPixmap(QPixmap(":led-green.png"));
+		m_led->setPixmap(QPixmap(":resource/led-green.png"));
 		this->setStyleSheet("background-color: #203220");
 		break;
 	}

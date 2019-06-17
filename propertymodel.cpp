@@ -329,25 +329,25 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 				PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
 				switch (p->property->state) {
 				case INDIGO_IDLE_STATE:
-					return QPixmap(":led-grey.png");
+					return QPixmap(":resource/led-grey.png");
 				case INDIGO_BUSY_STATE:
-					return QPixmap(":led-orange.png");
+					return QPixmap(":resource/led-orange.png");
 				case INDIGO_ALERT_STATE:
-					return QPixmap(":led-red.png");
+					return QPixmap(":resource/led-red.png");
 				case INDIGO_OK_STATE:
-					return QPixmap(":led-green.png");
+					return QPixmap(":resource/led-green.png");
 				}
 			} else if (node->node_type == TREE_NODE_DEVICE) {
 				DeviceNode* d = reinterpret_cast<DeviceNode*>(node);
 				switch (d->state) {
 				case INDIGO_IDLE_STATE:
-					return QPixmap(":led-grey.png");
+					return QPixmap(":resource/led-grey.png");
 				case INDIGO_BUSY_STATE:
-					return QPixmap(":led-orange.png");
+					return QPixmap(":resource/led-orange.png");
 				case INDIGO_ALERT_STATE:
-					return QPixmap(":led-red.png");
+					return QPixmap(":resource/led-red.png");
 				case INDIGO_OK_STATE:
-					return QPixmap(":led-green.png");
+					return QPixmap(":resource/led-green.png");
 			}
 			} else {
 				return QVariant();
