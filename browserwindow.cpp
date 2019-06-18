@@ -22,18 +22,19 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QWidget *widget = new QWidget;
 	setCentralWidget(widget);
 
+
+	//  Set the root layout to be a VBox
+	QVBoxLayout *rootLayout = new QVBoxLayout;
+	widget->setLayout(rootLayout);
+
 	// Create menubar
-	QMenuBar *menu = new QMenuBar(widget);
+	QMenuBar *menu = new QMenuBar;
 	QMenu *file = new QMenu("&File");
 	QAction *exit_act = new QAction(tr("&Exit"), this);
 	file->addAction(exit_act);
 	menu->addMenu(file);
 
 	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
-
-	//  Set the root layout to be a VBox
-	QVBoxLayout *rootLayout = new QVBoxLayout;
-	widget->setLayout(rootLayout);
 
 	//  Create properties viewing area
 	mProperties = new QTreeView;
@@ -65,6 +66,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	hSplitter->addWidget(form_panel);
 	hSplitter->setStretchFactor(0, 45);
 	hSplitter->setStretchFactor(2, 55);
+	rootLayout->addWidget(menu);
 	rootLayout->addWidget(hSplitter, 85);
 
 
