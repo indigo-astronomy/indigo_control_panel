@@ -19,24 +19,52 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	resize(1024, 768);
 
 	//  Set central widget of window
-	QWidget *widget = new QWidget;
-	setCentralWidget(widget);
+	QWidget *central = new QWidget;
+	setCentralWidget(central);
 
 
 	//  Set the root layout to be a VBox
 	QVBoxLayout *rootLayout = new QVBoxLayout;
-	widget->setLayout(rootLayout);
+	rootLayout->setSpacing(0);
+	rootLayout->setContentsMargins(0, 0, 0, 0);
+	rootLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	central->setLayout(rootLayout);
 
 	// Create menubar
 	QMenuBar *menu = new QMenuBar;
 	QMenu *file = new QMenu("&File");
+	QAction *servers_act = new QAction(tr("&Servers"), this);
+	file->addAction(servers_act);
 	QAction *exit_act = new QAction(tr("&Exit"), this);
 	file->addAction(exit_act);
 	menu->addMenu(file);
 
+	QMenu *settings = new QMenu("&Settings");
+	QAction *blobs_act = new QAction(tr("&Ebable BLOBs"), this);
+	blobs_act->setCheckable(true);
+	blobs_act->setChecked(true);
+	settings->addAction(blobs_act);
+	menu->addMenu(settings);
+
+	QAction *bonjour_act = new QAction(tr("&Enable auto connect"), this);
+	bonjour_act->setCheckable(true);
+	bonjour_act->setChecked(true);
+	settings->addAction(bonjour_act);
+	menu->addMenu(settings);
+
+	rootLayout->addWidget(menu);
+
 	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 
-	//  Create properties viewing area
+	// Create properties viewing area
+	QWidget *view = new QWidget;
+	QVBoxLayout *propertyLayout = new QVBoxLayout;
+	propertyLayout->setSpacing(5);
+	propertyLayout->setContentsMargins(5, 5, 5, 5);
+	propertyLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	view->setLayout(propertyLayout);
+	rootLayout->addWidget(view);
+
 	mProperties = new QTreeView;
 	form_panel = new QWidget();
 	form_layout = new QVBoxLayout();
@@ -47,33 +75,22 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	mScrollArea->setWidgetResizable(true);
 	mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	//mScrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-	//mScrollArea->setViewportMargins(0, 0, 60, 0);
-	//mScrollArea->setBackgroundRole(QPalette::Dark);
 	form_layout->addWidget(mScrollArea);
 	mScrollArea->setMinimumWidth(600);
 
-	//    QWidget* ppanel = new QWidget();
-	//    mScrollArea->setWidget(ppanel);
-	//    QVBoxLayout* playout = new QVBoxLayout;
-	//    ppanel->setLayout(playout);
-	//    form_layout = playout;
 
 	QSplitter* hSplitter = new QSplitter;
 	hSplitter->addWidget(mProperties);
-	//hSplitter->addWidget(form_panel);
-	//hSplitter->setOpaqueResize(false);
 	hSplitter->addWidget(form_panel);
 	hSplitter->setStretchFactor(0, 45);
 	hSplitter->setStretchFactor(2, 55);
-	rootLayout->addWidget(menu);
-	rootLayout->addWidget(hSplitter, 85);
+	propertyLayout->addWidget(hSplitter, 85);
 
 
 	//  Create log viewer
 	mLog = new QPlainTextEdit;
 	mLog->setReadOnly(true);
-	rootLayout->addWidget(mLog, 15);
+	propertyLayout->addWidget(mLog, 15);
 
 	mServiceModel = new ServiceModel("_indigo._tcp");
 
@@ -163,7 +180,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		QWidget* ppanel = new QWidget();
 		QVBoxLayout* playout = new QVBoxLayout;
 		playout->setSpacing(10);
-		playout->setContentsMargins(10, 10, 25, 10);
+		playout->setContentsMargins(10, 10, 10, 10);
 		playout->setSizeConstraint(QLayout::SetMinimumSize);
 		ppanel->setLayout(playout);
 		playout->addWidget(ip);
@@ -178,7 +195,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		QWidget* ppanel = new QWidget();
 		QVBoxLayout* playout = new QVBoxLayout;
 		playout->setSpacing(10);
-		playout->setContentsMargins(10, 10, 25, 10);
+		playout->setContentsMargins(10, 10, 10, 10);
 		playout->setSizeConstraint(QLayout::SetMinimumSize);
 		ppanel->setLayout(playout);
 
