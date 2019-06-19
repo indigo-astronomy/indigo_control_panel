@@ -1,5 +1,6 @@
 #include <indigo_client.h>
 #include "indigoclient.h"
+#include "conf.h"
 
 
 static indigo_result client_attach(indigo_client *client) {
@@ -25,11 +26,12 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	case INDIGO_BLOB_VECTOR:
-		if (device->version >= INDIGO_VERSION_2_0)
-			indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_URL);
-		else
-			indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_ALSO);
-
+		if (conf.blobs_enabled) {
+			if (device->version >= INDIGO_VERSION_2_0)
+				indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_URL);
+			else
+				indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_ALSO);
+		}
 		if (property->state == INDIGO_OK_STATE) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {

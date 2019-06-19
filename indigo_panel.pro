@@ -54,7 +54,8 @@ HEADERS += \
 	qindigonumber.h \
 	qindigolight.h \
 	qindigoblob.h \
-	logger.h
+	logger.h \
+	conf.h
 
 include(qtzeroconf/qtzeroconf.pri)
 

@@ -12,6 +12,7 @@
 #include "indigoclient.h"
 #include "qindigoproperty.h"
 #include "logger.h"
+#include "conf.h"
 
 
 BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
@@ -42,19 +43,21 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QMenu *settings = new QMenu("&Settings");
 	QAction *blobs_act = new QAction(tr("&Ebable BLOBs"), this);
 	blobs_act->setCheckable(true);
-	blobs_act->setChecked(true);
+	blobs_act->setChecked(conf.blobs_enabled);
 	settings->addAction(blobs_act);
 	menu->addMenu(settings);
 
 	QAction *bonjour_act = new QAction(tr("&Enable auto connect"), this);
 	bonjour_act->setCheckable(true);
-	bonjour_act->setChecked(true);
+	bonjour_act->setChecked(conf.auto_connect);
 	settings->addAction(bonjour_act);
 	menu->addMenu(settings);
 
 	rootLayout->addWidget(menu);
 
 	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
+	connect(blobs_act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
+	connect(bonjour_act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
 
 	// Create properties viewing area
 	QWidget *view = new QWidget;
@@ -243,4 +246,14 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 
 void BrowserWindow::on_exit_act() {
 	QApplication::quit();
+}
+
+void BrowserWindow::on_blobs_changed(bool status) {
+	conf.blobs_enabled = status;
+	printf ("%s\n", __FUNCTION__);
+}
+
+void BrowserWindow::on_bonjour_changed(bool status) {
+	conf.auto_connect = status;
+	printf ("%s\n", __FUNCTION__);
 }
