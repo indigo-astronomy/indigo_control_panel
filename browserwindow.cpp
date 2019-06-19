@@ -273,7 +273,7 @@ void BrowserWindow::on_bonjour_changed(bool status) {
 
 void BrowserWindow::on_about_act() {
 	QMessageBox *mb = new QMessageBox;
-	mb->about(this, "About INDIGO Panel", "INDIGO Control Panel v.0.1-b1\n\nAuthors:\nDavid Hulse\nRumen G.Bogdanovski\n\n(c)2019 by INDIGO Initiative\nhttp://www.indigo-astronomy.org");
+	mb->about(this, "About INDIGO Panel", "INDIGO Control Panel v.0.1-b1\n\nAuthors:\nDavid Hulse\nRumen G.Bogdanovski\n\nCopyright ©2019, The INDIGO Initiative.\nhttp://www.indigo-astronomy.org");
 	printf ("%s\n", __FUNCTION__);
 	delete mb;
 }
