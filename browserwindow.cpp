@@ -252,6 +252,8 @@ void BrowserWindow::on_exit_act() {
 void BrowserWindow::on_blobs_changed(bool status) {
 	conf.blobs_enabled = status;
 	emit(enable_blobs(status));
+	if(status) on_property_log(NULL, "BLOBs enabled");
+	else on_property_log(NULL, "BLOBs disabled");
 	printf ("%s\n", __FUNCTION__);
 }
 
