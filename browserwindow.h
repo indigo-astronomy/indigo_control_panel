@@ -30,6 +30,7 @@ public slots:
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
 	void on_exit_act();
+	void on_about_act();
 
 private:
 	QPlainTextEdit* mLog;

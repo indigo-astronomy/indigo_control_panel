@@ -3,8 +3,10 @@
 #include <QSplitter>
 #include <QTreeView>
 #include <QMenuBar>
+#include <QIcon>
 #include <QPlainTextEdit>
 #include <QScrollArea>
+#include <QMessageBox>
 #include <sys/time.h>
 #include "browserwindow.h"
 #include "servicemodel.h"
@@ -18,6 +20,9 @@
 BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	setWindowTitle(tr("INDIGO Control Panel"));
 	resize(1024, 768);
+
+	QIcon icon(":resource/appicon.png");
+	this->setWindowIcon(icon);
 
 	//  Set central widget of window
 	QWidget *central = new QWidget;
@@ -45,19 +50,23 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	blobs_act->setCheckable(true);
 	blobs_act->setChecked(conf.blobs_enabled);
 	settings->addAction(blobs_act);
-	menu->addMenu(settings);
-
 	QAction *bonjour_act = new QAction(tr("&Enable auto connect"), this);
 	bonjour_act->setCheckable(true);
 	bonjour_act->setChecked(conf.auto_connect);
 	settings->addAction(bonjour_act);
 	menu->addMenu(settings);
 
+	QMenu *help = new QMenu("&Help");
+	QAction *about_act = new QAction(tr("&About"), this);
+	help->addAction(about_act);
+	menu->addMenu(help);
+
 	rootLayout->addWidget(menu);
 
 	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 	connect(blobs_act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
 	connect(bonjour_act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
+	connect(about_act, &QAction::triggered, this, &BrowserWindow::on_about_act);
 
 	// Create properties viewing area
 	QWidget *view = new QWidget;
@@ -260,4 +269,11 @@ void BrowserWindow::on_blobs_changed(bool status) {
 void BrowserWindow::on_bonjour_changed(bool status) {
 	conf.auto_connect = status;
 	printf ("%s\n", __FUNCTION__);
+}
+
+void BrowserWindow::on_about_act() {
+	QMessageBox *mb = new QMessageBox;
+	mb->about(this, "About INDIGO Panel", "INDIGO Control Panel v.0.1-b1\n\nAuthors:\nDavid Hulse\nRumen G.Bogdanovski\n\n(c)2019 by INDIGO Initiative\nhttp://www.indigo-astronomy.org");
+	printf ("%s\n", __FUNCTION__);
+	delete mb;
 }
