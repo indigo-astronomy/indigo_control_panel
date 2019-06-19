@@ -7,6 +7,7 @@
 #include "qindigoproperty.h"
 #include <indigo_names.h>
 
+extern indigo_client client;
 
 TreeNode::~TreeNode() {
 	printf("CALLED: %s on %p\n", __FUNCTION__, this);
@@ -358,4 +359,31 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 		fprintf(stderr, "Missing pointer\n");
 	}
 	return QVariant();
+}
+
+void PropertyModel::enable_blobs(bool on) {
+	for (int dev_index = 0; dev_index < root.size(); dev_index++) {
+		DeviceNode* dev_node = static_cast<DeviceNode*>(root.children[dev_index]);
+		if (dev_node == nullptr) continue;
+		for (int group_index = 0; group_index < dev_node->size(); group_index++) {
+			GroupNode* group_node = static_cast<GroupNode*>(dev_node->children[group_index]);
+			if (group_node == nullptr) continue;
+			for (int prop_index = 0; prop_index < group_node->size(); prop_index++) {
+				PropertyNode* prop_node = static_cast<PropertyNode*>(group_node->children[prop_index]);
+				if (prop_node == nullptr) continue;
+				indigo_property *property = prop_node->property;
+				if (property == nullptr) continue;
+				if (property->type == INDIGO_BLOB_VECTOR) {
+					if ((on) && (property->version >= INDIGO_VERSION_2_0)) {
+						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_URL);
+					} else if (on) {
+						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_ALSO);
+					} else {
+						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_NEVER);
+					}
+					printf("BLOB %s.%s -> mode = %d\n", property->device, property->name, on);
+				}
+			}
+		}
+	}
 }

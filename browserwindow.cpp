@@ -112,6 +112,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_property_log);
 
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
+	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 
 	current_node = nullptr;
 
@@ -250,6 +251,7 @@ void BrowserWindow::on_exit_act() {
 
 void BrowserWindow::on_blobs_changed(bool status) {
 	conf.blobs_enabled = status;
+	emit(enable_blobs(status));
 	printf ("%s\n", __FUNCTION__);
 }
 

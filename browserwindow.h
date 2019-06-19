@@ -21,6 +21,9 @@ class BrowserWindow : public QMainWindow {
 public:
 	explicit BrowserWindow(QWidget *parent = nullptr);
 
+signals:
+	void enable_blobs(bool on);
+
 public slots:
 	void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);
 	void on_property_log(indigo_property* property, const char *message);

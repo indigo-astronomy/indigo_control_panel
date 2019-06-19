@@ -237,6 +237,7 @@ public slots:
     void define_property(indigo_property* property, const char *message);
     void update_property(indigo_property* property, const char *message);
     void delete_property(indigo_property* property, const char *message);
+	void enable_blobs(bool on);
 
 private:
     RootNode root;
