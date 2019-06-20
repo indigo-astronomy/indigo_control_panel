@@ -272,8 +272,20 @@ void BrowserWindow::on_bonjour_changed(bool status) {
 }
 
 void BrowserWindow::on_about_act() {
-	QMessageBox *mb = new QMessageBox;
-	mb->about(this, "About INDIGO Panel", "INDIGO Control Panel v.0.1-b1\n\nAuthors:\nDavid Hulse\nRumen G.Bogdanovski\n\nCopyright ©2019, The INDIGO Initiative.\nhttp://www.indigo-astronomy.org");
+	QMessageBox msgBox(this);
+	QPixmap pixmap(":resource/appicon.png");
+	msgBox.setWindowTitle("About INDIGO Panel");
+	msgBox.setTextFormat(Qt::RichText);
+	msgBox.setIconPixmap(pixmap.scaledToWidth(96, Qt::SmoothTransformation));
+	msgBox.setText(
+		"<b>INDIGO Control Panel</b><br>"
+		"Version 0.1-b1</b><br><br>"
+		"Authors:<br>"
+		"David Hulse<br>"
+		"Rumen G.Bogdanovski<br><br>"
+		"Copyright ©2019, The INDIGO Initiative.<br>"
+		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
+	);
+	msgBox.exec();
 	printf ("%s\n", __FUNCTION__);
-	delete mb;
 }
