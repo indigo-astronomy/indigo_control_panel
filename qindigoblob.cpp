@@ -70,15 +70,17 @@ void QIndigoBLOB::dirty() {
 	text->setStyleSheet("color: #CC0000");
 }
 
+
 /* C++ looks for method close - maybe name collision so... */
 void close_fd(int fd) {
 	close(fd);
 }
 
+
 void QIndigoBLOB::save_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 		char file_name[PATH_MAX];
-		char message[255];
+		char message[PATH_MAX+100];
 		char cwd[PATH_MAX];
 
 		if (!getcwd(cwd, sizeof(cwd))) {
@@ -86,28 +88,31 @@ void QIndigoBLOB::save_blob_item(){
 		}
 
 		if (save_blob_item_with_prefix(cwd, file_name)) {
-			sprintf(message, "Image saved to '%s'", file_name);
+			snprintf(message, sizeof(message), "Image saved to '%s'", file_name);
 			m_logger->log(NULL, message);
 		} else {
-			sprintf(message, "Can not save '%s'", file_name);
+			snprintf(message, sizeof(message), "Can not save '%s'", file_name);
 			m_logger->log(NULL, message);
 		}
 	}
 }
+
 
 void QIndigoBLOB::preview_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 		char file_name[PATH_MAX];
-		char url[PATH_MAX];
+		char url[PATH_MAX+100];
 
 		if (save_blob_item_with_prefix("/tmp", file_name)) {
-			sprintf(url, "file://%s", file_name);
-			QDesktopServices::openUrl(QUrl(url));
-		} else {
-			printf("Can not display image '%s'", file_name);
+			snprintf(url, sizeof(url), "file://%s", file_name);
+			if(QDesktopServices::openUrl(QUrl(url))) {
+				return;
+			}
 		}
+		printf("Can not display image '%s'", file_name);
 	}
 }
+
 
 bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name) {
 	int fd;
