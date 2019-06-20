@@ -17,12 +17,14 @@ public:
 	virtual void update();
 	virtual void reset();
 	virtual void apply();
+	bool save_blob_item_with_prefix(const char *prefix, char *file_name);
 
 signals:
 
 public slots:
 	void dirty();
 	void save_blob_item();
+	void preview_blob_item();
 
 private:
 	Logger* m_logger;

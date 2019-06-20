@@ -242,6 +242,12 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 		hbox->setSpacing(10);
 		hbox->setMargin(0);
 
+		//  Add Display button
+		QPushButton *displayb = new QPushButton("Preview...");
+		displayb->setDefault(true);
+		displayb->setMinimumWidth(75);
+		hbox->addWidget(displayb);
+
 		//  Add Save button
 		QPushButton* saveb = new QPushButton("Save BLOB");
 		saveb->setDefault(true);
@@ -250,6 +256,7 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 
 		//  Connect signals
 		connect(saveb, &QPushButton::clicked, blob, &QIndigoBLOB::save_blob_item);
+		connect(displayb, &QPushButton::clicked, blob, &QIndigoBLOB::preview_blob_item);
 	}
 
 	//  We want to button press signal to cause the form fields to update to the property and send on bus

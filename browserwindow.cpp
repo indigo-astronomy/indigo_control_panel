@@ -218,7 +218,6 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 			QIndigoProperty* ip = new QIndigoProperty(p->property);
 			playout->addWidget(ip);
 			connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
-
 		}
 		playout->addStretch(); // Fill the vertical space available
 

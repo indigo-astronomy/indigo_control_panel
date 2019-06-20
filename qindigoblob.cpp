@@ -1,6 +1,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <QUrl>
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include "qindigoblob.h"
 
@@ -78,27 +80,49 @@ void QIndigoBLOB::save_blob_item(){
 		char file_name[PATH_MAX];
 		char message[255];
 		char cwd[PATH_MAX];
-		int fd;
-		int file_no = 0;
 
 		if (!getcwd(cwd, sizeof(cwd))) {
 			cwd[0] = '\0';
 		}
 
-		do {
-			sprintf(file_name, "%s/blob_%03d%s", cwd, file_no++, m_item->blob.format);
-			fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
-		} while ((fd < 0) && (errno == EEXIST));
-
-		if (fd < 0) {
-			sprintf(message, "Can not save '%s'", file_name);
+		if (save_blob_item_with_prefix(cwd, file_name)) {
+			sprintf(message, "Image saved to '%s'", file_name);
 			m_logger->log(NULL, message);
 		} else {
-			write(fd, m_item->blob.value, m_item->blob.size);
-			close_fd(fd);
-
-			sprintf(message, "Image saved to '%s'", file_name);
+			sprintf(message, "Can not save '%s'", file_name);
 			m_logger->log(NULL, message);
 		}
 	}
+}
+
+void QIndigoBLOB::preview_blob_item(){
+	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
+		char file_name[PATH_MAX];
+		char url[PATH_MAX];
+
+		if (save_blob_item_with_prefix("/tmp", file_name)) {
+			sprintf(url, "file://%s", file_name);
+			QDesktopServices::openUrl(QUrl(url));
+		} else {
+			printf("Can not display image '%s'", file_name);
+		}
+	}
+}
+
+bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name) {
+	int fd;
+	int file_no = 0;
+
+	do {
+		sprintf(file_name, "%s/blob_%03d%s", prefix, file_no++, m_item->blob.format);
+		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
+	} while ((fd < 0) && (errno == EEXIST));
+
+	if (fd < 0) {
+		return false;
+	} else {
+		write(fd, m_item->blob.value, m_item->blob.size);
+		close_fd(fd);
+	}
+	return true;
 }
