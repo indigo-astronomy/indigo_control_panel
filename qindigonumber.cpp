@@ -44,14 +44,14 @@ void QIndigoNumber::update() {
 	if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm') {
 		strncpy(buffer, indigo_dtos(m_item->number.value, NULL), sizeof(buffer));
 	} else {
-		snprintf(buffer,  sizeof(buffer), m_item->number.format, m_item->number.value);
+		snprintf(buffer, sizeof(buffer), m_item->number.format, m_item->number.value);
 	}
 	text_value->setText(buffer);
 	if (text_target && !m_dirty) {
 		if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm')
 			strncpy(buffer, indigo_dtos(m_item->number.target, NULL), sizeof(buffer));
 		else
-			snprintf(buffer, sizeof(buffer), m_item->number.format, m_item->number.value);
+			snprintf(buffer, sizeof(buffer), m_item->number.format, m_item->number.target);
 		text_target->setText(buffer);
 	}
 }
@@ -66,7 +66,7 @@ void QIndigoNumber::reset() {
 }
 
 void QIndigoNumber::apply() {
-	if (text_target && m_dirty) {
+	if (text_target) {
 		m_item->number.value = m_item->number.target = indigo_stod((char*)text_target->text().toStdString().c_str());
 		reset();
 	}
@@ -77,7 +77,7 @@ void QIndigoNumber::dirty() {
 		//  Set dirty flag
 		m_dirty = true;
 
-		//  Colour text red
-		text_target->setStyleSheet("color: #CC0000");
+		//  Colour text orange
+		text_target->setStyleSheet("color: #CCCC00");
 	}
 }

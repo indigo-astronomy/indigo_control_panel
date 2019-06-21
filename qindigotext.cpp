@@ -58,7 +58,6 @@ void
 QIndigoText::dirty() {
     //  Set dirty flag
     m_dirty = true;
-
-    //  Colour text red
-    text->setStyleSheet("color: #CC0000");
+    //  Colour text orange
+    text->setStyleSheet("color: #CCCC00");
 }
