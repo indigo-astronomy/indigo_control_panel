@@ -6,7 +6,9 @@ QIndigoLight::QIndigoLight(QIndigoProperty* p, indigo_property* property, indigo
     : QWidget(parent), QIndigoItem(p, property, item)
 {
     led = new QLabel();
+	led->setObjectName("INDIGO_property");
     label = new QLabel(m_item->label);
+	label->setObjectName("INDIGO_property");
     update();
 
     //  Lay the labels out somehow in the widget

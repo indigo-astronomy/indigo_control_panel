@@ -890,8 +890,8 @@ QProgressBar::chunk:disabled {
 /* QPushButton ------------------------------------------------------------ */
 
 QPushButton {
-    background-color: #505F69 ;
-    border: 1px solid #353535;
+    background-color: #303030 ;
+    border: 1px solid #454545;
     color: #F0F0F0;
     border-radius: 4px;
     padding: 3px;
@@ -900,7 +900,7 @@ QPushButton {
 
 QPushButton:disabled {
     background-color: #353535;
-    border: 1px solid #353535;
+    border: 1px solid #454545;
     color: #787878;
     border-radius: 4px;
     padding: 3px;
@@ -909,7 +909,7 @@ QPushButton:disabled {
 
 QPushButton:checked {
     background-color: #353535;
-    border: 1px solid #353535;
+    border: 1px solid #454545;
     border-radius: 4px;
     padding: 3px;
     outline: none;
@@ -917,7 +917,7 @@ QPushButton:checked {
 
 QPushButton:checked:disabled {
     background-color: #202020;
-    border: 1px solid #353535;
+    border: 1px solid #454545;
     color: #787878;
     border-radius: 4px;
     padding: 3px;

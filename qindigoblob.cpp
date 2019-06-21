@@ -12,6 +12,7 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 
 	m_logger = &Logger::instance();
 	label = new QLabel(m_item->label);
+	label->setObjectName("INDIGO_property");
 	text = new QLineEdit();
 	if (m_property->perm == INDIGO_RO_PERM)
 		text->setReadOnly(true);

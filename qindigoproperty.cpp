@@ -45,19 +45,19 @@ void QIndigoProperty::update_property_view() {
 	switch (m_property->state) {
 	case INDIGO_IDLE_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-grey.png"));
-		this->setStyleSheet("background-color: #202020");
+		this->setStyleSheet("#INDIGO_property { background-color: #202020 }");
 		break;
 	case INDIGO_BUSY_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-orange.png"));
-		this->setStyleSheet("background-color: #353520");
+		this->setStyleSheet("#INDIGO_property { background-color: #353520 }");
 		break;
 	case INDIGO_ALERT_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-red.png"));
-		this->setStyleSheet("background-color: #352020");
+		this->setStyleSheet("#INDIGO_property { background-color: #352020 }");
 		break;
 	case INDIGO_OK_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-green.png"));
-		this->setStyleSheet("background-color: #203220");
+		this->setStyleSheet("#INDIGO_property { background-color: #203220 }");
 		break;
 	}
 	m_led->update();
@@ -109,6 +109,7 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	QFrame *frame = new QFrame();
 	frame->setFrameShadow(QFrame::Raised);
 	frame->setFrameShape(QFrame::StyledPanel);
+	frame->setObjectName("INDIGO_property");
 
 	QVBoxLayout* vbox = new QVBoxLayout();
 	vbox->addWidget(frame);
@@ -118,6 +119,7 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	frame->setLayout(frame_layout);
 
 	QWidget *head = new QWidget();
+	head->setObjectName("INDIGO_property");
 	frame_layout->addWidget(head);
 	QHBoxLayout* head_layout = new QHBoxLayout();
 	head->setLayout(head_layout);
@@ -129,9 +131,12 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	char device_string[1025];
 	sprintf(device_string, "@ %s", m_property->device);
 	m_led = new QLabel();
+	m_led->setObjectName("INDIGO_property");
 	QLabel* property_label = new QLabel(m_property->label);
 	property_label->setStyleSheet("font-weight: bold;");
+	property_label->setObjectName("INDIGO_property");
 	QLabel* device_label = new QLabel(device_string);
+	device_label->setObjectName("INDIGO_property");
 
 	head_layout->addWidget(m_led);
 	head_layout->addWidget(property_label);
@@ -139,6 +144,7 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	head_layout->addWidget(device_label);
 
 	QWidget *property_setings = new QWidget();
+	property_setings->setObjectName("INDIGO_property");
 	head_layout->addWidget(property_setings);
 	QVBoxLayout* property_layout = new QVBoxLayout();
 	property_setings->setLayout(property_layout);
@@ -244,12 +250,14 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 
 		//  Add Display button
 		QPushButton *displayb = new QPushButton("Preview...");
+		displayb->setObjectName("INDIGO_property");
 		displayb->setDefault(true);
 		displayb->setMinimumWidth(75);
 		hbox->addWidget(displayb);
 
 		//  Add Save button
 		QPushButton* saveb = new QPushButton("Save BLOB");
+		saveb->setObjectName("INDIGO_property");
 		saveb->setDefault(true);
 		saveb->setMinimumWidth(75);
 		hbox->addWidget(saveb);
@@ -283,7 +291,9 @@ void QIndigoProperty::build_buttons(QVBoxLayout* layout) {
 
 	//  Add buttons
 	QPushButton* set = new QPushButton("Set");
+	set->setObjectName("INDIGO_property");
 	QPushButton* reset = new QPushButton("Reset");
+	reset->setObjectName("INDIGO_property");
 	set->setDefault(true);
 	set->setMinimumWidth(75);
 	reset->setMinimumWidth(75);

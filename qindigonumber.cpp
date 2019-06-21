@@ -7,6 +7,7 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 	: QWidget(parent), QIndigoItem(p, property, item) {
 
 	label = new QLabel(m_item->label);
+	label->setObjectName("INDIGO_property");
 	text_value = new QLineEdit();
 	text_value->setReadOnly(true);
 	text_target = nullptr;

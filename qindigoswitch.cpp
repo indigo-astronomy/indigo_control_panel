@@ -9,6 +9,7 @@ QIndigoItem::~QIndigoItem()
 QIndigoSwitch::QIndigoSwitch(QIndigoProperty* p, indigo_property* property, indigo_item* item)
     : QCheckBox(), QIndigoItem(p, property, item)
 {
+	this->setObjectName("INDIGO_property");
     setText(m_item->label);
     if (m_property->perm == INDIGO_RO_PERM)
         setEnabled(false);
