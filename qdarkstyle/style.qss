@@ -19,7 +19,7 @@ configuration is described bellow.
     SELECTION ------------
 
         sel_light  #179AE0 #505050 (selection/hover/active)
-        sel_normal #3375A3 #1464A0 (selected)
+        sel_normal #3375A3 #515151 (selected)
         sel_dark   #18465D #14506E (selected disabled)
 
     FOREGROUND -----------
@@ -47,7 +47,7 @@ QWidget {
     border: 0px solid #353535;
     padding: 0px;
     color: #F0F0F0;
-    selection-background-color: #1464A0;
+    selection-background-color: #515151;
     selection-color: #F0F0F0;
 }
 
@@ -59,7 +59,7 @@ QWidget:disabled {
 }
 
 QWidget:item:selected {
-    background-color: #1464A0;
+    background-color: #515151;
 }
 
 QWidget:item:hover {
@@ -620,7 +620,7 @@ QTextEdit:hover {
 }
 
 QTextEdit:selected {
-    background: #1464A0;
+    background: #515151;
     color: #353535;
 }
 
@@ -639,7 +639,7 @@ QPlainTextEdit:hover {
 }
 
 QPlainTextEdit:selected {
-    background: #1464A0;
+    background: #515151;
     color: #353535;
 }
 
@@ -759,7 +759,7 @@ QAbstractSpinBox:hover{
 }
 
 QAbstractSpinBox:selected {
-    background: #1464A0;
+    background: #515151;
     color: #353535;
 }
 
@@ -872,7 +872,7 @@ QProgressBar:disabled {
 }
 
 QProgressBar::chunk {
-    background-color: #1464A0;
+    background-color: #515151;
     color: #202020;
     border-radius: 4px;
 }
@@ -944,7 +944,7 @@ QPushButton:checked:hover{
 
 QPushButton:selected,
 QPushButton:checked:selected{
-    background: #1464A0;
+    background: #515151;
     color: #353535;
 }
 
@@ -1044,7 +1044,7 @@ QCommandLinkButton:disabled {
 QComboBox {
     border: 1px solid #353535;
     border-radius: 4px;
-    selection-background-color: #1464A0;
+    selection-background-color: #515151;
     padding-top: 2px;     /* This fix  #103, #111*/
     padding-bottom: 2px;  /* This fix  #103, #111*/
     padding-left: 4px;
@@ -1113,7 +1113,7 @@ QSlider::groove:horizontal {
 }
 
 QSlider::sub-page:horizontal {
-    background: #1464A0;
+    background: #515151;
     border: 1px solid #353535;
     height: 4px;
     margin: 0px;
@@ -1147,7 +1147,7 @@ QSlider::groove:vertical {
 }
 
 QSlider::sub-page:vertical {
-    background: #1464A0;
+    background: #515151;
     border: 1px solid #353535;
     width: 4px;
     margin: 0px;
@@ -1197,7 +1197,7 @@ QLineEdit:hover{
 }
 
 QLineEdit:selected{
-    background: #1464A0;
+    background: #515151;
     color: #353535;
 }
 
@@ -1221,7 +1221,7 @@ QTabWidget::pane {
 
 QTabWidget::pane:selected {
     background-color: #353535;
-    border: 1px solid #1464A0;
+    border: 1px solid #515151;
 }
 
 /* QTabBar ---------------------------------------------------------------- */
@@ -1343,7 +1343,7 @@ QTabBar::tab:top {
 QTabBar::tab:top:selected {
     background-color: #505F69;
     color: #F0F0F0;
-    border-bottom: 3px solid #1464A0;
+    border-bottom: 3px solid #515151;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
@@ -1370,7 +1370,7 @@ QTabBar::tab:bottom {
 QTabBar::tab:bottom:selected {
     color: #F0F0F0;
     background-color: #505F69;
-    border-top: 3px solid #1464A0;
+    border-top: 3px solid #515151;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
 }
@@ -1396,7 +1396,7 @@ QTabBar::tab:left {
 QTabBar::tab:left:selected {
     color: #F0F0F0;
     background-color: #505F69;
-    border-left: 3px solid #1464A0;
+    border-left: 3px solid #515151;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 }
@@ -1422,7 +1422,7 @@ QTabBar::tab:right {
 QTabBar::tab:right:selected {
     color: #F0F0F0;
     background-color: #505F69;
-    border-right: 3px solid #1464A0;
+    border-right: 3px solid #515151;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 }
@@ -1552,16 +1552,16 @@ QTreeView::item:!selected:hover,
 QTableView::item:!selected:hover,
 QColumnView::item:!selected:hover {
     outline: 0;
-    color: #505050;
-    background-color: #353535;
+    color: #FFFF00;
+    background-color: #202020;
 }
 
 QListView::item:selected:hover,
 QTreeView::item:selected:hover,
 QTableView::item:selected:hover,
 QColumnView::item:selected:hover {
-    background: #1464A0;
-    color:  #202020;
+    background: #515151;
+    color: #FFFF00;
 }
 
 QTreeView::indicator:checked,
@@ -1629,8 +1629,8 @@ QListView:selected,
 QTreeView:selected,
 QTableView:selected,
 QColumnView:selected {
-    background: #1464A0;
-    color: #353535;
+    background: #515151;
+    color: #FFFFFF;
 }
 
 QListView:hover,
@@ -1639,20 +1639,21 @@ QTableView::hover,
 QColumnView::hover {
     background-color: #202020;
     border: 1px solid #505050;
+	color: #FFFFFF
 }
 
 QListView::item:pressed,
 QTreeView::item:pressed,
 QTableView::item:pressed,
 QColumnView::item:pressed {
-    background-color: #1464A0;
+    background-color: #515151;
 }
 
 QListView::item:selected:active,
 QTreeView::item:selected:active,
 QTableView::item:selected:active,
 QColumnView::item:selected:active {
-    background-color: #1464A0;
+    background-color: #515151;
 }
 
 QTableCornerButton::section {
@@ -1687,7 +1688,7 @@ QHeaderView::section {
 
 QHeaderView::section:checked {
     color: #F0F0F0;
-    background-color: #1464A0;
+    background-color: #515151;
 }
 
 QHeaderView::section:checked:disabled {
@@ -1746,7 +1747,7 @@ QToolBox {
 
 QToolBox::selected {
     padding: 0px;
-    border: 2px solid #1464A0;
+    border: 2px solid #515151;
 }
 
 QToolBox::tab {
@@ -1763,7 +1764,7 @@ QToolBox::tab:disabled {
 
 QToolBox::tab:selected {
     background-color: #505F69;
-    border-bottom: 2px solid #1464A0;
+    border-bottom: 2px solid #515151;
 }
 
 QToolBox::tab:!selected {
@@ -1842,7 +1843,7 @@ QSplitter::separator:vertical {
 /* QDateEdit-------------------------------------------------------------- */
 
 QDateEdit {
-    selection-background-color: #1464A0;
+    selection-background-color: #515151;
     border-style: solid;
     border: 1px solid #353535;
     border-radius: 4px;
@@ -1854,7 +1855,7 @@ QDateEdit {
 }
 
 QDateEdit:on {
-    selection-background-color: #1464A0;
+    selection-background-color: #515151;
 }
 
 QDateEdit::drop-down {
@@ -1879,7 +1880,7 @@ QDateEdit QAbstractItemView {
     background-color: #202020;
     border-radius: 4px;
     border: 1px solid #353535;
-    selection-background-color: #1464A0;
+    selection-background-color: #515151;
 }
 
 QAbstractView:hover{
@@ -1888,6 +1889,6 @@ QAbstractView:hover{
 }
 
 QAbstractView:selected {
-    background: #1464A0;
+    background: #515151;
     color: #353535;
 }
