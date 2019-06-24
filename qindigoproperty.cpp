@@ -56,7 +56,7 @@ void QIndigoProperty::update_property_view() {
 		this->setStyleSheet(
 			"#INDIGO_property { background-color: #353520 }"
 			"QLineEdit#INDIGO_property { background-color: #252520}"
-			"QPushButton#INDIGO_property { background-color: #383822 }"
+			"QPushButton#INDIGO_property { background-color: #454522 }"
 		);
 		break;
 	case INDIGO_ALERT_STATE:
@@ -64,7 +64,7 @@ void QIndigoProperty::update_property_view() {
 		this->setStyleSheet(
 			"#INDIGO_property { background-color: #352020 }"
 			"QLineEdit#INDIGO_property { background-color: #252020}"
-			"QPushButton#INDIGO_property { background-color: #382222 }"
+			"QPushButton#INDIGO_property { background-color: #452222 }"
 		);
 		break;
 	case INDIGO_OK_STATE:
@@ -72,7 +72,7 @@ void QIndigoProperty::update_property_view() {
 		this->setStyleSheet(
 			"#INDIGO_property { background-color: #203220 }"
 			"QLineEdit#INDIGO_property { background-color: #202520}"
-			"QPushButton#INDIGO_property { background-color: #223522 }"
+			"QPushButton#INDIGO_property { background-color: #224322 }"
 		);
 		break;
 	}
@@ -265,14 +265,14 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 		hbox->setMargin(0);
 
 		//  Add Display button
-		QPushButton *displayb = new QPushButton("Preview...");
+		QPushButton *displayb = new QPushButton("&Preview...");
 		displayb->setObjectName("INDIGO_property");
 		displayb->setDefault(true);
 		displayb->setMinimumWidth(75);
 		hbox->addWidget(displayb);
 
 		//  Add Save button
-		QPushButton* saveb = new QPushButton("Save BLOB");
+		QPushButton* saveb = new QPushButton("&Save BLOB");
 		saveb->setObjectName("INDIGO_property");
 		saveb->setDefault(true);
 		saveb->setMinimumWidth(75);
@@ -306,9 +306,9 @@ void QIndigoProperty::build_buttons(QVBoxLayout* layout) {
 	hbox->setMargin(0);
 
 	//  Add buttons
-	QPushButton* set = new QPushButton("Set");
+	QPushButton* set = new QPushButton("&Set");
 	set->setObjectName("INDIGO_property");
-	QPushButton* reset = new QPushButton("Reset");
+	QPushButton* reset = new QPushButton("&Reset");
 	reset->setObjectName("INDIGO_property");
 	set->setDefault(true);
 	set->setMinimumWidth(75);

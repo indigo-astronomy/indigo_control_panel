@@ -46,11 +46,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	menu->addMenu(file);
 
 	QMenu *settings = new QMenu("&Settings");
-	QAction *blobs_act = new QAction(tr("&Ebable BLOBs"), this);
+	QAction *blobs_act = new QAction(tr("Ebable &BLOBs"), this);
 	blobs_act->setCheckable(true);
 	blobs_act->setChecked(conf.blobs_enabled);
 	settings->addAction(blobs_act);
-	QAction *bonjour_act = new QAction(tr("&Enable auto connect"), this);
+	QAction *bonjour_act = new QAction(tr("Enable auto &connect"), this);
 	bonjour_act->setCheckable(true);
 	bonjour_act->setChecked(conf.auto_connect);
 	settings->addAction(bonjour_act);
