@@ -8,6 +8,7 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
     label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
     text = new QLineEdit();
+	text->setObjectName("INDIGO_property");
     if (m_property->perm == INDIGO_RO_PERM)
         text->setReadOnly(true);
     update();

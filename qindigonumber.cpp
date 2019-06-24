@@ -9,11 +9,14 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 	text_value = new QLineEdit();
+	text_value->setObjectName("INDIGO_property");
 	text_value->setReadOnly(true);
 	text_target = nullptr;
 	m_dirty = false;
-	if (m_property->perm != INDIGO_RO_PERM)
+	if (m_property->perm != INDIGO_RO_PERM) {
 		text_target = new QLineEdit();
+		text_target->setObjectName("INDIGO_property");
+	}
 	update();
 
 	//  Lay the labels out somehow in the widget
