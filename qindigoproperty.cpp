@@ -49,30 +49,34 @@ void QIndigoProperty::update_property_view() {
 			"#INDIGO_property { background-color: #202020 }"
 			"QLineEdit#INDIGO_property { background-color: #202020}"
 			"QPushButton#INDIGO_property { background-color: #222222 }"
+			"QPushButton#INDIGO_property:focus { background-color: #272727 }"
 		);
 		break;
 	case INDIGO_BUSY_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-orange.png"));
 		this->setStyleSheet(
-			"#INDIGO_property { background-color: #353520 }"
+			"#INDIGO_property { background-color: #353520; border: 0px}"
 			"QLineEdit#INDIGO_property { background-color: #252520}"
 			"QPushButton#INDIGO_property { background-color: #454522 }"
+			"QPushButton#INDIGO_property:focus { background-color: #505022 }"
 		);
 		break;
 	case INDIGO_ALERT_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-red.png"));
 		this->setStyleSheet(
-			"#INDIGO_property { background-color: #352020 }"
-			"QLineEdit#INDIGO_property { background-color: #252020}"
+			"#INDIGO_property { background-color: #352222; border: 0px}"
+			"QLineEdit#INDIGO_property { background-color: #252222}"
 			"QPushButton#INDIGO_property { background-color: #452222 }"
+			"QPushButton#INDIGO_property:focus { background-color: #502222 }"
 		);
 		break;
 	case INDIGO_OK_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-green.png"));
 		this->setStyleSheet(
-			"#INDIGO_property { background-color: #203220 }"
+			"#INDIGO_property { background-color: #203220; border: 0px}"
 			"QLineEdit#INDIGO_property { background-color: #202520}"
 			"QPushButton#INDIGO_property { background-color: #224322 }"
+			"QPushButton#INDIGO_property:focus { background-color: #225022 }"
 		);
 		break;
 	}
