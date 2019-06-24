@@ -118,6 +118,9 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_property_log);
 
+	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_changed);
+	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_changed);
+
 	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_property_log);
 
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
@@ -150,6 +153,16 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	mLog->appendPlainText(log_line); // Adds the message to the widget
 }
 
+void BrowserWindow::on_property_changed() {
+	printf("PROPERTY defined/deleted\n");
+	clear_window();
+	if (mProperties->selectionModel()->hasSelection()) {
+		printf("HAS SELECTION\n");
+		QItemSelection is = mProperties->selectionModel()->selection();
+		on_selection_changed(is, is);
+	}
+}
+
 void BrowserWindow::clear_window() {
 	QWidget* ppanel = new QWidget();
 	QVBoxLayout* playout = new QVBoxLayout;
@@ -162,6 +175,7 @@ void BrowserWindow::clear_window() {
 
 void BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemSelection &) {
 	fprintf(stderr, "SELECTION CHANGED\n");
+	//current_selection = (QItemSelection*)&selected;
 
 	//  Deal with the outgoing selection
 	if (current_node != nullptr) {
