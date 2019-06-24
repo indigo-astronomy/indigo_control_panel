@@ -10,6 +10,7 @@ static indigo_result client_attach(indigo_client *client) {
 
 
 static indigo_result client_define_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
+	Q_UNUSED(device);
 	//  Deep copy the property so it won't disappear on us later
 	static indigo_property* p = nullptr;
 	switch (property->type) {
@@ -55,6 +56,8 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 
 
 static indigo_result client_update_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
+	Q_UNUSED(client);
+	Q_UNUSED(device);
 	static indigo_property* p = nullptr;
 	switch (property->type) {
 	case INDIGO_TEXT_VECTOR:
@@ -94,6 +97,8 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 
 
 static indigo_result client_delete_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
+	Q_UNUSED(client);
+	Q_UNUSED(device);
 	fprintf(stderr, "** Deleting property [%s] on device [%s]\n", property->name, property->device);
 
 	indigo_property* p = new indigo_property;
@@ -113,12 +118,16 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 
 
 static indigo_result client_send_message(indigo_client *client, indigo_device *device, const char *message) {
+	Q_UNUSED(client);
+	Q_UNUSED(device);
+	Q_UNUSED(message);
 	//qDebug() << "BUS MSG: " << message;
 	return INDIGO_OK;
 }
 
 
 static indigo_result client_detach(indigo_client *client) {
+	Q_UNUSED(client);
 	//qDebug() << ("client detach\n");
 	//exit(0);
 	return INDIGO_OK;

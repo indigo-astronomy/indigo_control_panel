@@ -232,8 +232,8 @@ public:
 
 signals:
 	void property_updated(indigo_property* property, const char *message);
-	void property_defined();
-	void property_deleted();
+	void property_defined(indigo_property* property, const char *message);
+	void property_deleted(indigo_property* property, const char *message);
 
 public slots:
     void define_property(indigo_property* property, const char *message);

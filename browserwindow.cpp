@@ -153,15 +153,37 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	mLog->appendPlainText(log_line); // Adds the message to the widget
 }
 
-void BrowserWindow::on_property_changed() {
-	printf("PROPERTY defined/deleted\n");
-	clear_window();
+void BrowserWindow::on_property_changed(indigo_property* property, const char *message) {
+	Q_UNUSED(message);
 	if (mProperties->selectionModel()->hasSelection()) {
-		printf("HAS SELECTION\n");
-		QItemSelection is = mProperties->selectionModel()->selection();
-		on_selection_changed(is, is);
+		QItemSelection selected = mProperties->selectionModel()->selection();
+		QModelIndex s = selected.indexes().front();
+		TreeNode* node = static_cast<TreeNode*>(s.internalPointer());
+		if (node->node_type == TREE_NODE_PROPERTY) {
+			/* We can not have selected property to be defined -> so just clean window */
+			PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
+			if (!strcmp(p->property->name, property->name) &&
+			    !strcmp(p->property->device, property->device) &&
+			    !strcmp(p->property->group, property->group)) {
+				printf("SELECTED PROPERTY deleted\n");
+				clear_window();
+			}
+		} else if (node->node_type == TREE_NODE_GROUP) {
+			/* If we have deleted or defined property update group window */
+			GroupNode* g = reinterpret_cast<GroupNode*>(node);
+			PropertyNode* p = g->children.nodes[0];
+			if (!strcmp(p->property->device, property->device) &&
+			    !strcmp(p->property->group, property->group)) {
+				printf("PROPERTY IN GROUP defined/deleted\n");
+				clear_window();
+				on_selection_changed(selected, selected);
+			} else {
+				printf("SELECTION does not contain the created/deleted PROPERTY\n");
+			}
+		}
 	}
 }
+
 
 void BrowserWindow::clear_window() {
 	QWidget* ppanel = new QWidget();

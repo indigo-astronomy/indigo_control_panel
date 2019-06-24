@@ -107,7 +107,7 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 				device->state = INDIGO_IDLE_STATE;
 		}
 	}
-	emit (property_defined());
+	emit(property_defined(property, message));
 	//fprintf(stderr, "Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 }
 
@@ -249,11 +249,10 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", devname);
 	}
 
+	emit(property_deleted(property, message));
 	//delete p;
 	//p = nullptr;
-	//delete property;
-
-	emit (property_deleted());
+	delete property;
 
 	//if (group_empty) delete group;
 	//if (device_empty) delete device;
