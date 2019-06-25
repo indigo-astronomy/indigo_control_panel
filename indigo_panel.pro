@@ -27,7 +27,8 @@ SOURCES += \
 	qindigotext.cpp \
 	qindigonumber.cpp \
 	qindigolight.cpp \
-	qindigoblob.cpp
+	qindigoblob.cpp \
+	qindigoservers.cpp
 
 RESOURCES += qdarkstyle/style.qrc resource/appicon.png resource/led-red.png resource/led-grey.png resource/led-green.png resource/led-orange.png
 
@@ -54,6 +55,7 @@ HEADERS += \
 	qindigonumber.h \
 	qindigolight.h \
 	qindigoblob.h \
+	qindigoservers.h \
 	logger.h \
 	conf.h
 

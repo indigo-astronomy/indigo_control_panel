@@ -13,6 +13,7 @@
 #include "propertymodel.h"
 #include "indigoclient.h"
 #include "qindigoproperty.h"
+#include "qindigoservers.h"
 #include "logger.h"
 #include "conf.h"
 
@@ -23,6 +24,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	QIcon icon(":resource/appicon.png");
 	this->setWindowIcon(icon);
+
+	mIndigoServers = new QIndigoServers();
 
 	//  Set central widget of window
 	QWidget *central = new QWidget;
@@ -63,6 +66,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	rootLayout->addWidget(menu);
 
+	connect(servers_act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
 	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 	connect(blobs_act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
 	connect(bonjour_act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
@@ -314,6 +318,12 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		*/
 	}
 }
+
+
+void BrowserWindow::on_servers_act() {
+	mIndigoServers->show();
+}
+
 
 void BrowserWindow::on_exit_act() {
 	QApplication::quit();

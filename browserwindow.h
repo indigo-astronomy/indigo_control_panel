@@ -12,8 +12,10 @@ class PropertyModel;
 class QItemSelection;
 class QVBoxLayout;
 class QScrollArea;
+class QIndigoServers;
 struct PropertyNode;
 struct TreeNode;
+
 
 
 class BrowserWindow : public QMainWindow {
@@ -30,6 +32,7 @@ public slots:
 	void on_property_define_delete(indigo_property* property, const char *message);
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
+	void on_servers_act();
 	void on_exit_act();
 	void on_about_act();
 
@@ -40,6 +43,7 @@ private:
 	QWidget* form_panel;
 	QVBoxLayout* form_layout;
 
+	QIndigoServers *mIndigoServers;
 	ServiceModel* mServiceModel;
 	PropertyModel* mPropertyModel;
 	PropertyNode* current_node;
