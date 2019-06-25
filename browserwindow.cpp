@@ -128,6 +128,9 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	current_node = nullptr;
 
+	//mServiceModel->addService("localhost", "localhost", 7624);
+	//mServiceModel->connectService("localhost");
+
 	//  Start up the client
 	IndigoClient::instance().start();
 }

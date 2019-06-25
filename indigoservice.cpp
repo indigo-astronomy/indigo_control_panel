@@ -1,10 +1,25 @@
 #include "indigoservice.h"
 
-IndigoService::IndigoService(const QZeroConfService& _service) : service(_service), server_entry(nullptr) {
+IndigoService::IndigoService(const QZeroConfService& _service) :
+	m_name(_service.name().toUtf8().constData()),
+	m_host(_service.host().toUtf8().constData()),
+	m_port(_service.port()),
+	m_service(_service),
+	m_server_entry(nullptr),
+	isQZeroConfService(true) {
 }
 
 
-IndigoService::IndigoService(const IndigoService &other) : service(other.service) {
+IndigoService::IndigoService(const IndigoService &other) : m_service(other.m_service) {
+}
+
+
+IndigoService::IndigoService(QByteArray name, QByteArray host, int port) :
+	m_name(name),
+	m_host(host),
+	m_port(port),
+	m_server_entry(nullptr),
+	isQZeroConfService(false) {
 }
 
 
@@ -12,22 +27,34 @@ IndigoService::~IndigoService() {
 }
 
 
+bool IndigoService::connect() {
+	return (indigo_connect_server(m_name, m_host, m_port, &m_server_entry) == INDIGO_OK);
+}
+
+
+bool IndigoService::connected() const {
+	if (m_server_entry) return (m_server_entry->socket > 0);
+	return false;
+}
+
+
+bool IndigoService::disconnect() {
+	if (m_server_entry) return (indigo_disconnect_server(m_server_entry) == INDIGO_OK);
+	return false;
+}
+
+
 IndigoService &IndigoService::operator=(const IndigoService &other) {
-	service = other.service;
+	m_service = other.m_service;
 	return *this;
 }
 
 
 bool IndigoService::operator==(const IndigoService &other) const {
-	return service == other.service;
+	return m_service == other.m_service;
 }
 
 
 bool IndigoService::operator!=(const IndigoService &other) const {
 	return !(*this == other);
-}
-
-
-QByteArray IndigoService::name() const {
-	return service.name().toUtf8();
 }

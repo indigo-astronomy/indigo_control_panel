@@ -19,7 +19,15 @@ public:
     ServiceModel(const QByteArray &type);
 
     virtual int rowCount(const QModelIndex &parent) const;
+	bool addService(QByteArray name, QByteArray host,  int port);
+	bool connectService(QByteArray name);
+	bool disconnectService(QByteArray name);
+	bool removeService(QByteArray name);
     virtual QVariant data(const QModelIndex &index, int role) const;
+
+signals:
+	void serviceAdded(IndigoService &indigo_service);
+	void serviceRemoved(IndigoService &indigo_service);
 
 private Q_SLOTS:
     void onServiceError(QZeroConf::error_t);
@@ -32,7 +40,7 @@ private:
 
     QList<IndigoService*> mServices;
 
-    QZeroConf zeroConf;
+    QZeroConf m_zeroConf;
 };
 
 #endif // SERVICEMODEL_H

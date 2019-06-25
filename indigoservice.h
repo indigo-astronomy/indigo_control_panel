@@ -11,6 +11,8 @@ class IndigoService
 public:
     IndigoService(const QZeroConfService& _service);
     IndigoService(const IndigoService &other);
+	IndigoService(QByteArray name, QByteArray host, int port);
+
     virtual ~IndigoService();
 
     IndigoService &operator=(const IndigoService &other);
@@ -18,11 +20,21 @@ public:
     bool operator==(const IndigoService &other) const;
     bool operator!=(const IndigoService &other) const;
 
-    QByteArray name() const;
+	bool connect();
+	bool connected() const;
+	bool disconnect();
+	QByteArray name() const { return m_name; }
+	QByteArray host() const { return m_host; }
+	int port() const { return m_port; }
+
+	QByteArray m_name;
+	QByteArray m_host;
+	int m_port;
+	QZeroConfService m_service;
+	indigo_server_entry* m_server_entry;
 
 public:
-    QZeroConfService service;
-    indigo_server_entry* server_entry;
+	bool isQZeroConfService;
 };
 
 #endif // INDIGOSERVICE_H

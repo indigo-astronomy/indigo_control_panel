@@ -4,15 +4,77 @@
 
 
 ServiceModel::ServiceModel(const QByteArray &type) {
-	connect(&zeroConf, &QZeroConf::error, this, &ServiceModel::onServiceError);
-	connect(&zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
-	connect(&zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
-	zeroConf.startBrowser(type);
+	connect(&m_zeroConf, &QZeroConf::error, this, &ServiceModel::onServiceError);
+	connect(&m_zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
+	connect(&m_zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
+	m_zeroConf.startBrowser(type);
 }
 
 
 int ServiceModel::rowCount(const QModelIndex &) const {
 	return mServices.count();
+}
+
+bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
+	int i = findService(name);
+	if (i != -1) {
+		fprintf(stderr, "SERVICE DUPLICATE [%s]\n", name.constData());
+		return false;
+	}
+
+	fprintf(stderr, "SERVICE ADDED Manually [%s]\n", name.constData());
+
+	qDebug() << host.constData() << "on port" << port << "!";
+	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
+	IndigoService* indigo_service = new IndigoService(name, host, port);
+	mServices.append(indigo_service);
+	endInsertRows();
+	return true;
+}
+
+
+bool ServiceModel::removeService(QByteArray name) {
+	//qDebug() << "Service Removed " << service.name();
+	int i = findService(name);
+	if (i != -1) {
+		IndigoService* indigo_service = mServices.at(i);
+		if (indigo_service->isQZeroConfService) return false;
+		beginRemoveRows(QModelIndex(), i, i);
+		mServices.removeAt(i);
+		endRemoveRows();
+		indigo_service->disconnect();
+		delete indigo_service;
+		fprintf(stderr, "SERVICE REMOVED [%s]\n", name.constData());
+		return true;
+	}
+	fprintf(stderr, "SERVICE DOES NOT EXIST [%s]\n", name.constData());
+	return false;
+}
+
+
+bool ServiceModel::connectService(QByteArray name) {
+	int i = findService(name);
+	if (i == -1) {
+		fprintf(stderr, "SERVICE NOT FOUND [%s]\n", name.constData());
+		return false;
+	}
+	IndigoService* indigo_service = mServices.at(i);
+	fprintf(stderr, "CONNECTING TO SERVICE [%s]\n", name.constData());
+	qDebug() << indigo_service->host().constData() << "on port" << indigo_service->port() << "!";
+	return indigo_service->connect();
+}
+
+
+bool ServiceModel::disconnectService(QByteArray name) {
+	int i = findService(name);
+	if (i == -1) {
+		fprintf(stderr, "SERVICE NOT FOUND [%s]\n", name.constData());
+		return false;
+	}
+	IndigoService* indigo_service = mServices.at(i);
+	fprintf(stderr, "DISCONNECTING FROM SERVICE [%s]\n", name.constData());
+	qDebug() << indigo_service->host().constData() << "on port" << indigo_service->port() << "!";
+	return indigo_service->disconnect();
 }
 
 
@@ -27,8 +89,8 @@ QVariant ServiceModel::data(const QModelIndex &index, int role) const {
 	switch (role) {
 	case Qt::DisplayRole:
 		return QString("%1:%2")
-			.arg(QString(service->service.host()))
-			.arg(service->service.port());
+			.arg(QString(service->host()))
+			.arg(service->port());
 	case Qt::UserRole:
 		return QVariant();
 	}
@@ -57,7 +119,8 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 	mServices.append(indigo_service);
 	endInsertRows();
 
-	indigo_connect_server(service.name().toUtf8().constData(), service.host().toUtf8().constData(), service.port(), &indigo_service->server_entry);
+	indigo_service->connect();
+	emit(serviceAdded(*indigo_service));
 }
 
 
@@ -79,12 +142,12 @@ void ServiceModel::onServiceRemoved(QZeroConfService service) {
 	int i = findService(service.name().toUtf8());
 	if (i != -1) {
 		IndigoService* indigo_service = mServices.at(i);
-
+		fprintf(stderr, "SERVICE REMOVED WWWWW [%s]\n", service.name().toUtf8().constData());
 		beginRemoveRows(QModelIndex(), i, i);
 		mServices.removeAt(i);
 		endRemoveRows();
-
-		indigo_disconnect_server(indigo_service->server_entry);
+		indigo_service->disconnect();
+		emit(serviceRemoved(*indigo_service));
 		delete indigo_service;
 		indigo_service = nullptr;
 	}
@@ -93,7 +156,7 @@ void ServiceModel::onServiceRemoved(QZeroConfService service) {
 
 int ServiceModel::findService(const QByteArray &name) {
 	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
-		if ((*i)->service.name() == name) {
+		if ((*i)->name() == name) {
 			return i - mServices.constBegin();
 		}
 	}
