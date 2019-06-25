@@ -27,9 +27,9 @@ signals:
 public slots:
 	void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);
 	void on_property_log(indigo_property* property, const char *message);
+	void on_property_define_delete(indigo_property* property, const char *message);
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
-	void on_property_changed(indigo_property* property, const char *message);
 	void on_exit_act();
 	void on_about_act();
 

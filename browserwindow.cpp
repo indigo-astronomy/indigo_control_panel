@@ -118,8 +118,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_property_log);
 
-	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_changed);
-	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_changed);
+	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define_delete);
+	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_define_delete);
 
 	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_property_log);
 
@@ -153,10 +153,11 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	mLog->appendPlainText(log_line); // Adds the message to the widget
 }
 
-void BrowserWindow::on_property_changed(indigo_property* property, const char *message) {
+void BrowserWindow::on_property_define_delete(indigo_property* property, const char *message) {
 	Q_UNUSED(message);
-	if (mProperties->selectionModel()->hasSelection()) {
-		QItemSelection selected = mProperties->selectionModel()->selection();
+	printf("@@@@@@@@@@@@@@ PROPERTY CHANGE\n");
+	QItemSelection selected = mProperties->selectionModel()->selection();
+	if (!selected.isEmpty()) {
 		QModelIndex s = selected.indexes().front();
 		TreeNode* node = static_cast<TreeNode*>(s.internalPointer());
 		if (node->node_type == TREE_NODE_PROPERTY) {
@@ -167,20 +168,42 @@ void BrowserWindow::on_property_changed(indigo_property* property, const char *m
 			    !strcmp(p->property->group, property->group)) {
 				printf("SELECTED PROPERTY deleted\n");
 				clear_window();
+				return;
 			}
 		} else if (node->node_type == TREE_NODE_GROUP) {
 			/* If we have deleted or defined property update group window */
 			GroupNode* g = reinterpret_cast<GroupNode*>(node);
-			PropertyNode* p = g->children.nodes[0];
-			if (!strcmp(p->property->device, property->device) &&
-			    !strcmp(p->property->group, property->group)) {
-				printf("PROPERTY IN GROUP defined/deleted\n");
-				clear_window();
-				on_selection_changed(selected, selected);
-			} else {
-				printf("SELECTION does not contain the created/deleted PROPERTY\n");
+			if (g->size() > 0) {
+				PropertyNode* p = g->children.nodes[0];
+				if (!strcmp(p->property->device, property->device) &&
+				    !strcmp(p->property->group, property->group)) {
+						printf("PROPERTY IN GROUP defined/deleted\n");
+						clear_window();
+						on_selection_changed(selected, selected);
+						return;
+				}
 			}
 		}
+		if (!strcmp(property->name,"")) {
+			if (node->node_type == TREE_NODE_PROPERTY) {
+				PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
+				if (!strcmp(p->property->device, property->device)) {
+					printf("SELECTED DEVICE deleted (Peoperty selected)\n");
+					clear_window();
+					return;
+				}
+			} else if (node->node_type == TREE_NODE_GROUP) {
+				GroupNode* g = reinterpret_cast<GroupNode*>(node);
+				PropertyNode* p = g->children.nodes[0];
+				if (!strcmp(p->property->device, property->device)) {
+					printf("SELECTED DEVICE deleted (Group selected)\n");
+					clear_window();
+					return;
+				}
+			}
+		}
+	} else {
+		printf("SELECTION does not contain the created/deleted PROPERTY\n");
 	}
 }
 

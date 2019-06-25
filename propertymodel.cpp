@@ -161,8 +161,9 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
 	if (device == nullptr) {
 		fprintf(stderr, "Deleting property on device [%s] - NOT FOUND\n", property->device);
+		emit(property_deleted(property, message));
 		delete property;
-		property = nullptr;
+		//property = nullptr;
 		return;
 	}
 
@@ -171,10 +172,11 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
+		emit(property_deleted(property, message));
 		delete property;
-		property = nullptr;
+		//property = nullptr;
 		//delete device;
-		device = nullptr;
+		//device = nullptr;
 		return;
 	}
 
@@ -184,8 +186,9 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	GroupNode* group = device->children.find_by_name_with_index(property->group, group_row);
 	if ((property) && (group == nullptr)) {
 		fprintf(stderr, "Deleting property in group [%s] - NOT FOUND\n", property->group);
+		emit(property_deleted(property, message));
 		delete property;
-		property = nullptr;
+		//property = nullptr;
 		return;
 	}
 
@@ -194,10 +197,11 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
+		emit(property_deleted(property, message));
 		delete property;
-		property = nullptr;
+		//property = nullptr;
 		//delete group;
-		group = nullptr;
+		//group = nullptr;
 		return;
 	}
 
@@ -207,13 +211,14 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	PropertyNode* p = group->children.find_by_name_with_index(property->name, property_row);
 	if (p == nullptr) {
 		fprintf(stderr, "Deleting property [%s] - NOT FOUND\n", property->name);
+		emit(property_deleted(property, message));
 		delete property;
-		property = nullptr;
+		//property = nullptr;
 		return;
 	}
 
-	bool group_empty = false;
-	bool device_empty = false;
+	//bool group_empty = false;
+	//bool device_empty = false;
 
 	//  Remove the property
 	fprintf(stderr, "Erasing property [%s] in %p %p\n", property->name, device, group);
@@ -234,7 +239,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
-		group_empty = true;
+		//group_empty = true;
 		fprintf(stderr, "--- REMOVED EMPTY GROUP [%s]\n", groupname);
 	}
 
@@ -244,7 +249,7 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
-		device_empty = true;
+		//device_empty = true;
 		//device = nullptr;
 		fprintf(stderr, "--- REMOVED EMPTY DEVICE [%s]\n", devname);
 	}
