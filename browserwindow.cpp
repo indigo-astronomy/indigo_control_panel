@@ -25,7 +25,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QIcon icon(":resource/appicon.png");
 	this->setWindowIcon(icon);
 
-	mIndigoServers = new QIndigoServers();
+	mIndigoServers = new QIndigoServers(this);
 
 	//  Set central widget of window
 	QWidget *central = new QWidget;

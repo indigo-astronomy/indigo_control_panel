@@ -38,7 +38,7 @@ public slots:
 private:
 	QListWidget* m_server_list;
 	QDialogButtonBox* m_button_box;
-	QGroupBox* m_view_box;
+	QWidget* m_view_box;
 	QLineEdit* m_service_line;
 	QPushButton* m_add_button;
 	QPushButton* m_remove_button;

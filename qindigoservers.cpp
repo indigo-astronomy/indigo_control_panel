@@ -2,10 +2,10 @@
 
 QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 {
-	setWindowTitle("Available Servers");
+	setWindowTitle("Available Services");
 
 	m_server_list = new QListWidget;
-	m_view_box = new QGroupBox(tr("Servers"));
+	m_view_box = new QWidget();
 	m_button_box = new QDialogButtonBox;
 	m_service_line = new QLineEdit;
 	m_add_button = m_button_box->addButton(tr("Add service"), QDialogButtonBox::ActionRole);
@@ -13,6 +13,7 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 	m_close_button = m_button_box->addButton(tr("Close"), QDialogButtonBox::ActionRole);
 
 	QVBoxLayout* viewLayout = new QVBoxLayout;
+	viewLayout->setContentsMargins(0, 0, 0, 0);
 	viewLayout->addWidget(m_server_list);
 	viewLayout->addWidget(m_service_line);
 	m_view_box->setLayout(viewLayout);
