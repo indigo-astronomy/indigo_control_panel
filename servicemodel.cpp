@@ -1,9 +1,11 @@
 #include "indigoservice.h"
 #include "servicemodel.h"
 #include <indigo_client.h>
+#include "conf.h"
 
 
 ServiceModel::ServiceModel(const QByteArray &type) {
+	m_logger = &Logger::instance();
 	connect(&m_zeroConf, &QZeroConf::error, this, &ServiceModel::onServiceError);
 	connect(&m_zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
 	connect(&m_zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
@@ -119,7 +121,7 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 	mServices.append(indigo_service);
 	endInsertRows();
 
-	indigo_service->connect();
+	if (conf.auto_connect) indigo_service->connect();
 	emit(serviceAdded(*indigo_service));
 }
 
@@ -151,6 +153,16 @@ void ServiceModel::onServiceRemoved(QZeroConfService service) {
 		delete indigo_service;
 		indigo_service = nullptr;
 	}
+}
+
+
+void ServiceModel::onRequestConnect(const QString &service) {
+	connectService(service.toUtf8());
+}
+
+
+void ServiceModel::onRequestDisconnect(const QString &service) {
+	disconnectService(service.toUtf8());
 }
 
 

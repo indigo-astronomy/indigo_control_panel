@@ -12,26 +12,31 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
+#include "indigoservice.h"
 
 class QIndigoServers : public QDialog
 {
 	Q_OBJECT
 public:
 	QIndigoServers(QWidget *parent = 0);
+	QString getServiceName(QListWidgetItem* item);
+
+signals:
+	void requestConnect(const QString &service);
+	void requestDisconnect(const QString &service);
+
 public slots:
+	void onAddService(IndigoService &indigo_service);
+	void onRemoveService(IndigoService &indigo_service);
 	void highlightChecked(QListWidgetItem* item);
 	void save();
 private:
-	QListWidget* widget;
-	QDialogButtonBox* buttonBox;
-	QGroupBox* viewBox;
-	QPushButton* saveButton;
-	QPushButton* closeButton;
-
-	void createListWidget();
-	void createOtherWidgets();
-	void createLayout();
-	void createConnections();
+	QListWidget* m_server_list;
+	QDialogButtonBox* m_button_box;
+	QGroupBox* m_view_box;
+	QPushButton* m_add_button;
+	QPushButton* m_remove_button;
+	QPushButton* m_close_button;
 };
 
 #endif // QINDIGO_SERVERS_H

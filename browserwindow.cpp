@@ -114,6 +114,12 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	mProperties->setHeaderHidden(true);
 	mProperties->setModel(mPropertyModel);
 
+	connect(mServiceModel, &ServiceModel::serviceAdded, mIndigoServers, &QIndigoServers::onAddService);
+	connect(mServiceModel, &ServiceModel::serviceRemoved, mIndigoServers, &QIndigoServers::onRemoveService);
+	connect(mIndigoServers, &QIndigoServers::requestConnect, mServiceModel, &ServiceModel::onRequestConnect);
+	connect(mIndigoServers, &QIndigoServers::requestDisconnect, mServiceModel, &ServiceModel::onRequestDisconnect);
+
+
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);

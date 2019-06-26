@@ -28,12 +28,21 @@ IndigoService::~IndigoService() {
 
 
 bool IndigoService::connect() {
-	return (indigo_connect_server(m_name, m_host, m_port, &m_server_entry) == INDIGO_OK);
+	int i = 30;
+	indigo_result res = indigo_connect_server(m_name, m_host, m_port, &m_server_entry);
+	if (res != INDIGO_OK) return false;
+	while (!connected() && i--) {
+		indigo_usleep(100000);
+	}
+	return connected();
 }
 
 
 bool IndigoService::connected() const {
-	if (m_server_entry) return (m_server_entry->socket > 0);
+	if (m_server_entry) {
+		return (m_server_entry->socket > 0);
+	}
+	printf ("Connected socket null\n");
 	return false;
 }
 

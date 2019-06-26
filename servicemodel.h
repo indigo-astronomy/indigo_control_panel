@@ -5,6 +5,7 @@
 #include <QList>
 
 #include <qzeroconf.h>
+#include "logger.h"
 
 
 class IndigoService;
@@ -34,10 +35,14 @@ private Q_SLOTS:
     void onServiceAdded(QZeroConfService s);
     void onServiceUpdated(QZeroConfService s);
     void onServiceRemoved(QZeroConfService s);
+public Q_SLOTS:
+	void onRequestConnect(const QString &service);
+	void onRequestDisconnect(const QString &service);
 
 private:
     int findService(const QByteArray &name);
 
+	Logger* m_logger;
     QList<IndigoService*> mServices;
 
     QZeroConf m_zeroConf;
