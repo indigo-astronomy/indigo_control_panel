@@ -28,7 +28,7 @@ IndigoService::~IndigoService() {
 
 
 bool IndigoService::connect() {
-	int i = 30;
+	int i = 50; /* 5 seconds */
 	indigo_result res = indigo_connect_server(m_name, m_host, m_port, &m_server_entry);
 	if (res != INDIGO_OK) return false;
 	while (!connected() && i--) {

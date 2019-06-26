@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
+#include <QLineEdit>
 #include "indigoservice.h"
 
 class QIndigoServers : public QDialog
@@ -24,16 +25,21 @@ public:
 signals:
 	void requestConnect(const QString &service);
 	void requestDisconnect(const QString &service);
+	void requestAddManualService(IndigoService &indigo_service);
+	void requestRemoveManualService(const QString &service);
 
 public slots:
 	void onAddService(IndigoService &indigo_service);
 	void onRemoveService(IndigoService &indigo_service);
 	void highlightChecked(QListWidgetItem* item);
-	void save();
+	void onAddManualService();
+	void onRemoveManualService();
+
 private:
 	QListWidget* m_server_list;
 	QDialogButtonBox* m_button_box;
 	QGroupBox* m_view_box;
+	QLineEdit* m_service_line;
 	QPushButton* m_add_button;
 	QPushButton* m_remove_button;
 	QPushButton* m_close_button;

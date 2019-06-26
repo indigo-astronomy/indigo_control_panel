@@ -31,6 +31,9 @@ bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 	IndigoService* indigo_service = new IndigoService(name, host, port);
 	mServices.append(indigo_service);
 	endInsertRows();
+
+	if (conf.auto_connect) indigo_service->connect();
+	emit(serviceAdded(*indigo_service));
 	return true;
 }
 
@@ -45,6 +48,7 @@ bool ServiceModel::removeService(QByteArray name) {
 		mServices.removeAt(i);
 		endRemoveRows();
 		indigo_service->disconnect();
+		emit(serviceRemoved(*indigo_service));
 		delete indigo_service;
 		fprintf(stderr, "SERVICE REMOVED [%s]\n", name.constData());
 		return true;
@@ -163,6 +167,15 @@ void ServiceModel::onRequestConnect(const QString &service) {
 
 void ServiceModel::onRequestDisconnect(const QString &service) {
 	disconnectService(service.toUtf8());
+}
+
+void ServiceModel::onRequestAddManualService(IndigoService &indigo_service) {
+	addService(indigo_service.name(), indigo_service.host(), indigo_service.port());
+}
+
+
+void ServiceModel::onRequestRemoveManualService(const QString &service) {
+	removeService(service.toUtf8());
 }
 
 

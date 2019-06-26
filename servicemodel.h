@@ -37,6 +37,8 @@ private Q_SLOTS:
     void onServiceRemoved(QZeroConfService s);
 public Q_SLOTS:
 	void onRequestConnect(const QString &service);
+	void onRequestAddManualService(IndigoService &indigo_service);
+	void onRequestRemoveManualService(const QString &service);
 	void onRequestDisconnect(const QString &service);
 
 private:
