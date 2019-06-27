@@ -19,7 +19,7 @@ void ServiceModel::onTimer() {
 	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
 		if (i == nullptr) continue;
 		int socket = (*i)->m_server_entry->socket;
-		printf("SERVICE Sockets [%d] %d\n",socket, (*i)->prevSocket);
+		//printf("SERVICE Sockets [%d] %d\n",socket, (*i)->prevSocket);
 		if (socket != (*i)->prevSocket) {
 			(*i)->prevSocket = socket;
 			emit(serviceConnectionChange(**i));

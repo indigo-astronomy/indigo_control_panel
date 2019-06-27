@@ -90,22 +90,37 @@ void QIndigoServers::onAddService(IndigoService &indigo_service) {
 
 
 void QIndigoServers::onAddManualService() {
+	int port = 7624;
+	QString hostname;
+	QString service;
 	QString service_str = m_service_line->text();
-	QStringList parts = service_str.split('@', QString::SkipEmptyParts);
-	if (parts.size() != 2) {
+	QStringList parts = service_str.split(':', QString::SkipEmptyParts);
+	if (parts.size() > 2) {
 		printf ("FORMAT ERROR\n");
 		return;
+	} else if (parts.size() == 2) {
+		port = atoi(parts.at(1).toUtf8().constData());
 	}
-	QStringList parts2 = parts.at(1).split(':', QString::SkipEmptyParts);
-	if (parts2.size() != 2) {
+	QStringList parts2 = parts.at(0).split('@', QString::SkipEmptyParts);
+	if (parts2.size() > 2) {
 		printf ("FORMAT 2 ERROR\n");
 		return;
+	} else if (parts2.size() == 2) {
+		service = parts2.at(0);
+		hostname = parts2.at(1);
+	} else {
+		hostname = parts2.at(0);
+		service = parts2.at(0);
+		int index = service.indexOf(QChar('.'));
+		if (index > 0) {
+			service.truncate(index);
+		}
 	}
-	int port = atoi(parts2.at(1).toUtf8().constData());
-	IndigoService indigo_service(parts.at(0).toUtf8(), parts2.at(0).toUtf8(), port);
+
+	IndigoService indigo_service(service.toUtf8(), hostname.toUtf8(), port);
 	requestAddManualService(indigo_service);
 	m_service_line->setText("");
-	printf ("Service '%s' host '%s' port = %d\n", parts.at(0).toUtf8().constData(), parts2.at(0).toUtf8().constData(), atoi(parts2.at(1).toUtf8().constData()));
+	printf ("Service '%s' host '%s' port = %d\n", service.toUtf8().constData(), hostname.toUtf8().constData(), port);
 }
 
 
