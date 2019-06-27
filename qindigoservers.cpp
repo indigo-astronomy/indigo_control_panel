@@ -34,6 +34,24 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 }
 
 
+void QIndigoServers::onConnectionChange(IndigoService &indigo_service, bool connected) {
+	QString service_name = indigo_service.name();
+	printf ("Connection State Change [%s] connected = %d\n", service_name.toUtf8().constData(), indigo_service.connected());
+	QListWidgetItem* item = 0;
+	for(int i = 0; i < m_server_list->count(); ++i){
+		item = m_server_list->item(i);
+		QString service = getServiceName(item);
+		if (service == service_name) {
+			if (indigo_service.connected())
+				item->setCheckState(Qt::Checked);
+			else
+				item->setCheckState(Qt::Unchecked);
+			break;
+		}
+	}
+}
+
+
 void QIndigoServers::onAddService(IndigoService &indigo_service) {
 	QListWidgetItem* item = new QListWidgetItem(
 		indigo_service.name() +

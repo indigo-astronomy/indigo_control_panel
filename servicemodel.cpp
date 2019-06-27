@@ -6,12 +6,26 @@
 
 ServiceModel::ServiceModel(const QByteArray &type) {
 	m_logger = &Logger::instance();
+	QTimer *m_timer = new QTimer(this);
+	connect(m_timer, &QTimer::timeout, this, QOverload<>::of(&ServiceModel::onTimer));
+	m_timer->start(3000);
 	connect(&m_zeroConf, &QZeroConf::error, this, &ServiceModel::onServiceError);
 	connect(&m_zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
 	connect(&m_zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
 	m_zeroConf.startBrowser(type);
 }
 
+void ServiceModel::onTimer() {
+	printf("Timet hit\n");
+	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
+		if (i == nullptr) continue;
+		bool connected = (*i)->connected();
+		if (connected != (*i)->prevConnectState) {
+			(*i)->prevConnectState = connected;
+			emit(serviceConnectionChange(**i, connected));
+		}
+	}
+}
 
 int ServiceModel::rowCount(const QModelIndex &) const {
 	return mServices.count();

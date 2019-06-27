@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QList>
+#include <QTimer>
 
 #include <qzeroconf.h>
 #include "logger.h"
@@ -29,12 +30,14 @@ public:
 signals:
 	void serviceAdded(IndigoService &indigo_service);
 	void serviceRemoved(IndigoService &indigo_service);
+	void serviceConnectionChange(IndigoService &indigo_service, bool connected);
 
 private Q_SLOTS:
     void onServiceError(QZeroConf::error_t);
     void onServiceAdded(QZeroConfService s);
     void onServiceUpdated(QZeroConfService s);
     void onServiceRemoved(QZeroConfService s);
+	void onTimer();
 public Q_SLOTS:
 	void onRequestConnect(const QString &service);
 	void onRequestAddManualService(IndigoService &indigo_service);

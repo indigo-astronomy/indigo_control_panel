@@ -6,7 +6,8 @@ IndigoService::IndigoService(const QZeroConfService& _service) :
 	m_port(_service.port()),
 	m_service(_service),
 	m_server_entry(nullptr),
-	isQZeroConfService(true) {
+	isQZeroConfService(true),
+	prevConnectState(false) {
 }
 
 
@@ -19,7 +20,8 @@ IndigoService::IndigoService(QByteArray name, QByteArray host, int port) :
 	m_host(host),
 	m_port(port),
 	m_server_entry(nullptr),
-	isQZeroConfService(false) {
+	isQZeroConfService(false),
+	prevConnectState(false) {
 }
 
 

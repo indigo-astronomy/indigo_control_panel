@@ -116,6 +116,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	connect(mServiceModel, &ServiceModel::serviceAdded, mIndigoServers, &QIndigoServers::onAddService);
 	connect(mServiceModel, &ServiceModel::serviceRemoved, mIndigoServers, &QIndigoServers::onRemoveService);
+	connect(mServiceModel, &ServiceModel::serviceConnectionChange, mIndigoServers, &QIndigoServers::onConnectionChange);
+
 	connect(mIndigoServers, &QIndigoServers::requestConnect, mServiceModel, &ServiceModel::onRequestConnect);
 	connect(mIndigoServers, &QIndigoServers::requestDisconnect, mServiceModel, &ServiceModel::onRequestDisconnect);
 	connect(mIndigoServers, &QIndigoServers::requestAddManualService, mServiceModel, &ServiceModel::onRequestAddManualService);

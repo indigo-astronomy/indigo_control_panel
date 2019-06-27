@@ -32,6 +32,7 @@ public slots:
 	void onAddService(IndigoService &indigo_service);
 	void onRemoveService(IndigoService &indigo_service);
 	void highlightChecked(QListWidgetItem* item);
+	void onConnectionChange(IndigoService &indigo_service, bool connected);
 	void onAddManualService();
 	void onRemoveManualService();
 
