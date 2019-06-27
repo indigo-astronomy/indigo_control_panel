@@ -15,22 +15,26 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 	m_zeroConf.startBrowser(type);
 }
 
+
 void ServiceModel::onTimer() {
 	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
 		if (i == nullptr) continue;
+		if ((*i)->m_server_entry == nullptr) continue;
+
 		int socket = (*i)->m_server_entry->socket;
-		//printf("SERVICE Sockets [%d] %d\n",socket, (*i)->prevSocket);
 		if (socket != (*i)->prevSocket) {
-			printf("SERVICE Sockets %s %s [%d] %d\n",(*i)->m_server_entry->name, (*i)->m_server_entry->host, socket, (*i)->prevSocket);
+			printf("SERVICE Sockets '%s' '%s' [%d] %d\n",(*i)->m_server_entry->name, (*i)->m_server_entry->host, socket, (*i)->prevSocket);
 			(*i)->prevSocket = socket;
 			emit(serviceConnectionChange(**i));
 		}
 	}
 }
 
+
 int ServiceModel::rowCount(const QModelIndex &) const {
 	return mServices.count();
 }
+
 
 bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 	int i = findService(name);

@@ -52,10 +52,11 @@ bool IndigoService::connected() const {
 
 
 bool IndigoService::disconnect() {
-
 	if (m_server_entry) {
-		 printf ("CALL: ----- DISCONNECT %s %s %d\n", m_name.constData(), m_host.constData(), m_port);
-		return (indigo_disconnect_server(m_server_entry) == INDIGO_OK);
+		printf ("CALL: ----- DISCONNECT %s %s %d\n", m_name.constData(), m_host.constData(), m_port);
+		bool res = (indigo_disconnect_server(m_server_entry) == INDIGO_OK);
+		m_server_entry=nullptr;
+		return res;
 	}
 	return false;
 }
