@@ -8,14 +8,25 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 	m_view_box = new QWidget();
 	m_button_box = new QDialogButtonBox;
 	m_service_line = new QLineEdit;
-	m_add_button = m_button_box->addButton(tr("Add service"), QDialogButtonBox::ActionRole);
-	m_remove_button = m_button_box->addButton(tr("Remove service"), QDialogButtonBox::ActionRole);
+	m_service_line->setMinimumWidth(300);
+	//m_add_button = m_button_box->addButton(tr("Add service"), QDialogButtonBox::ActionRole);
+	m_add_button = new QPushButton(" &Add ");
+	m_add_button->setDefault(true);
+	m_remove_button = m_button_box->addButton(tr("Remove selected"), QDialogButtonBox::ActionRole);
 	m_close_button = m_button_box->addButton(tr("Close"), QDialogButtonBox::ActionRole);
 
 	QVBoxLayout* viewLayout = new QVBoxLayout;
 	viewLayout->setContentsMargins(0, 0, 0, 0);
 	viewLayout->addWidget(m_server_list);
-	viewLayout->addWidget(m_service_line);
+
+	m_add_service_box = new QWidget();
+	QHBoxLayout* addLayout = new QHBoxLayout;
+	addLayout->setContentsMargins(0, 0, 0, 0);
+	addLayout->addWidget(m_service_line);
+	addLayout->addWidget(m_add_button);
+	m_add_service_box->setLayout(addLayout);
+
+	viewLayout->addWidget(m_add_service_box);
 	m_view_box->setLayout(viewLayout);
 
 	QHBoxLayout* horizontalLayout = new QHBoxLayout;
@@ -34,7 +45,7 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 }
 
 
-void QIndigoServers::onConnectionChange(IndigoService &indigo_service, bool connected) {
+void QIndigoServers::onConnectionChange(IndigoService &indigo_service) {
 	QString service_name = indigo_service.name();
 	printf ("Connection State Change [%s] connected = %d\n", service_name.toUtf8().constData(), indigo_service.connected());
 	QListWidgetItem* item = 0;
@@ -67,12 +78,16 @@ void QIndigoServers::onAddService(IndigoService &indigo_service) {
 	else
 		item->setCheckState(Qt::Unchecked);
 
-	if (indigo_service.isQZeroConfService)
-		item->setForeground(QBrush(QColor("#55FF00")));
-	else
+	if (indigo_service.isQZeroConfService) {
+		item->setForeground(QBrush(QColor("#99FF00")));
+		item->setData(Qt::DecorationRole,QIcon("resource/bonjour_service.png"));
+	} else {
 		item->setForeground(QBrush(QColor("#FFFFFF")));
+		item->setData(Qt::DecorationRole,QIcon("resource/manual_service.png"));
+	}
 	m_server_list->addItem(item);
 }
+
 
 void QIndigoServers::onAddManualService() {
 	QString service_str = m_service_line->text();
@@ -127,6 +142,7 @@ void QIndigoServers::onRemoveManualService() {
 	printf ("TO BE REMOVED: [%s]\n", service.toUtf8().constData());
 	emit(requestRemoveManualService(service));
 }
+
 
 QString QIndigoServers::getServiceName(QListWidgetItem* item) {
 	QString service = item->text();

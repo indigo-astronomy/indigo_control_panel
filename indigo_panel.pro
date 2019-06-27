@@ -30,7 +30,7 @@ SOURCES += \
 	qindigoblob.cpp \
 	qindigoservers.cpp
 
-RESOURCES += qdarkstyle/style.qrc resource/appicon.png resource/led-red.png resource/led-grey.png resource/led-green.png resource/led-orange.png
+RESOURCES += qdarkstyle/style.qrc resource/appicon.png resource/bonjour_service.png resource/manual_service.png resource/led-red.png resource/led-grey.png resource/led-green.png resource/led-orange.png
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

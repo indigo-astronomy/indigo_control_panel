@@ -32,7 +32,7 @@ public slots:
 	void onAddService(IndigoService &indigo_service);
 	void onRemoveService(IndigoService &indigo_service);
 	void highlightChecked(QListWidgetItem* item);
-	void onConnectionChange(IndigoService &indigo_service, bool connected);
+	void onConnectionChange(IndigoService &indigo_service);
 	void onAddManualService();
 	void onRemoveManualService();
 
@@ -40,6 +40,7 @@ private:
 	QListWidget* m_server_list;
 	QDialogButtonBox* m_button_box;
 	QWidget* m_view_box;
+	QWidget* m_add_service_box;
 	QLineEdit* m_service_line;
 	QPushButton* m_add_button;
 	QPushButton* m_remove_button;

@@ -35,7 +35,7 @@ public:
 
 public:
 	bool isQZeroConfService;
-	bool prevConnectState;
+	int prevSocket;
 };
 
 #endif // INDIGOSERVICE_H

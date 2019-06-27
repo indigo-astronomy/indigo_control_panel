@@ -7,7 +7,7 @@ IndigoService::IndigoService(const QZeroConfService& _service) :
 	m_service(_service),
 	m_server_entry(nullptr),
 	isQZeroConfService(true),
-	prevConnectState(false) {
+	prevSocket(0) {
 }
 
 
@@ -21,7 +21,7 @@ IndigoService::IndigoService(QByteArray name, QByteArray host, int port) :
 	m_port(port),
 	m_server_entry(nullptr),
 	isQZeroConfService(false),
-	prevConnectState(false) {
+	prevSocket(0) {
 }
 
 
@@ -30,7 +30,8 @@ IndigoService::~IndigoService() {
 
 
 bool IndigoService::connect() {
-	int i = 50; /* 5 seconds */
+	int i = 5; /* 0.5 seconds */
+	prevSocket = -100;
 	indigo_result res = indigo_connect_server(m_name, m_host, m_port, &m_server_entry);
 	if (res != INDIGO_OK) return false;
 	while (!connected() && i--) {

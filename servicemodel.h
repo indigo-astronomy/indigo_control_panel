@@ -30,7 +30,7 @@ public:
 signals:
 	void serviceAdded(IndigoService &indigo_service);
 	void serviceRemoved(IndigoService &indigo_service);
-	void serviceConnectionChange(IndigoService &indigo_service, bool connected);
+	void serviceConnectionChange(IndigoService &indigo_service);
 
 private Q_SLOTS:
     void onServiceError(QZeroConf::error_t);

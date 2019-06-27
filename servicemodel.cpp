@@ -16,13 +16,13 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 }
 
 void ServiceModel::onTimer() {
-	printf("Timet hit\n");
 	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
 		if (i == nullptr) continue;
-		bool connected = (*i)->connected();
-		if (connected != (*i)->prevConnectState) {
-			(*i)->prevConnectState = connected;
-			emit(serviceConnectionChange(**i, connected));
+		int socket = (*i)->m_server_entry->socket;
+		printf("SERVICE Sockets [%d] %d\n",socket, (*i)->prevSocket);
+		if (socket != (*i)->prevSocket) {
+			(*i)->prevSocket = socket;
+			emit(serviceConnectionChange(**i));
 		}
 	}
 }

@@ -42,7 +42,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	// Create menubar
 	QMenuBar *menu = new QMenuBar;
 	QMenu *file = new QMenu("&File");
-	QAction *servers_act = new QAction(tr("&Servers"), this);
+	QAction *servers_act = new QAction(tr("&Manage Services"), this);
 	file->addAction(servers_act);
 	QAction *exit_act = new QAction(tr("&Exit"), this);
 	file->addAction(exit_act);
