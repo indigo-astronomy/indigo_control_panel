@@ -32,7 +32,8 @@ IndigoService::~IndigoService() {
 bool IndigoService::connect() {
 	int i = 5; /* 0.5 seconds */
 	prevSocket = -100;
-	indigo_result res = indigo_connect_server(m_name, m_host, m_port, &m_server_entry);
+	printf ("CALL: +++++ CONNECT %s %s %d\n", m_name.constData(), m_host.constData(), m_port);
+	indigo_result res = indigo_connect_server(m_name.constData(), m_host.constData(), m_port, &m_server_entry);
 	if (res != INDIGO_OK) return false;
 	while (!connected() && i--) {
 		indigo_usleep(100000);
@@ -51,7 +52,11 @@ bool IndigoService::connected() const {
 
 
 bool IndigoService::disconnect() {
-	if (m_server_entry) return (indigo_disconnect_server(m_server_entry) == INDIGO_OK);
+
+	if (m_server_entry) {
+		 printf ("CALL: ----- DISCONNECT %s %s %d\n", m_name.constData(), m_host.constData(), m_port);
+		return (indigo_disconnect_server(m_server_entry) == INDIGO_OK);
+	}
 	return false;
 }
 

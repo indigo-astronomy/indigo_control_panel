@@ -21,6 +21,7 @@ void ServiceModel::onTimer() {
 		int socket = (*i)->m_server_entry->socket;
 		//printf("SERVICE Sockets [%d] %d\n",socket, (*i)->prevSocket);
 		if (socket != (*i)->prevSocket) {
+			printf("SERVICE Sockets %s %s [%d] %d\n",(*i)->m_server_entry->name, (*i)->m_server_entry->host, socket, (*i)->prevSocket);
 			(*i)->prevSocket = socket;
 			emit(serviceConnectionChange(**i));
 		}

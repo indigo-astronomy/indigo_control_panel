@@ -173,7 +173,7 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 void BrowserWindow::on_property_define_delete(indigo_property* property, const char *message) {
 	Q_UNUSED(message);
-	printf("@@@@@@@@@@@@@@ PROPERTY CHANGE\n");
+	//printf("@@@@@@@@@@@@@@ PROPERTY CHANGE\n");
 	QItemSelection selected = mProperties->selectionModel()->selection();
 	if (!selected.isEmpty()) {
 		QModelIndex s = selected.indexes().front();
@@ -184,7 +184,7 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 			if (!strcmp(p->property->name, property->name) &&
 			    !strcmp(p->property->device, property->device) &&
 			    !strcmp(p->property->group, property->group)) {
-				printf("SELECTED PROPERTY deleted\n");
+				//printf("SELECTED PROPERTY deleted\n");
 				clear_window();
 				return;
 			}
@@ -221,7 +221,7 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 			}
 		}
 	} else {
-		printf("SELECTION does not contain the created/deleted PROPERTY\n");
+		//printf("SELECTION does not contain the created/deleted PROPERTY\n");
 	}
 }
 

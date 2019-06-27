@@ -79,10 +79,10 @@ void QIndigoServers::onAddService(IndigoService &indigo_service) {
 		item->setCheckState(Qt::Unchecked);
 
 	if (indigo_service.isQZeroConfService) {
-		item->setForeground(QBrush(QColor("#99FF00")));
+		//item->setForeground(QBrush(QColor("#99FF00")));
 		item->setData(Qt::DecorationRole,QIcon("resource/bonjour_service.png"));
 	} else {
-		item->setForeground(QBrush(QColor("#FFFFFF")));
+		//item->setForeground(QBrush(QColor("#FFFFFF")));
 		item->setData(Qt::DecorationRole,QIcon("resource/manual_service.png"));
 	}
 	m_server_list->addItem(item);
@@ -118,7 +118,7 @@ void QIndigoServers::onAddManualService() {
 	}
 
 	IndigoService indigo_service(service.toUtf8(), hostname.toUtf8(), port);
-	requestAddManualService(indigo_service);
+	emit(requestAddManualService(indigo_service));
 	m_service_line->setText("");
 	printf ("Service '%s' host '%s' port = %d\n", service.toUtf8().constData(), hostname.toUtf8().constData(), port);
 }
