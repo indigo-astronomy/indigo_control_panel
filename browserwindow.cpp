@@ -1,3 +1,22 @@
+// Copyright (c) 2019 Rumen G.Bogdanovski & David Hulse
+// All rights reserved.
+//
+// You can use this software under the terms of 'INDIGO Astronomy
+// open-source license' (see LICENSE.md).
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHORS 'AS IS' AND ANY EXPRESS
+// OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSplitter>
@@ -414,8 +433,9 @@ void BrowserWindow::on_about_act() {
 		"<b>INDIGO Control Panel</b><br>"
 		"Version 0.1-b1</b><br><br>"
 		"Authors:<br>"
-		"David Hulse<br>"
-		"Rumen G.Bogdanovski<br><br>"
+		"Rumen G.Bogdanovski<br>"
+		"David Hulse<br><br>"
+		"You can use this software under the terms of <b>INDIGO Astronomy open-source license</b><br><br>"
 		"Copyright ©2019, The INDIGO Initiative.<br>"
 		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
 	);
