@@ -25,11 +25,11 @@ configuration is described bellow.
     FOREGROUND -----------
 
         for_light  #EFF0F1 #F0F0F0 (texts/labels)
-        for_dark   #505F69 #787878 (disabled texts)
+        for_dark   #505252 #787878 (disabled texts)
 
     BACKGROUND -----------
 
-        bac_light  #4D545B #505F69 (unpressed)
+        bac_light  #4D545B #505252 (unpressed)
         bac_normal #31363B #353535 (border, disabled, pressed, checked, toolbars, menus)
         bac_dark   #232629 #202020 (background)
 
@@ -79,7 +79,7 @@ QMainWindow::separator {
 }
 
 QMainWindow::separator:hover {
-    background-color: #505F69;
+    background-color: #505252;
     border: 0px solid #505050;
 }
 
@@ -361,12 +361,12 @@ QMenu {
 }
 
 QMenu::separator {
-    height: 2px;
-    background-color: #505F69;
+    height: 1px;
+    background-color: #505252;
     color: #F0F0F0;
     padding-left: 4px;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 QMenu::icon {
@@ -1341,7 +1341,7 @@ QTabBar::tab:top {
 }
 
 QTabBar::tab:top:selected {
-    background-color: #505F69;
+    background-color: #505252;
     color: #F0F0F0;
     border-bottom: 3px solid #515151;
     border-top-left-radius: 3px;
@@ -1369,7 +1369,7 @@ QTabBar::tab:bottom {
 
 QTabBar::tab:bottom:selected {
     color: #F0F0F0;
-    background-color: #505F69;
+    background-color: #505252;
     border-top: 3px solid #515151;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -1395,7 +1395,7 @@ QTabBar::tab:left {
 
 QTabBar::tab:left:selected {
     color: #F0F0F0;
-    background-color: #505F69;
+    background-color: #505252;
     border-left: 3px solid #515151;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -1421,7 +1421,7 @@ QTabBar::tab:right {
 
 QTabBar::tab:right:selected {
     color: #F0F0F0;
-    background-color: #505F69;
+    background-color: #505252;
     border-right: 3px solid #515151;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
@@ -1763,7 +1763,7 @@ QToolBox::tab:disabled {
 }
 
 QToolBox::tab:selected {
-    background-color: #505F69;
+    background-color: #505252;
     border-bottom: 2px solid #515151;
 }
 
