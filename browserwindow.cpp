@@ -158,7 +158,7 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 	if (!message) return;
 
-	//printf("CCCCC-> %s\n", message);
+	//indigo_debug("CCCCC-> %s\n", message);
 
 	gettimeofday(&tmnow, NULL);
 	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
@@ -173,7 +173,7 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 void BrowserWindow::on_property_define_delete(indigo_property* property, const char *message) {
 	Q_UNUSED(message);
-	//printf("@@@@@@@@@@@@@@ PROPERTY CHANGE\n");
+	//indigo_debug("@@@@@@@@@@@@@@ PROPERTY CHANGE\n");
 	QItemSelection selected = mProperties->selectionModel()->selection();
 	if (!selected.isEmpty()) {
 		QModelIndex s = selected.indexes().front();
@@ -184,7 +184,7 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 			if (!strcmp(p->property->name, property->name) &&
 			    !strcmp(p->property->device, property->device) &&
 			    !strcmp(p->property->group, property->group)) {
-				//printf("SELECTED PROPERTY deleted\n");
+				//indigo_debug("SELECTED PROPERTY deleted\n");
 				clear_window();
 				return;
 			}
@@ -195,7 +195,7 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 				PropertyNode* p = g->children.nodes[0];
 				if (!strcmp(p->property->device, property->device) &&
 				    !strcmp(p->property->group, property->group)) {
-						printf("PROPERTY IN GROUP defined/deleted\n");
+						indigo_debug("PROPERTY IN GROUP defined/deleted\n");
 						clear_window();
 						on_selection_changed(selected, selected);
 						return;
@@ -206,7 +206,7 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 			if (node->node_type == TREE_NODE_PROPERTY) {
 				PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
 				if (!strcmp(p->property->device, property->device)) {
-					printf("SELECTED DEVICE deleted (Peoperty selected)\n");
+					indigo_debug("SELECTED DEVICE deleted (Peoperty selected)\n");
 					clear_window();
 					return;
 				}
@@ -214,14 +214,14 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 				GroupNode* g = reinterpret_cast<GroupNode*>(node);
 				PropertyNode* p = g->children.nodes[0];
 				if (!strcmp(p->property->device, property->device)) {
-					printf("SELECTED DEVICE deleted (Group selected)\n");
+					indigo_debug("SELECTED DEVICE deleted (Group selected)\n");
 					clear_window();
 					return;
 				}
 			}
 		}
 	} else {
-		//printf("SELECTION does not contain the created/deleted PROPERTY\n");
+		//indigo_debug("SELECTION does not contain the created/deleted PROPERTY\n");
 	}
 }
 
@@ -237,17 +237,17 @@ void BrowserWindow::clear_window() {
 }
 
 void BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemSelection &) {
-	fprintf(stderr, "SELECTION CHANGED\n");
+	indigo_debug( "SELECTION CHANGED\n");
 	//current_selection = (QItemSelection*)&selected;
 
 	//  Deal with the outgoing selection
 	if (current_node != nullptr) {
-		fprintf(stderr, "SELECTION CHANGED no current node\n");
+		indigo_debug("SELECTION CHANGED no current node\n");
 		clear_window();
 	}
 
 	if (selected.indexes().empty()) {
-		fprintf(stderr, "SELECTION CHANGED selected.indexes().empty()\n");
+		indigo_debug("SELECTION CHANGED selected.indexes().empty()\n");
 		clear_window();
 		current_node = nullptr;
 		return;
@@ -256,12 +256,12 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 	QModelIndex s = selected.indexes().front();
 	TreeNode* n = static_cast<TreeNode*>(s.internalPointer());
 	if (n != nullptr) {
-		fprintf(stderr, "SELECTION CHANGED n->node_type == %d\n", n->node_type);
+		indigo_debug("SELECTION CHANGED n->node_type == %d\n", n->node_type);
 		clear_window();
 	}
 
 	if (n != nullptr && n->node_type == TREE_NODE_PROPERTY) {
-		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_PROPERTY\n");
+		indigo_debug( "SELECTION CHANGED n->node_type == TREE_NODE_PROPERTY\n");
 
 		PropertyNode* p = reinterpret_cast<PropertyNode*>(n);
 		QIndigoProperty* ip = new QIndigoProperty(p->property);
@@ -280,7 +280,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		//  Connect to update signals coming from indigo bus
 		connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
 	} else if (n != nullptr && n->node_type == TREE_NODE_GROUP) {
-		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_GROUP\n");
+		indigo_debug("SELECTION CHANGED n->node_type == TREE_NODE_GROUP\n");
 		GroupNode* g = reinterpret_cast<GroupNode*>(n);
 		QWidget* ppanel = new QWidget();
 		QVBoxLayout* playout = new QVBoxLayout;
@@ -302,7 +302,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		mScrollArea->setWidgetResizable(true);
 		ppanel->show();
 	} else if (n != nullptr && n->node_type == TREE_NODE_DEVICE) {
-		fprintf(stderr, "SELECTION CHANGED n->node_type == TREE_NODE_DEVICE\n");
+		indigo_debug("SELECTION CHANGED n->node_type == TREE_NODE_DEVICE\n");
 		clear_window();
 
 		/*
@@ -318,7 +318,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
                 for (int i = 0; i < d->children.count; i++) {
 			PropertyNode* p = d->children.nodes[i];
                         QIndigoProperty* ip = new QIndigoProperty(p->property);
-                        fprintf(stderr, "POPER\n");
+                        indigo_debug("POPER\n");
                         playout->addWidget(ip);
                         connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
                 }
@@ -345,12 +345,12 @@ void BrowserWindow::on_blobs_changed(bool status) {
 	emit(enable_blobs(status));
 	if(status) on_property_log(NULL, "BLOBs enabled");
 	else on_property_log(NULL, "BLOBs disabled");
-	printf ("%s\n", __FUNCTION__);
+	indigo_debug ("%s\n", __FUNCTION__);
 }
 
 void BrowserWindow::on_bonjour_changed(bool status) {
 	conf.auto_connect = status;
-	printf ("%s\n", __FUNCTION__);
+	indigo_debug ("%s\n", __FUNCTION__);
 }
 
 void BrowserWindow::on_about_act() {
@@ -369,5 +369,5 @@ void BrowserWindow::on_about_act() {
 		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
 	);
 	msgBox.exec();
-	printf ("%s\n", __FUNCTION__);
+	indigo_debug ("%s\n", __FUNCTION__);
 }

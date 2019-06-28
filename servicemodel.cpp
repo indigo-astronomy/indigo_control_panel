@@ -23,7 +23,7 @@ void ServiceModel::onTimer() {
 
 		int socket = (*i)->m_server_entry->socket;
 		if (socket != (*i)->prevSocket) {
-			printf("SERVICE Sockets '%s' '%s' [%d] %d\n",(*i)->m_server_entry->name, (*i)->m_server_entry->host, socket, (*i)->prevSocket);
+			indigo_debug("SERVICE Sockets '%s' '%s' [%d] %d\n",(*i)->m_server_entry->name, (*i)->m_server_entry->host, socket, (*i)->prevSocket);
 			(*i)->prevSocket = socket;
 			emit(serviceConnectionChange(**i));
 		}
@@ -39,11 +39,11 @@ int ServiceModel::rowCount(const QModelIndex &) const {
 bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 	int i = findService(name);
 	if (i != -1) {
-		fprintf(stderr, "SERVICE DUPLICATE [%s]\n", name.constData());
+		indigo_debug("SERVICE DUPLICATE [%s]\n", name.constData());
 		return false;
 	}
 
-	fprintf(stderr, "SERVICE ADDED Manually [%s]\n", name.constData());
+	indigo_debug("SERVICE ADDED Manually [%s]\n", name.constData());
 
 	qDebug() << host.constData() << "on port" << port << "!";
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
@@ -69,10 +69,10 @@ bool ServiceModel::removeService(QByteArray name) {
 		indigo_service->disconnect();
 		emit(serviceRemoved(*indigo_service));
 		delete indigo_service;
-		fprintf(stderr, "SERVICE REMOVED [%s]\n", name.constData());
+		indigo_debug("SERVICE REMOVED [%s]\n", name.constData());
 		return true;
 	}
-	fprintf(stderr, "SERVICE DOES NOT EXIST [%s]\n", name.constData());
+	indigo_debug("SERVICE DOES NOT EXIST [%s]\n", name.constData());
 	return false;
 }
 
@@ -80,11 +80,11 @@ bool ServiceModel::removeService(QByteArray name) {
 bool ServiceModel::connectService(QByteArray name) {
 	int i = findService(name);
 	if (i == -1) {
-		fprintf(stderr, "SERVICE NOT FOUND [%s]\n", name.constData());
+		indigo_debug("SERVICE NOT FOUND [%s]\n", name.constData());
 		return false;
 	}
 	IndigoService* indigo_service = mServices.at(i);
-	fprintf(stderr, "CONNECTING TO SERVICE [%s]\n", name.constData());
+	indigo_debug("CONNECTING TO SERVICE [%s]\n", name.constData());
 	qDebug() << indigo_service->host().constData() << "on port" << indigo_service->port() << "!";
 	return indigo_service->connect();
 }
@@ -93,11 +93,11 @@ bool ServiceModel::connectService(QByteArray name) {
 bool ServiceModel::disconnectService(QByteArray name) {
 	int i = findService(name);
 	if (i == -1) {
-		fprintf(stderr, "SERVICE NOT FOUND [%s]\n", name.constData());
+		indigo_debug("SERVICE NOT FOUND [%s]\n", name.constData());
 		return false;
 	}
 	IndigoService* indigo_service = mServices.at(i);
-	fprintf(stderr, "DISCONNECTING FROM SERVICE [%s]\n", name.constData());
+	indigo_debug("DISCONNECTING FROM SERVICE [%s]\n", name.constData());
 	qDebug() << indigo_service->host().constData() << "on port" << indigo_service->port() << "!";
 	return indigo_service->disconnect();
 }
@@ -125,18 +125,18 @@ QVariant ServiceModel::data(const QModelIndex &index, int role) const {
 
 
 void ServiceModel::onServiceError(QZeroConf::error_t e) {
-	fprintf(stderr, "ZEROCONF ERROR %d", e);
+	indigo_debug("ZEROCONF ERROR %d", e);
 }
 
 
 void ServiceModel::onServiceAdded(QZeroConfService service) {
 	int i = findService(service.name().toUtf8());
 	if (i != -1) {
-		fprintf(stderr, "SERVICE DUPLICATE [%s]\n", service.name().toUtf8().constData());
+		indigo_debug("SERVICE DUPLICATE [%s]\n", service.name().toUtf8().constData());
 		return;
 	}
 
-	fprintf(stderr, "SERVICE ADDED [%s]\n", service.name().toUtf8().constData());
+	indigo_debug("SERVICE ADDED [%s]\n", service.name().toUtf8().constData());
 
 	qDebug() << service.name() << "discovered on port" << service.port() << "!";
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
@@ -161,13 +161,13 @@ void ServiceModel::onServiceUpdated(QZeroConfService service) {
 
 
 void ServiceModel::onServiceRemoved(QZeroConfService service) {
-	fprintf(stderr, "SERVICE REMOVED [%s]\n", service.name().toUtf8().constData());
+	indigo_debug("SERVICE REMOVED [%s]\n", service.name().toUtf8().constData());
 
 	//qDebug() << "Service Removed " << service.name();
 	int i = findService(service.name().toUtf8());
 	if (i != -1) {
 		IndigoService* indigo_service = mServices.at(i);
-		fprintf(stderr, "SERVICE REMOVED WWWWW [%s]\n", service.name().toUtf8().constData());
+		indigo_debug("SERVICE REMOVED WWWWW [%s]\n", service.name().toUtf8().constData());
 		beginRemoveRows(QModelIndex(), i, i);
 		mServices.removeAt(i);
 		endRemoveRows();

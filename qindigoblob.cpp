@@ -112,7 +112,7 @@ void QIndigoBLOB::preview_blob_item(){
 				return;
 			}
 		}
-		printf("Can not display image '%s'", file_name);
+		indigo_debug("Can not display image '%s'", file_name);
 	}
 }
 

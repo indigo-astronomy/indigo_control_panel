@@ -76,7 +76,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 		if (property->state == INDIGO_OK_STATE) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
-					printf("image URL received (%s, %ld bytes)...", property->items[0].blob.url, property->items[0].blob.size);
+					indigo_debug("image URL received (%s, %ld bytes)...", property->items[0].blob.url, property->items[0].blob.size);
 				}
 			}
 		}
@@ -99,7 +99,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 static indigo_result client_delete_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
 	Q_UNUSED(client);
 	Q_UNUSED(device);
-	fprintf(stderr, "** Deleting property [%s] on device [%s]\n", property->name, property->device);
+	indigo_debug("** Deleting property [%s] on device [%s]\n", property->name, property->device);
 
 	indigo_property* p = new indigo_property;
 	strcpy(p->device, property->device);
