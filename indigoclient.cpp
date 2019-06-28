@@ -76,7 +76,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 		if (property->state == INDIGO_OK_STATE) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
-					indigo_debug("image URL received (%s, %ld bytes)...", property->items[0].blob.url, property->items[0].blob.size);
+					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
 				}
 			}
 		}
@@ -99,7 +99,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 static indigo_result client_delete_property(indigo_client *client, indigo_device *device, indigo_property *property, const char *message) {
 	Q_UNUSED(client);
 	Q_UNUSED(device);
-	indigo_debug("** Deleting property [%s] on device [%s]\n", property->name, property->device);
+	indigo_debug("Deleting property [%s] on device [%s]\n", property->name, property->device);
 
 	indigo_property* p = new indigo_property;
 	strcpy(p->device, property->device);
@@ -121,15 +121,14 @@ static indigo_result client_send_message(indigo_client *client, indigo_device *d
 	Q_UNUSED(client);
 	Q_UNUSED(device);
 	Q_UNUSED(message);
-	//qDebug() << "BUS MSG: " << message;
+
 	return INDIGO_OK;
 }
 
 
 static indigo_result client_detach(indigo_client *client) {
 	Q_UNUSED(client);
-	//qDebug() << ("client detach\n");
-	//exit(0);
+
 	return INDIGO_OK;
 }
 

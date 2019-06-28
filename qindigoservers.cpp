@@ -47,7 +47,7 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 
 void QIndigoServers::onConnectionChange(IndigoService &indigo_service) {
 	QString service_name = indigo_service.name();
-	indigo_debug ("Connection State Change [%s] connected = %d\n", service_name.toUtf8().constData(), indigo_service.connected());
+	indigo_debug("Connection State Change [%s] connected = %d\n", service_name.toUtf8().constData(), indigo_service.connected());
 	QListWidgetItem* item = 0;
 	for(int i = 0; i < m_server_list->count(); ++i){
 		item = m_server_list->item(i);
@@ -96,14 +96,14 @@ void QIndigoServers::onAddManualService() {
 	QString service_str = m_service_line->text();
 	QStringList parts = service_str.split(':', QString::SkipEmptyParts);
 	if (parts.size() > 2) {
-		indigo_debug ("FORMAT ERROR\n");
+		indigo_error("%s(): Service format error.\n",__FUNCTION__);
 		return;
 	} else if (parts.size() == 2) {
 		port = atoi(parts.at(1).toUtf8().constData());
 	}
 	QStringList parts2 = parts.at(0).split('@', QString::SkipEmptyParts);
 	if (parts2.size() > 2) {
-		indigo_debug ("FORMAT 2 ERROR\n");
+		indigo_error("%s(): Service format error.\n",__FUNCTION__);
 		return;
 	} else if (parts2.size() == 2) {
 		service = parts2.at(0);
@@ -120,7 +120,7 @@ void QIndigoServers::onAddManualService() {
 	IndigoService indigo_service(service.toUtf8(), hostname.toUtf8(), port);
 	emit(requestAddManualService(indigo_service));
 	m_service_line->setText("");
-	indigo_debug ("Service '%s' host '%s' port = %d\n", service.toUtf8().constData(), hostname.toUtf8().constData(), port);
+	indigo_debug("ADD: Service '%s' host '%s' port = %d\n", service.toUtf8().constData(), hostname.toUtf8().constData(), port);
 }
 
 
@@ -148,13 +148,12 @@ void QIndigoServers::highlightChecked(QListWidgetItem *item){
 
 
 void QIndigoServers::onRemoveManualService() {
-	indigo_debug ("TO BE REMOVED: [....]\n");
 	QModelIndex index = m_server_list->currentIndex();
 	QString service = index.data(Qt::DisplayRole).toString();
 	int pos = service.indexOf('@');
 	if (pos > 0) service.truncate(pos);
 	service = service.trimmed();
-	indigo_debug ("TO BE REMOVED: [%s]\n", service.toUtf8().constData());
+	indigo_debug("TO BE REMOVED: [%s]\n", service.toUtf8().constData());
 	emit(requestRemoveManualService(service));
 }
 

@@ -99,8 +99,6 @@ void QIndigoProperty::property_update(indigo_property* property) {
 	if (m_property != property)
 		return;
 
-	//  It's for us, so update!!
-	//fprintf(stderr, "UPDATE TO [%s]	WE WANT [%s]\n", property->name, m_property->name);
 	update_controls();
 	update_property_view();
 }

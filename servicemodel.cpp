@@ -58,7 +58,6 @@ bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 
 
 bool ServiceModel::removeService(QByteArray name) {
-	//qDebug() << "Service Removed " << service.name();
 	int i = findService(name);
 	if (i != -1) {
 		IndigoService* indigo_service = mServices.at(i);
@@ -84,8 +83,7 @@ bool ServiceModel::connectService(QByteArray name) {
 		return false;
 	}
 	IndigoService* indigo_service = mServices.at(i);
-	indigo_debug("CONNECTING TO SERVICE [%s]\n", name.constData());
-	qDebug() << indigo_service->host().constData() << "on port" << indigo_service->port() << "!";
+	indigo_debug("CONNECTING TO SERVICE [%s] on %s:%d\n", name.constData(), indigo_service->host().constData(), indigo_service->port());
 	return indigo_service->connect();
 }
 
@@ -97,8 +95,8 @@ bool ServiceModel::disconnectService(QByteArray name) {
 		return false;
 	}
 	IndigoService* indigo_service = mServices.at(i);
-	indigo_debug("DISCONNECTING FROM SERVICE [%s]\n", name.constData());
-	qDebug() << indigo_service->host().constData() << "on port" << indigo_service->port() << "!";
+	indigo_debug("CONNECTING TO SERVICE [%s] on %s:%d\n", name.constData(), indigo_service->host().constData(), indigo_service->port());
+
 	return indigo_service->disconnect();
 }
 
@@ -125,7 +123,7 @@ QVariant ServiceModel::data(const QModelIndex &index, int role) const {
 
 
 void ServiceModel::onServiceError(QZeroConf::error_t e) {
-	indigo_debug("ZEROCONF ERROR %d", e);
+	indigo_error("ZEROCONF ERROR %d", e);
 }
 
 
@@ -136,9 +134,8 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 		return;
 	}
 
-	indigo_debug("SERVICE ADDED [%s]\n", service.name().toUtf8().constData());
+	indigo_debug("SERVICE ADDED [%s] on %s:%d\n", service.name().constData(), service.host().constData(), service.port());
 
-	qDebug() << service.name() << "discovered on port" << service.port() << "!";
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
 	IndigoService* indigo_service = new IndigoService(service);
 	mServices.append(indigo_service);
@@ -150,7 +147,7 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 
 
 void ServiceModel::onServiceUpdated(QZeroConfService service) {
-	qDebug() << "Service Updated " << service.name();
+	indigo_debug("SERVICE ADDED [%s] on %s:%d\n", service.name().constData(), service.host().constData(), service.port());
 //	int i = findService(service.name());
 //	if (i != -1) {
 //		IndigoService s(service);

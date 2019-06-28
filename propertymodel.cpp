@@ -388,7 +388,7 @@ void PropertyModel::enable_blobs(bool on) {
 					} else {
 						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_NEVER);
 					}
-					printf("BLOB %s.%s -> mode = %d\n", property->device, property->name, on);
+					indigo_debug("BLOB %s.%s -> mode = %d\n", property->device, property->name, on);
 				}
 			}
 		}

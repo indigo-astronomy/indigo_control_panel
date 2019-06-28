@@ -31,7 +31,6 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QWidget *central = new QWidget;
 	setCentralWidget(central);
 
-
 	//  Set the root layout to be a VBox
 	QVBoxLayout *rootLayout = new QVBoxLayout;
 	rootLayout->setSpacing(0);
@@ -94,14 +93,12 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	form_layout->addWidget(mScrollArea);
 	mScrollArea->setMinimumWidth(600);
 
-
 	QSplitter* hSplitter = new QSplitter;
 	hSplitter->addWidget(mProperties);
 	hSplitter->addWidget(form_panel);
 	hSplitter->setStretchFactor(0, 45);
 	hSplitter->setStretchFactor(2, 55);
 	propertyLayout->addWidget(hSplitter, 85);
-
 
 	//  Create log viewer
 	mLog = new QPlainTextEdit;
@@ -123,8 +120,6 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(mIndigoServers, &QIndigoServers::requestAddManualService, mServiceModel, &ServiceModel::onRequestAddManualService);
 	connect(mIndigoServers, &QIndigoServers::requestRemoveManualService, mServiceModel, &ServiceModel::onRequestRemoveManualService);
 
-
-
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);
@@ -142,9 +137,6 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 
 	current_node = nullptr;
-
-	//mServiceModel->addService("localhost", "localhost", 7624);
-	//mServiceModel->connectService("localhost");
 
 	//  Start up the client
 	IndigoClient::instance().start();
@@ -169,11 +161,11 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 		snprintf(log_line, 512, "%s %s", timestamp, message);
 
 	mLog->appendPlainText(log_line); // Adds the message to the widget
+	indigo_debug("Log window: %s\n", message);
 }
 
 void BrowserWindow::on_property_define_delete(indigo_property* property, const char *message) {
 	Q_UNUSED(message);
-	//indigo_debug("@@@@@@@@@@@@@@ PROPERTY CHANGE\n");
 	QItemSelection selected = mProperties->selectionModel()->selection();
 	if (!selected.isEmpty()) {
 		QModelIndex s = selected.indexes().front();
@@ -304,29 +296,6 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 	} else if (n != nullptr && n->node_type == TREE_NODE_DEVICE) {
 		indigo_debug("SELECTION CHANGED n->node_type == TREE_NODE_DEVICE\n");
 		clear_window();
-
-		/*
-		GroupNode* d = reinterpret_cast<GroupNode*>(n);
-                QWidget* ppanel = new QWidget();
-                QVBoxLayout* playout = new QVBoxLayout;
-                playout->setSpacing(10);
-                playout->setContentsMargins(10, 10, 25, 10);
-                playout->setSizeConstraint(QLayout::SetMinimumSize);
-                ppanel->setLayout(playout);
-
-                //  Iterate groups
-                for (int i = 0; i < d->children.count; i++) {
-			PropertyNode* p = d->children.nodes[i];
-                        QIndigoProperty* ip = new QIndigoProperty(p->property);
-                        indigo_debug("POPER\n");
-                        playout->addWidget(ip);
-                        connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
-                }
-                playout->addStretch(); // Fill the vertical space available
-                mScrollArea->setWidget(ppanel);
-                mScrollArea->setWidgetResizable(true);
-                ppanel->show();
-		*/
 	}
 }
 
