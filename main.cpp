@@ -41,6 +41,9 @@ int main(int argc, char *argv[]) {
 	conf.indigo_log_level = 1; //Not used yet
 	read_conf();
 
+	/* This shall be set only before connecting */
+	indigo_use_host_suffix = conf.indigo_use_host_suffix;
+
 	QApplication app(argc, argv);
 
 	QFile f(":qdarkstyle/style.qss");

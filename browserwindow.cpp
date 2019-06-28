@@ -7,6 +7,7 @@
 #include <QPlainTextEdit>
 #include <QScrollArea>
 #include <QMessageBox>
+#include <QActionGroup>
 #include <sys/time.h>
 #include "browserwindow.h"
 #include "servicemodel.h"
@@ -42,35 +43,59 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	// Create menubar
 	QMenuBar *menu = new QMenuBar;
 	QMenu *file = new QMenu("&File");
-	QAction *servers_act = new QAction(tr("&Manage Services"), this);
-	file->addAction(servers_act);
-	QAction *exit_act = new QAction(tr("&Exit"), this);
-	file->addAction(exit_act);
+	QAction *act;
+
+	act = file->addAction(tr("&Manage Services"));
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
+
+	act = file->addAction(tr("&Exit"));
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
+
 	menu->addMenu(file);
 
 	QMenu *settings = new QMenu("&Settings");
-	QAction *blobs_act = new QAction(tr("Ebable &BLOBs"), this);
-	blobs_act->setCheckable(true);
-	blobs_act->setChecked(conf.blobs_enabled);
-	settings->addAction(blobs_act);
-	QAction *bonjour_act = new QAction(tr("Enable auto &connect"), this);
-	bonjour_act->setCheckable(true);
-	bonjour_act->setChecked(conf.auto_connect);
-	settings->addAction(bonjour_act);
-	menu->addMenu(settings);
 
+	act = settings->addAction(tr("Ebable &BLOBs"));
+	act->setCheckable(true);
+	act->setChecked(conf.blobs_enabled);
+	connect(act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
+
+	act = settings->addAction(tr("Enable auto &connect"));
+	act->setCheckable(true);
+	act->setChecked(conf.auto_connect);
+	connect(act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
+
+	act = settings->addAction(tr("&Use host suffix"));
+	act->setCheckable(true);
+	act->setChecked(conf.indigo_use_host_suffix);
+	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_suffix_changed);
+
+	settings->addSeparator();
+	QActionGroup *log_group = new QActionGroup(this);
+	log_group->setExclusive(true);
+	QAction *log_act;
+	log_act = settings->addAction("Log Error");
+	log_act->setCheckable(true);
+	log_act->setChecked(true);
+	log_group->addAction(log_act);
+	log_act = settings->addAction("Log Info");
+	log_act->setCheckable(true);
+	log_group->addAction(log_act);
+	log_act = settings->addAction("Log Debug");
+	log_act->setCheckable(true);
+	log_group->addAction(log_act);
+	log_act = settings->addAction("Log Trace");
+	log_act->setCheckable(true);
+	log_group->addAction(log_act);
+
+	menu->addMenu(settings);
 	QMenu *help = new QMenu("&Help");
-	QAction *about_act = new QAction(tr("&About"), this);
-	help->addAction(about_act);
+
+	act = help->addAction(tr("&About"));
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_about_act);
 	menu->addMenu(help);
 
 	rootLayout->addWidget(menu);
-
-	connect(servers_act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
-	connect(exit_act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
-	connect(blobs_act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
-	connect(bonjour_act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
-	connect(about_act, &QAction::triggered, this, &BrowserWindow::on_about_act);
 
 	// Create properties viewing area
 	QWidget *view = new QWidget;
@@ -321,6 +346,12 @@ void BrowserWindow::on_blobs_changed(bool status) {
 
 void BrowserWindow::on_bonjour_changed(bool status) {
 	conf.auto_connect = status;
+	write_conf();
+	indigo_debug ("%s\n", __FUNCTION__);
+}
+
+void BrowserWindow::on_use_suffix_changed(bool status) {
+	conf.indigo_use_host_suffix = status;
 	write_conf();
 	indigo_debug ("%s\n", __FUNCTION__);
 }
