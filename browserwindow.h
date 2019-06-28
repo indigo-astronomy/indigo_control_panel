@@ -33,6 +33,10 @@ public slots:
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
 	void on_use_suffix_changed(bool status);
+	void on_log_error();
+	void on_log_info();
+	void on_log_debug();
+	void on_log_trace();
 	void on_servers_act();
 	void on_exit_act();
 	void on_about_act();

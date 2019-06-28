@@ -38,8 +38,10 @@ int main(int argc, char *argv[]) {
 	conf.blobs_enabled = true;
 	conf.auto_connect = true;
 	conf.indigo_use_host_suffix = true;
-	conf.indigo_log_level = 1; //Not used yet
+	conf.indigo_log_level = INDIGO_LOG_INFO;
 	read_conf();
+
+	indigo_set_log_level(conf.indigo_log_level);
 
 	/* This shall be set only before connecting */
 	indigo_use_host_suffix = conf.indigo_use_host_suffix;

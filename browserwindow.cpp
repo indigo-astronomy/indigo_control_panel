@@ -73,20 +73,30 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	settings->addSeparator();
 	QActionGroup *log_group = new QActionGroup(this);
 	log_group->setExclusive(true);
-	QAction *log_act;
-	log_act = settings->addAction("Log Error");
-	log_act->setCheckable(true);
-	log_act->setChecked(true);
-	log_group->addAction(log_act);
-	log_act = settings->addAction("Log Info");
-	log_act->setCheckable(true);
-	log_group->addAction(log_act);
-	log_act = settings->addAction("Log Debug");
-	log_act->setCheckable(true);
-	log_group->addAction(log_act);
-	log_act = settings->addAction("Log Trace");
-	log_act->setCheckable(true);
-	log_group->addAction(log_act);
+
+	act = settings->addAction("Log Error");
+	act->setCheckable(true);
+	if (conf.indigo_log_level == INDIGO_LOG_ERROR) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_error);
+	log_group->addAction(act);
+
+	act = settings->addAction("Log Info");
+	act->setCheckable(true);
+	if (conf.indigo_log_level == INDIGO_LOG_INFO) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_info);
+	log_group->addAction(act);
+
+	act = settings->addAction("Log Debug");
+	act->setCheckable(true);
+	if (conf.indigo_log_level == INDIGO_LOG_DEBUG) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_debug);
+	log_group->addAction(act);
+
+	act = settings->addAction("Log Trace");
+	act->setCheckable(true);
+	if (conf.indigo_log_level == INDIGO_LOG_TRACE) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_trace);
+	log_group->addAction(act);
 
 	menu->addMenu(settings);
 	QMenu *help = new QMenu("&Help");
@@ -335,26 +345,62 @@ void BrowserWindow::on_exit_act() {
 	QApplication::quit();
 }
 
+
 void BrowserWindow::on_blobs_changed(bool status) {
 	conf.blobs_enabled = status;
 	emit(enable_blobs(status));
 	if(status) on_property_log(NULL, "BLOBs enabled");
 	else on_property_log(NULL, "BLOBs disabled");
 	write_conf();
-	indigo_debug ("%s\n", __FUNCTION__);
+	indigo_debug("%s\n", __FUNCTION__);
 }
+
 
 void BrowserWindow::on_bonjour_changed(bool status) {
 	conf.auto_connect = status;
 	write_conf();
-	indigo_debug ("%s\n", __FUNCTION__);
+	indigo_debug("%s\n", __FUNCTION__);
 }
+
 
 void BrowserWindow::on_use_suffix_changed(bool status) {
 	conf.indigo_use_host_suffix = status;
 	write_conf();
-	indigo_debug ("%s\n", __FUNCTION__);
+	indigo_debug("%s\n", __FUNCTION__);
 }
+
+
+void BrowserWindow::on_log_error() {
+	conf.indigo_log_level = INDIGO_LOG_ERROR;
+	indigo_set_log_level(conf.indigo_log_level);
+	write_conf();
+	indigo_error("%s\n", __FUNCTION__);
+}
+
+
+void BrowserWindow::on_log_info() {
+	indigo_debug("%s\n", __FUNCTION__);
+	conf.indigo_log_level = INDIGO_LOG_INFO;
+	indigo_set_log_level(conf.indigo_log_level);
+	write_conf();
+}
+
+
+void BrowserWindow::on_log_debug() {
+	indigo_debug("%s\n", __FUNCTION__);
+	conf.indigo_log_level = INDIGO_LOG_DEBUG;
+	indigo_set_log_level(conf.indigo_log_level);
+	write_conf();
+}
+
+
+void BrowserWindow::on_log_trace() {
+	indigo_debug("%s\n", __FUNCTION__);
+	conf.indigo_log_level = INDIGO_LOG_TRACE;
+	indigo_set_log_level(conf.indigo_log_level);
+	write_conf();
+}
+
 
 void BrowserWindow::on_about_act() {
 	QMessageBox msgBox(this);

@@ -45,7 +45,6 @@ bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 
 	indigo_debug("SERVICE ADDED Manually [%s]\n", name.constData());
 
-	qDebug() << host.constData() << "on port" << port << "!";
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
 	IndigoService* indigo_service = new IndigoService(name, host, port);
 	mServices.append(indigo_service);

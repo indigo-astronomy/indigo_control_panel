@@ -145,7 +145,6 @@ indigo_client client = {
 
 
 IndigoClient::IndigoClient() {
-	indigo_set_log_level(INDIGO_LOG_DEBUG);
 }
 
 void IndigoClient::start() {
