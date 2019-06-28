@@ -48,6 +48,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act = file->addAction(tr("&Manage Services"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
 
+	file->addSeparator();
+
 	act = file->addAction(tr("&Exit"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 
@@ -74,25 +76,25 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QActionGroup *log_group = new QActionGroup(this);
 	log_group->setExclusive(true);
 
-	act = settings->addAction("Log Error");
+	act = settings->addAction("Log &Error");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_ERROR) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_error);
 	log_group->addAction(act);
 
-	act = settings->addAction("Log Info");
+	act = settings->addAction("Log &Info");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_INFO) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_info);
 	log_group->addAction(act);
 
-	act = settings->addAction("Log Debug");
+	act = settings->addAction("Log &Debug");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_DEBUG) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_debug);
 	log_group->addAction(act);
 
-	act = settings->addAction("Log Trace");
+	act = settings->addAction("Log &Trace");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_TRACE) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_trace);
