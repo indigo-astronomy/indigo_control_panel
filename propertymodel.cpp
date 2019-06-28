@@ -55,7 +55,7 @@ PropertyModel::PropertyModel() {
 
 void PropertyModel::define_property(indigo_property* property, const char *message) {
 	//  Find or create TreeNode for property->device
-	//indigo_trace("Defining device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
+	//indigo_debug("Defining device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 	int device_row = 0;
 	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
 	if (device == nullptr) {
@@ -108,7 +108,7 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 		}
 	}
 	emit(property_defined(property, message));
-	//indigo_trace("Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
+	//indigo_debug("Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 }
 
 
@@ -154,13 +154,13 @@ void PropertyModel::update_property(indigo_property* property, const char *messa
 }
 
 void PropertyModel::delete_property(indigo_property* property, const char *message) {
-	indigo_trace("Deleting property [%s] on device [%s]\n", property->name, property->device);
+	indigo_debug("Deleting property [%s] on device [%s]\n", property->name, property->device);
 
 	//  Find TreeNode for property->device
 	int device_row = 0;
 	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
 	if (device == nullptr) {
-		indigo_trace("Deleting property on device [%s] - NOT FOUND\n", property->device);
+		indigo_debug("Deleting property on device [%s] - NOT FOUND\n", property->device);
 		emit(property_deleted(property, message));
 		delete property;
 		//property = nullptr;
@@ -181,11 +181,11 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	}
 
 	//  Find TreeNode within device for property->group
-	indigo_trace("Deleting property in group [%s]\n", property->group);
+	indigo_debug("Deleting property in group [%s]\n", property->group);
 	int group_row = 0;
 	GroupNode* group = device->children.find_by_name_with_index(property->group, group_row);
 	if ((property) && (group == nullptr)) {
-		indigo_trace("Deleting property in group [%s] - NOT FOUND\n", property->group);
+		indigo_debug("Deleting property in group [%s] - NOT FOUND\n", property->group);
 		emit(property_deleted(property, message));
 		delete property;
 		//property = nullptr;
@@ -206,11 +206,11 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	}
 
 	//  Find or create TreeNode within group fro property->name
-	indigo_trace("Deleting property [%s]\n", property->name);
+	indigo_debug("Deleting property [%s]\n", property->name);
 	int property_row = 0;
 	PropertyNode* p = group->children.find_by_name_with_index(property->name, property_row);
 	if (p == nullptr) {
-		indigo_trace("Deleting property [%s] - NOT FOUND\n", property->name);
+		indigo_debug("Deleting property [%s] - NOT FOUND\n", property->name);
 		emit(property_deleted(property, message));
 		delete property;
 		//property = nullptr;
@@ -221,11 +221,11 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	//bool device_empty = false;
 
 	//  Remove the property
-	indigo_trace("Erasing property [%s] in %p %p\n", property->name, device, group);
+	indigo_debug("Erasing property [%s] in %p %p\n", property->name, device, group);
 	beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
 	group->children.remove_index(property_row);
 	endRemoveRows();
-	indigo_trace("Erased property [%s]\n", property->name);
+	indigo_debug("Erased property [%s]\n", property->name);
 
 
 	char devname[255];
@@ -235,23 +235,23 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 
 	//  Remove the group if empty
 	if (group->children.empty()) {
-		indigo_trace("--- REMOVING EMPTY GROUP %p -> [%s]\n", group, groupname);
+		indigo_debug("--- REMOVING EMPTY GROUP %p -> [%s]\n", group, groupname);
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
 		//group_empty = true;
-		indigo_trace("--- REMOVED EMPTY GROUP [%s]\n", groupname);
+		indigo_debug("--- REMOVED EMPTY GROUP [%s]\n", groupname);
 	}
 
 	//  Remove the device if empty
 	if (device->children.empty()) {
-		indigo_trace("--- REMOVING EMPTY DEVICE %p -> [%s]\n", device, devname);
+		indigo_debug("--- REMOVING EMPTY DEVICE %p -> [%s]\n", device, devname);
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
 		//device_empty = true;
 		//device = nullptr;
-		indigo_trace("--- REMOVED EMPTY DEVICE [%s]\n", devname);
+		indigo_debug("--- REMOVED EMPTY DEVICE [%s]\n", devname);
 	}
 
 	emit(property_deleted(property, message));
@@ -270,15 +270,15 @@ QModelIndex PropertyModel::index(int row, int column, const QModelIndex &parent)
 		return QModelIndex();
 
 	if (!parent.isValid()) {
-		//indigo_trace("INDEX of node type %d returning %d,%d\n", TREE_NODE_ROOT, row, column);
+		//indigo_debug("INDEX of node type %d returning %d,%d\n", TREE_NODE_ROOT, row, column);
 		DeviceNode* n = root.children[row];
 		return createIndex(row,column,n);
 	}
 	else {
 		TreeNode* n = reinterpret_cast<TreeNode*>(parent.internalPointer());
-		//indigo_trace("->INDEX of node type %d returning %d,%d\n", n->node_type, row, column);
+		//indigo_debug("->INDEX of node type %d returning %d,%d\n", n->node_type, row, column);
 		n = (*n)[row];
-		//indigo_trace("  Yields row of node type %d\n", n->node_type);
+		//indigo_debug("  Yields row of node type %d\n", n->node_type);
 		return createIndex(row,column,n);
 	}
 }
@@ -304,7 +304,7 @@ QModelIndex PropertyModel::parent(const QModelIndex &child) const {
 		return QModelIndex();
 
 	int row = node->parent()->index_of(node);
-	//indigo_trace("  Yields row %d of parent of node type %d\n", row, node->parent()->node_type);
+	//indigo_debug("  Yields row %d of parent of node type %d\n", row, node->parent()->node_type);
 	return createIndex(row,0, node->parent());
 }
 
@@ -313,7 +313,7 @@ int PropertyModel::rowCount(const QModelIndex &parent) const {
 	if (!parent.isValid())
 		return root.size();
 	TreeNode* node = static_cast<TreeNode*>(parent.internalPointer());
-	//indigo_trace("ROWS for node type %d -> %d\n", node->node_type, node->size());
+	//indigo_debug("ROWS for node type %d -> %d\n", node->node_type, node->size());
 	return node->size();
 }
 
@@ -330,7 +330,7 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 	if (node) {
 		switch (role) {
 		case Qt::DisplayRole:
-			//indigo_trace("DATA for node type %d [%s]\n", node->node_type, node->label());
+			//indigo_debug("DATA for node type %d [%s]\n", node->node_type, node->label());
 			return QString::fromStdString(node->label());
 		case Qt::DecorationRole: {
 			if (node->node_type == TREE_NODE_PROPERTY) {
@@ -363,7 +363,7 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 		}
 		}
 	} else {
-		indigo_trace("Missing pointer\n");
+		indigo_debug("Missing pointer\n");
 	}
 	return QVariant();
 }
