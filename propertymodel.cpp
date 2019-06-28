@@ -10,24 +10,24 @@
 extern indigo_client client;
 
 TreeNode::~TreeNode() {
-	printf("CALLED: %s on %p\n", __FUNCTION__, this);
+	indigo_debug("CALLED: %s on %p\n", __FUNCTION__, this);
 }
 
 
 DeviceNode::~DeviceNode() {
-	printf("CALLED: %s on %p\n", __FUNCTION__, this);
-	printf("=== relese DEVICE\n");
+	indigo_debug("CALLED: %s on %p\n", __FUNCTION__, this);
+	indigo_debug("=== relese DEVICE\n");
 }
 
 
 GroupNode::~GroupNode() {
-	printf("CALLED: %s on %p\n", __FUNCTION__, this);
-	printf("=== release GROUP\n");
+	indigo_debug("CALLED: %s on %p\n", __FUNCTION__, this);
+	indigo_debug("=== release GROUP\n");
 }
 
 
 PropertyNode::~PropertyNode() {
-	printf("CALLED: %s on %p\n", __FUNCTION__, this);
+	indigo_debug("CALLED: %s on %p\n", __FUNCTION__, this);
 	if (property) {
 		indigo_release_property(property);
 		property = nullptr;
@@ -41,15 +41,15 @@ ItemNode::ItemNode(indigo_item* i, PropertyNode* parent) : TreeNodeWithParent<Pr
 
 
 ItemNode::~ItemNode() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	indigo_debug("CALLED: %s\n", __FUNCTION__);
 }
 
 RootNode::~RootNode() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	indigo_debug("CALLED: %s\n", __FUNCTION__);
 }
 
 PropertyModel::PropertyModel() {
-	printf("CALLED: %s\n", __FUNCTION__);
+	indigo_debug("CALLED: %s\n", __FUNCTION__);
 }
 
 
@@ -296,7 +296,7 @@ QModelIndex PropertyModel::parent(const QModelIndex &child) const {
 	if (node == nullptr) {
 		return QModelIndex();
 	}
-	//printf("*********************** child %p -> parent %p\n", child, node);
+	//indigo_debug("*********************** child %p -> parent %p\n", child, node);
 	if (node->node_type == TREE_NODE_DEVICE)
 		return QModelIndex();
 

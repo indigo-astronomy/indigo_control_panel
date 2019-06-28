@@ -17,6 +17,7 @@
 #include "logger.h"
 #include "conf.h"
 
+void write_conf();
 
 BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	setWindowTitle(tr("INDIGO Control Panel"));
@@ -314,11 +315,13 @@ void BrowserWindow::on_blobs_changed(bool status) {
 	emit(enable_blobs(status));
 	if(status) on_property_log(NULL, "BLOBs enabled");
 	else on_property_log(NULL, "BLOBs disabled");
+	write_conf();
 	indigo_debug ("%s\n", __FUNCTION__);
 }
 
 void BrowserWindow::on_bonjour_changed(bool status) {
 	conf.auto_connect = status;
+	write_conf();
 	indigo_debug ("%s\n", __FUNCTION__);
 }
 
