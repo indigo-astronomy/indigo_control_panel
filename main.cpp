@@ -8,7 +8,7 @@ conf_t conf;
 
 void write_conf() {
 	char filename[PATH_MAX];
-	snprintf(filename, PATH_MAX, "%s/%s", getenv("HOME"), ".indigo_panel.config");
+	snprintf(filename, PATH_MAX, "%s/%s", getenv("HOME"), CONFIG_FILENAME);
 	FILE * file= fopen(filename, "wb");
 	if (file != NULL) {
 		fwrite(&conf, sizeof(conf), 1, file);
@@ -18,7 +18,7 @@ void write_conf() {
 
 void read_conf() {
 	char filename[PATH_MAX];
-	snprintf(filename, PATH_MAX, "%s/%s", getenv("HOME"), ".indigo_panel.config");
+	snprintf(filename, PATH_MAX, "%s/%s", getenv("HOME"), CONFIG_FILENAME);
 	FILE * file= fopen(filename, "rb");
 	if (file != NULL) {
 		fread(&conf, sizeof(conf), 1, file);
@@ -27,6 +27,9 @@ void read_conf() {
 }
 
 int main(int argc, char *argv[]) {
+	indigo_main_argv = (const char**)argv;
+	indigo_main_argc = argc;
+
 	/* This is important if coma is used for numeric it breaks everything */
 	unsetenv("LC_NUMERIC");
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

@@ -1,6 +1,8 @@
 #ifndef CONF_H
 #define CONF_H
 
+#define CONFIG_FILENAME ".indigo_panel.conf"
+
 typedef struct {
 	bool blobs_enabled;
 	bool auto_connect;
