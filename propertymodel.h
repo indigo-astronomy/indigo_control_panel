@@ -181,6 +181,7 @@ struct ItemNode;
 struct DeviceNode : public TreeNodeWithChildren<RootNode,GroupNode> {
     DeviceNode(const char* device_name, RootNode* parent) : TreeNodeWithChildren<RootNode,GroupNode>(TREE_NODE_DEVICE, parent), state(INDIGO_IDLE_STATE) {
         strncpy(m_name, device_name, sizeof(m_name));
+		m_interface = 0;
     }
     virtual ~DeviceNode();
 
@@ -188,6 +189,7 @@ struct DeviceNode : public TreeNodeWithChildren<RootNode,GroupNode> {
     virtual int index_of(TreeNode* n) const { assert(n->node_type == TREE_NODE_GROUP); return children.index_of(reinterpret_cast<GroupNode*>(n)); }
 
     char m_name[INDIGO_NAME_SIZE];
+	int m_interface;
     indigo_property_state state;   //  This could instead be a pointer to the connection property of the device
 };
 

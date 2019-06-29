@@ -125,6 +125,16 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 			else
 				device->state = INDIGO_IDLE_STATE;
 		}
+		// Change device icon according the device intrface
+		if (strcmp(property->name, INFO_PROPERTY_NAME) == 0) {
+			for (int i = 0; i < property->count; ++i) {
+				if (strcmp(property->items[i].name, INFO_DEVICE_INTERFACE_ITEM_NAME) == 0) {
+					device->m_interface = atoi(property->items[i].text.value);
+					indigo_debug("Device interface [%s] = %04x\n",device->name(), device->m_interface);
+					break;
+				}
+			}
+		}
 	}
 	emit(property_defined(property, message));
 	//indigo_debug("Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
@@ -366,16 +376,43 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 				}
 			} else if (node->node_type == TREE_NODE_DEVICE) {
 				DeviceNode* d = reinterpret_cast<DeviceNode*>(node);
+				if (d->m_interface & INDIGO_INTERFACE_CCD) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/ccd-green.png");
+					default:
+						return QPixmap(":resource/ccd-grey.png");
+					}
+				}
+				if (d->m_interface & INDIGO_INTERFACE_MOUNT) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/mount-green.png");
+					default:
+						return QPixmap(":resource/mount-grey.png");
+					}
+				}
+				if (d->m_interface & INDIGO_INTERFACE_GUIDER) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/guider-green.png");
+					default:
+						return QPixmap(":resource/guider-grey.png");
+					}
+				}
+				if (d->m_interface == 0) { // server
+						return QPixmap(":resource/server.png");
+				}
 				switch (d->state) {
 				case INDIGO_IDLE_STATE:
-					return QPixmap(":resource/led-grey.png");
+					return QPixmap(":resource/led-grey-dev.png");
 				case INDIGO_BUSY_STATE:
 					return QPixmap(":resource/led-orange.png");
 				case INDIGO_ALERT_STATE:
 					return QPixmap(":resource/led-red.png");
 				case INDIGO_OK_STATE:
-					return QPixmap(":resource/led-green.png");
-			}
+					return QPixmap(":resource/led-green-dev.png");
+				}
 			} else {
 				return QVariant();
 			}
