@@ -46,6 +46,8 @@ RESOURCES += \
 	resource/ccd-green.png \
 	resource/mount-grey.png \
 	resource/mount-green.png \
+	resource/wheel-grey.png \
+	resource/wheel-green.png \
 	resource/guider-grey.png \
 	resource/guider-green.png
 

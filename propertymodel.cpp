@@ -400,6 +400,14 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 						return QPixmap(":resource/guider-grey.png");
 					}
 				}
+				if (d->m_interface & INDIGO_INTERFACE_WHEEL) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/wheel-green.png");
+					default:
+						return QPixmap(":resource/wheel-grey.png");
+					}
+				}
 				if (d->m_interface == 0) { // server
 						return QPixmap(":resource/server.png");
 				}
