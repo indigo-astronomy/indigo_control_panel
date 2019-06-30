@@ -16,7 +16,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <QRegularExpression>
 #include "indigoservice.h"
 #include "servicemodel.h"
 #include <indigo_client.h>
@@ -91,6 +91,8 @@ int ServiceModel::rowCount(const QModelIndex &) const {
 
 
 bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
+	host = host.trimmed();
+	name = name.trimmed();
 	int i = findService(name);
 	if (i != -1) {
 		indigo_debug("SERVICE DUPLICATE [%s]\n", name.constData());
