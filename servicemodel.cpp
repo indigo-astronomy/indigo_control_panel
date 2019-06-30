@@ -22,6 +22,8 @@
 #include <indigo_client.h>
 #include "conf.h"
 
+#define SERVICE_FILENAME ".indigo_panel.services"
+
 
 ServiceModel::ServiceModel(const QByteArray &type) {
 	m_logger = &Logger::instance();
@@ -32,6 +34,39 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 	connect(&m_zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
 	connect(&m_zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
 	m_zeroConf.startBrowser(type);
+}
+
+
+void ServiceModel::saveManualServices() {
+	char filename[PATH_MAX];
+	snprintf(filename, PATH_MAX, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
+	FILE * file= fopen(filename, "w");
+	if (file != NULL) {
+		for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
+			if((*i)->isQZeroConfService == false) {
+				fprintf(file, "%s@%s:%d\n", (*i)->name().constData(), (*i)->host().constData(), (*i)->port());
+			}
+		}
+		fclose(file);
+	}
+}
+
+
+void ServiceModel::loadManualServices() {
+	char filename[PATH_MAX];
+	char name[256]={0};
+	char host[256]={0};
+	int port=7624;
+	snprintf(filename, PATH_MAX, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
+	FILE * file= fopen(filename, "r");
+	if (file != NULL) {
+		indigo_debug("########## file open\n");
+		while (fscanf(file,"%[^@]@%[^:]:%d\n", name, host, &port) == 3) {
+			indigo_debug("########## %s@%s:%d\n", name, host, port);
+			addService(QByteArray(name), QByteArray(host), port);
+		}
+		fclose(file);
+	}
 }
 
 
@@ -152,7 +187,7 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 		return;
 	}
 
-	indigo_debug("SERVICE ADDED [%s] on %s:%d\n", service.name().constData(), service.host().constData(), service.port());
+	indigo_debug("SERVICE ADDED [%s] on %s:%d\n", service.name().toUtf8().constData(), service.host().toUtf8().constData(), service.port());
 
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
 	IndigoService* indigo_service = new IndigoService(service);
@@ -204,12 +239,13 @@ void ServiceModel::onRequestDisconnect(const QString &service) {
 }
 
 void ServiceModel::onRequestAddManualService(IndigoService &indigo_service) {
-	addService(indigo_service.name(), indigo_service.host(), indigo_service.port());
+	if (addService(indigo_service.name(), indigo_service.host(), indigo_service.port()))
+		saveManualServices();
 }
 
 
 void ServiceModel::onRequestRemoveManualService(const QString &service) {
-	removeService(service.toUtf8());
+	if (removeService(service.toUtf8())) saveManualServices();
 }
 
 

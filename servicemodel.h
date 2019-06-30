@@ -39,12 +39,14 @@ public:
 
     ServiceModel(const QByteArray &type);
 
-    virtual int rowCount(const QModelIndex &parent) const;
+	void saveManualServices();
+	void loadManualServices();
+	virtual int rowCount(const QModelIndex &parent) const;
 	bool addService(QByteArray name, QByteArray host,  int port);
 	bool connectService(QByteArray name);
 	bool disconnectService(QByteArray name);
 	bool removeService(QByteArray name);
-    virtual QVariant data(const QModelIndex &index, int role) const;
+	virtual QVariant data(const QModelIndex &index, int role) const;
 
 signals:
 	void serviceAdded(IndigoService &indigo_service);

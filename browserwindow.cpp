@@ -194,6 +194,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 
 	current_node = nullptr;
+	mServiceModel->loadManualServices();
 
 	//  Start up the client
 	IndigoClient::instance().start();
@@ -431,7 +432,7 @@ void BrowserWindow::on_about_act() {
 	msgBox.setIconPixmap(pixmap.scaledToWidth(96, Qt::SmoothTransformation));
 	msgBox.setText(
 		"<b>INDIGO Control Panel</b><br>"
-		"Version 0.1-b1</b><br><br>"
+		"Version 0.1-1-POC</b><br><br>"
 		"Authors:<br>"
 		"Rumen G.Bogdanovski<br>"
 		"David Hulse<br><br>"
