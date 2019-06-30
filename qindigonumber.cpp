@@ -89,7 +89,7 @@ void QIndigoNumber::reset() {
 
 void QIndigoNumber::apply() {
 	if (text_target) {
-		m_item->number.value = m_item->number.target = indigo_stod((char*)text_target->text().toStdString().c_str());
+		m_item->number.value = m_item->number.target = indigo_stod((char*)text_target->text().trimmed().toStdString().c_str());
 		reset();
 	}
 }

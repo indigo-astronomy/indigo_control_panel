@@ -64,7 +64,7 @@ void QIndigoText::reset() {
 
 void QIndigoText::apply() {
 	if (m_dirty) {
-		strncpy(m_item->text.value, text->text().toUtf8().constData(), sizeof(m_item->text.value));
+		strncpy(m_item->text.value, text->text().trimmed().toUtf8().constData(), sizeof(m_item->text.value));
 		reset();
 	}
 }
