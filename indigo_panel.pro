@@ -48,8 +48,16 @@ RESOURCES += \
 	resource/mount-green.png \
 	resource/wheel-grey.png \
 	resource/wheel-green.png \
+	resource/ao-grey.png \
+	resource/ao-green.png \
+	resource/focuser-grey.png \
+	resource/focuser-green.png \
+	resource/gps-grey.png \
+	resource/gps-green.png \
 	resource/guider-grey.png \
-	resource/guider-green.png
+	resource/guider-green.png \
+	resource/dome-grey.png \
+	resource/dome-green.png
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

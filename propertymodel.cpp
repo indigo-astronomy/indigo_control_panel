@@ -400,12 +400,44 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 						return QPixmap(":resource/guider-grey.png");
 					}
 				}
+				if (d->m_interface & INDIGO_INTERFACE_GPS) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/gps-green.png");
+					default:
+						return QPixmap(":resource/gps-grey.png");
+					}
+				}
 				if (d->m_interface & INDIGO_INTERFACE_WHEEL) {
 					switch (d->state) {
 					case INDIGO_OK_STATE:
 						return QPixmap(":resource/wheel-green.png");
 					default:
 						return QPixmap(":resource/wheel-grey.png");
+					}
+				}
+				if (d->m_interface & INDIGO_INTERFACE_FOCUSER) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/focuser-green.png");
+					default:
+						return QPixmap(":resource/focuser-grey.png");
+					}
+				}
+				if (d->m_interface & INDIGO_INTERFACE_AO) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/ao-green.png");
+					default:
+						return QPixmap(":resource/ao-grey.png");
+					}
+				}
+				if (d->m_interface & INDIGO_INTERFACE_DOME) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/dome-green.png");
+					default:
+						return QPixmap(":resource/dome-grey.png");
 					}
 				}
 				if (d->m_interface == 0) { // server
