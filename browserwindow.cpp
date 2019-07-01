@@ -185,8 +185,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_property_log);
 
-	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define_delete);
-	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_define_delete);
+	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define);
+	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_delete);
 
 	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_property_log);
 
@@ -222,7 +222,16 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	indigo_debug("Log window: %s\n", message);
 }
 
-void BrowserWindow::on_property_define_delete(indigo_property* property, const char *message) {
+void BrowserWindow::on_property_define(indigo_property* property, const char *message) {
+	property_define_delete(property, message, false);
+}
+
+void BrowserWindow::on_property_delete(indigo_property* property, const char *message) {
+        property_define_delete(property, message, true);
+}
+
+
+void BrowserWindow::property_define_delete(indigo_property* property, const char *message, bool action_deleted) {
 	Q_UNUSED(message);
 	QItemSelection selected = mProperties->selectionModel()->selection();
 	if (!selected.isEmpty()) {
@@ -234,8 +243,10 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 			if (!strcmp(p->property->name, property->name) &&
 			    !strcmp(p->property->device, property->device) &&
 			    !strcmp(p->property->group, property->group)) {
-				//indigo_debug("SELECTED PROPERTY deleted\n");
-				clear_window();
+				if (action_deleted) {
+					indigo_debug("SELECTED PROPERTY deleted\n");
+					clear_window();
+				}
 				return;
 			}
 		} else if (node->node_type == TREE_NODE_GROUP) {
@@ -277,6 +288,7 @@ void BrowserWindow::on_property_define_delete(indigo_property* property, const c
 
 
 void BrowserWindow::clear_window() {
+	indigo_debug("CLEAR_WINDOW!\n");
 	QWidget* ppanel = new QWidget();
 	QVBoxLayout* playout = new QVBoxLayout;
 	playout->setSizeConstraint(QLayout::SetMinimumSize);
