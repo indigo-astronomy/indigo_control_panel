@@ -194,10 +194,12 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 
 	current_node = nullptr;
-	mServiceModel->loadManualServices();
 
 	//  Start up the client
 	IndigoClient::instance().start();
+
+	// load manually configured services
+	mServiceModel->loadManualServices();
 }
 
 
