@@ -138,8 +138,12 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 
 static indigo_result client_send_message(indigo_client *client, indigo_device *device, const char *message) {
 	Q_UNUSED(client);
-	Q_UNUSED(device);
-	Q_UNUSED(message);
+	//Q_UNUSED(device);
+	//Q_UNUSED(message);
+
+	char msg[PATH_MAX];
+	snprintf(msg, sizeof(msg), "Device: %s: %s", device->name, message);
+	IndigoClient::instance().m_logger->log(NULL, msg);
 
 	return INDIGO_OK;
 }
@@ -164,6 +168,7 @@ indigo_client client = {
 
 
 IndigoClient::IndigoClient() {
+	m_logger = &Logger::instance();
 }
 
 void IndigoClient::start() {

@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <indigo_bus.h>
+#include "logger.h"
 
 
 class IndigoClient : public QObject
@@ -35,6 +36,7 @@ public:
 
     void start();
 
+	Logger* m_logger;
 signals:
     void property_defined(indigo_property* property, const char *message);
     void property_changed(indigo_property* property, const char *message);
