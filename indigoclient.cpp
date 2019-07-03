@@ -142,7 +142,8 @@ static indigo_result client_send_message(indigo_client *client, indigo_device *d
 	if (!message) return INDIGO_OK;
 
 	char msg[PATH_MAX];
-	if ((device) && (device->name[0])) {
+	if ((device) && (device->name[0]) && (device->name[0] != '@')) {
+		// We have device name
 		snprintf(msg, sizeof(msg), "%s: %s", device->name, message);
 	} else {
 		snprintf(msg, sizeof(msg), "%s", message);

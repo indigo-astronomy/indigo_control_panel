@@ -210,13 +210,11 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 	if (!message) return;
 
-	//indigo_debug("CCCCC-> %s\n", message);
-
 	gettimeofday(&tmnow, NULL);
 	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
 	if (property)
-		snprintf(log_line, 512, "%s '%s'.%s - %s", timestamp, property->device, property->name, message);
+		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
 	else
 		snprintf(log_line, 512, "%s %s", timestamp, message);
 
