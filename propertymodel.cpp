@@ -477,10 +477,8 @@ void PropertyModel::enable_blobs(bool on) {
 				indigo_property *property = prop_node->property;
 				if (property == nullptr) continue;
 				if (property->type == INDIGO_BLOB_VECTOR) {
-					if ((on) && (property->version >= INDIGO_VERSION_2_0)) {
-						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_URL);
-					} else if (on) {
-						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_ALSO);
+					if (on) { // Enagle blob and let adapter decide URL or ALSO
+						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB);
 					} else {
 						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_NEVER);
 					}

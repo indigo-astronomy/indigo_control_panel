@@ -46,11 +46,10 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	case INDIGO_BLOB_VECTOR:
-		if (conf.blobs_enabled) {
-			if (device->version >= INDIGO_VERSION_2_0)
-				indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_URL);
-			else
-				indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB_ALSO);
+		if (device->version < INDIGO_VERSION_2_0)
+			IndigoClient::instance().m_logger->log(property, "BLOB can be used in INDI legacy mode");
+		if (conf.blobs_enabled) { // Enagle blob and let adapter decide URL or ALSO
+				indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB);
 		}
 		if (property->state == INDIGO_OK_STATE) {
 			for (int row = 0; row < property->count; row++) {
