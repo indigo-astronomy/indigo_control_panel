@@ -41,6 +41,7 @@ class BrowserWindow : public QMainWindow {
 	Q_OBJECT
 public:
 	explicit BrowserWindow(QWidget *parent = nullptr);
+	virtual ~BrowserWindow();
 	void property_define_delete(indigo_property* property, const char *message, bool action_deleted);
 
 signals:

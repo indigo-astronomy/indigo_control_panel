@@ -60,73 +60,74 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	central->setLayout(rootLayout);
 
 	// Create menubar
-	QMenuBar *menu = new QMenuBar;
-	QMenu *file = new QMenu("&File");
+	QMenuBar *menu_bar = new QMenuBar;
+	QMenu *menu = new QMenu("&File");
 	QAction *act;
 
-	act = file->addAction(tr("&Manage Services"));
+	act = menu->addAction(tr("&Manage Services"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
 
-	file->addSeparator();
+	menu->addSeparator();
 
-	act = file->addAction(tr("&Exit"));
+	act = menu->addAction(tr("&Exit"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 
-	menu->addMenu(file);
+	menu_bar->addMenu(menu);
 
-	QMenu *settings = new QMenu("&Settings");
+	menu = new QMenu("&Settings");
 
-	act = settings->addAction(tr("Ebable &BLOBs"));
+	act = menu->addAction(tr("Ebable &BLOBs"));
 	act->setCheckable(true);
 	act->setChecked(conf.blobs_enabled);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
 
-	act = settings->addAction(tr("Enable auto &connect"));
+	act = menu->addAction(tr("Enable auto &connect"));
 	act->setCheckable(true);
 	act->setChecked(conf.auto_connect);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
 
-	act = settings->addAction(tr("&Use host suffix"));
+	act = menu->addAction(tr("&Use host suffix"));
 	act->setCheckable(true);
 	act->setChecked(conf.indigo_use_host_suffix);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_suffix_changed);
 
-	settings->addSeparator();
+	menu->addSeparator();
 	QActionGroup *log_group = new QActionGroup(this);
 	log_group->setExclusive(true);
 
-	act = settings->addAction("Log &Error");
+	act = menu->addAction("Log &Error");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_ERROR) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_error);
 	log_group->addAction(act);
 
-	act = settings->addAction("Log &Info");
+	act = menu->addAction("Log &Info");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_INFO) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_info);
 	log_group->addAction(act);
 
-	act = settings->addAction("Log &Debug");
+	act = menu->addAction("Log &Debug");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_DEBUG) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_debug);
 	log_group->addAction(act);
 
-	act = settings->addAction("Log &Trace");
+	act = menu->addAction("Log &Trace");
 	act->setCheckable(true);
 	if (conf.indigo_log_level == INDIGO_LOG_TRACE) act->setChecked(true);
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_log_trace);
 	log_group->addAction(act);
 
-	menu->addMenu(settings);
-	QMenu *help = new QMenu("&Help");
+	menu_bar->addMenu(menu);
 
-	act = help->addAction(tr("&About"));
+	menu = new QMenu("&Help");
+
+	act = menu->addAction(tr("&About"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_about_act);
-	menu->addMenu(help);
+	menu_bar->addMenu(menu);
 
-	rootLayout->addWidget(menu);
+	rootLayout->addWidget(menu_bar);
 
 	// Create properties viewing area
 	QWidget *view = new QWidget;
@@ -200,6 +201,17 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	// load manually configured services
 	mServiceModel->loadManualServices();
+}
+
+
+BrowserWindow::~BrowserWindow () {
+	indigo_debug("CALLED: %s\n", __FUNCTION__);
+	delete mLog;
+	delete mProperties;
+	delete form_panel;
+	delete mIndigoServers;
+	delete mServiceModel;
+	delete mPropertyModel;
 }
 
 
