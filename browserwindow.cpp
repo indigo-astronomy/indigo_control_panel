@@ -289,13 +289,18 @@ void BrowserWindow::property_define_delete(indigo_property* property, const char
 
 void BrowserWindow::clear_window() {
 	indigo_debug("CLEAR_WINDOW!\n");
-	QWidget* ppanel = new QWidget();
-	QVBoxLayout* playout = new QVBoxLayout;
-	playout->setSizeConstraint(QLayout::SetMinimumSize);
-	ppanel->setLayout(playout);
-	mScrollArea->setWidget(ppanel);
+	delete form_layout;
+
+	form_layout = new QVBoxLayout();
+	form_layout->setMargin(0);
+	form_panel->setLayout(form_layout);
+
+	mScrollArea = new QScrollArea();
 	mScrollArea->setWidgetResizable(true);
-	ppanel->show();
+	mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	form_layout->addWidget(mScrollArea);
+	mScrollArea->setMinimumWidth(600);
 }
 
 void BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemSelection &) {
