@@ -73,7 +73,7 @@ private:
 	QIndigoServers *mIndigoServers;
 	ServiceModel* mServiceModel;
 	PropertyModel* mPropertyModel;
-	PropertyNode* current_node;
+	TreeNode* current_node;
 	void clear_window();
 };
 

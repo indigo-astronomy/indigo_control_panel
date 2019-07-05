@@ -333,18 +333,17 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 	}
 
 	QModelIndex s = selected.indexes().front();
-	TreeNode* n = static_cast<TreeNode*>(s.internalPointer());
-	if (n != nullptr) {
-		indigo_debug("SELECTION CHANGED n->node_type == %d\n", n->node_type);
+	current_node = static_cast<TreeNode*>(s.internalPointer());
+	if (current_node != nullptr) {
+		indigo_debug("SELECTION CHANGED current_node->node_type == %d\n", current_node->node_type);
 		clear_window();
 	}
 
-	if (n != nullptr && n->node_type == TREE_NODE_PROPERTY) {
-		indigo_debug( "SELECTION CHANGED n->node_type == TREE_NODE_PROPERTY\n");
+	if (current_node != nullptr && current_node->node_type == TREE_NODE_PROPERTY) {
+		indigo_debug( "SELECTION CHANGED current_node->node_type == TREE_NODE_PROPERTY\n");
 
-		PropertyNode* p = reinterpret_cast<PropertyNode*>(n);
+		PropertyNode* p = reinterpret_cast<PropertyNode*>(current_node);
 		QIndigoProperty* ip = new QIndigoProperty(p->property);
-		current_node = p;
 
 		QWidget* ppanel = new QWidget();
 		QVBoxLayout* playout = new QVBoxLayout;
@@ -358,9 +357,9 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 
 		//  Connect to update signals coming from indigo bus
 		connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
-	} else if (n != nullptr && n->node_type == TREE_NODE_GROUP) {
-		indigo_debug("SELECTION CHANGED n->node_type == TREE_NODE_GROUP\n");
-		GroupNode* g = reinterpret_cast<GroupNode*>(n);
+	} else if (current_node != nullptr && current_node->node_type == TREE_NODE_GROUP) {
+		indigo_debug("SELECTION CHANGED current_node->node_type == TREE_NODE_GROUP\n");
+		GroupNode* g = reinterpret_cast<GroupNode*>(current_node);
 		QWidget* ppanel = new QWidget();
 		QVBoxLayout* playout = new QVBoxLayout;
 		playout->setSpacing(10);
@@ -380,8 +379,8 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		mScrollArea->setWidget(ppanel);
 		mScrollArea->setWidgetResizable(true);
 		ppanel->show();
-	} else if (n != nullptr && n->node_type == TREE_NODE_DEVICE) {
-		indigo_debug("SELECTION CHANGED n->node_type == TREE_NODE_DEVICE\n");
+	} else if (current_node != nullptr && current_node->node_type == TREE_NODE_DEVICE) {
+		indigo_debug("SELECTION CHANGED current_node->node_type == TREE_NODE_DEVICE\n");
 		clear_window();
 	}
 }
