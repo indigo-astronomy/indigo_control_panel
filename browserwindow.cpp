@@ -242,59 +242,64 @@ void BrowserWindow::on_property_delete(indigo_property* property, const char *me
         property_define_delete(property, message, true);
 }
 
+#define PP(p) indigo_error("%s PROPERTY %s.%s.%s\n",__FUNCTION__, p->device, p->group, p->name);
+#define PG(p) indigo_error("%s GROUP %s.%s\n",__FUNCTION__, p->device, p->group);
 
 void BrowserWindow::property_define_delete(indigo_property* property, const char *message, bool action_deleted) {
 	Q_UNUSED(message);
-	QItemSelection selected = mProperties->selectionModel()->selection();
-	if (!selected.isEmpty()) {
-		QModelIndex s = selected.indexes().front();
-		TreeNode* node = static_cast<TreeNode*>(s.internalPointer());
-		if (node->node_type == TREE_NODE_PROPERTY) {
-			/* We can not have selected property to be defined -> so just clean window */
-			PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
-			if (!strcmp(p->property->name, property->name) &&
-			    !strcmp(p->property->device, property->device) &&
+	indigo_debug("%s()\n", __FUNCTION__);
+	PP(property);
+
+	if (current_node == nullptr) return;
+	TreeNode* node = current_node;
+	if (node->node_type == TREE_NODE_PROPERTY) {
+		/* We can not have selected property to be defined -> so just clean window */
+		PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
+		if (!strcmp(p->property->name, property->name) &&
+		    !strcmp(p->property->device, property->device) &&
+		    !strcmp(p->property->group, property->group)) {
+			if (action_deleted) {
+				indigo_debug("SELECTED PROPERTY deleted\n");
+				PP(property);
+				clear_window();
+			}
+			return;
+		}
+	} else if (node->node_type == TREE_NODE_GROUP) {
+		/* If we have deleted or defined property update group window */
+		GroupNode* g = reinterpret_cast<GroupNode*>(node);
+		if (g->size() > 0) {
+			PropertyNode* p = g->children.nodes[0];
+			PG(p->property);
+			if (!strcmp(p->property->device, property->device) &&
 			    !strcmp(p->property->group, property->group)) {
-				if (action_deleted) {
-					indigo_debug("SELECTED PROPERTY deleted\n");
-					clear_window();
-				}
+				indigo_debug("PROPERTY IN GROUP defined/deleted\n");
+				PP(property);
+				clear_window();
+				repaint_property_window(node);
+				return;
+			}
+		}
+	}
+	if (!strcmp(property->name,"")) {
+		if (node->node_type == TREE_NODE_PROPERTY) {
+			PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
+			if (!strcmp(p->property->device, property->device)) {
+				indigo_debug("SELECTED DEVICE deleted (Peoperty selected)\n");
+				PP(property);
+				clear_window();
 				return;
 			}
 		} else if (node->node_type == TREE_NODE_GROUP) {
-			/* If we have deleted or defined property update group window */
 			GroupNode* g = reinterpret_cast<GroupNode*>(node);
-			if (g->size() > 0) {
-				PropertyNode* p = g->children.nodes[0];
-				if (!strcmp(p->property->device, property->device) &&
-				    !strcmp(p->property->group, property->group)) {
-						indigo_debug("PROPERTY IN GROUP defined/deleted\n");
-						clear_window();
-						on_selection_changed(selected, selected);
-						return;
-				}
+			PropertyNode* p = g->children.nodes[0];
+			if (!strcmp(p->property->device, property->device)) {
+				indigo_debug("SELECTED DEVICE deleted (Group selected)\n");
+				PP(property);
+				clear_window();
+				return;
 			}
 		}
-		if (!strcmp(property->name,"")) {
-			if (node->node_type == TREE_NODE_PROPERTY) {
-				PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
-				if (!strcmp(p->property->device, property->device)) {
-					indigo_debug("SELECTED DEVICE deleted (Peoperty selected)\n");
-					clear_window();
-					return;
-				}
-			} else if (node->node_type == TREE_NODE_GROUP) {
-				GroupNode* g = reinterpret_cast<GroupNode*>(node);
-				PropertyNode* p = g->children.nodes[0];
-				if (!strcmp(p->property->device, property->device)) {
-					indigo_debug("SELECTED DEVICE deleted (Group selected)\n");
-					clear_window();
-					return;
-				}
-			}
-		}
-	} else {
-		//indigo_debug("SELECTION does not contain the created/deleted PROPERTY\n");
 	}
 }
 
@@ -315,9 +320,57 @@ void BrowserWindow::clear_window() {
 	mScrollArea->setMinimumWidth(600);
 }
 
+void BrowserWindow::repaint_property_window(TreeNode* node) {
+	if (node != nullptr && node->node_type == TREE_NODE_PROPERTY) {
+		indigo_debug( "SELECTION CHANGED current_node->node_type == TREE_NODE_PROPERTY\n");
+
+		PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
+		QIndigoProperty* ip = new QIndigoProperty(p->property);
+
+		QWidget* ppanel = new QWidget();
+		QVBoxLayout* playout = new QVBoxLayout;
+		playout->setSpacing(10);
+		playout->setContentsMargins(10, 10, 10, 10);
+		playout->setSizeConstraint(QLayout::SetMinimumSize);
+		ppanel->setLayout(playout);
+		playout->addWidget(ip);
+		mScrollArea->setWidget(ppanel);
+		ppanel->show();
+
+		//  Connect to update signals coming from indigo bus
+		connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
+	} else if (node != nullptr && node->node_type == TREE_NODE_GROUP) {
+		indigo_debug("SELECTION CHANGED node->node_type == TREE_NODE_GROUP\n");
+		GroupNode* g = reinterpret_cast<GroupNode*>(node);
+		QWidget* ppanel = new QWidget();
+		QVBoxLayout* playout = new QVBoxLayout;
+		playout->setSpacing(10);
+		playout->setContentsMargins(10, 10, 10, 10);
+		playout->setSizeConstraint(QLayout::SetMinimumSize);
+		ppanel->setLayout(playout);
+
+		//  Iterate properties
+		for (int i = 0; i < g->children.count; i++) {
+			PropertyNode* p = g->children.nodes[i];
+			QIndigoProperty* ip = new QIndigoProperty(p->property);
+			playout->addWidget(ip);
+			connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
+		}
+		playout->addStretch(); // Fill the vertical space available
+
+		mScrollArea->setWidget(ppanel);
+		mScrollArea->setWidgetResizable(true);
+		ppanel->show();
+	} else if (node != nullptr && node->node_type == TREE_NODE_DEVICE) {
+		indigo_debug("SELECTION CHANGED node->node_type == TREE_NODE_DEVICE\n");
+		clear_window();
+	}
+}
+
 void BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemSelection &) {
+
+	if (mPropertyModel->no_repaint_flag) return;
 	indigo_debug( "SELECTION CHANGED\n");
-	//current_selection = (QItemSelection*)&selected;
 
 	//  Deal with the outgoing selection
 	if (current_node != nullptr) {
@@ -339,50 +392,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 		clear_window();
 	}
 
-	if (current_node != nullptr && current_node->node_type == TREE_NODE_PROPERTY) {
-		indigo_debug( "SELECTION CHANGED current_node->node_type == TREE_NODE_PROPERTY\n");
-
-		PropertyNode* p = reinterpret_cast<PropertyNode*>(current_node);
-		QIndigoProperty* ip = new QIndigoProperty(p->property);
-
-		QWidget* ppanel = new QWidget();
-		QVBoxLayout* playout = new QVBoxLayout;
-		playout->setSpacing(10);
-		playout->setContentsMargins(10, 10, 10, 10);
-		playout->setSizeConstraint(QLayout::SetMinimumSize);
-		ppanel->setLayout(playout);
-		playout->addWidget(ip);
-		mScrollArea->setWidget(ppanel);
-		ppanel->show();
-
-		//  Connect to update signals coming from indigo bus
-		connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
-	} else if (current_node != nullptr && current_node->node_type == TREE_NODE_GROUP) {
-		indigo_debug("SELECTION CHANGED current_node->node_type == TREE_NODE_GROUP\n");
-		GroupNode* g = reinterpret_cast<GroupNode*>(current_node);
-		QWidget* ppanel = new QWidget();
-		QVBoxLayout* playout = new QVBoxLayout;
-		playout->setSpacing(10);
-		playout->setContentsMargins(10, 10, 10, 10);
-		playout->setSizeConstraint(QLayout::SetMinimumSize);
-		ppanel->setLayout(playout);
-
-        	//  Iterate properties
-		for (int i = 0; i < g->children.count; i++) {
-			PropertyNode* p = g->children.nodes[i];
-			QIndigoProperty* ip = new QIndigoProperty(p->property);
-			playout->addWidget(ip);
-			connect(mPropertyModel, &PropertyModel::property_updated, ip, &QIndigoProperty::property_update);
-		}
-		playout->addStretch(); // Fill the vertical space available
-
-		mScrollArea->setWidget(ppanel);
-		mScrollArea->setWidgetResizable(true);
-		ppanel->show();
-	} else if (current_node != nullptr && current_node->node_type == TREE_NODE_DEVICE) {
-		indigo_debug("SELECTION CHANGED current_node->node_type == TREE_NODE_DEVICE\n");
-		clear_window();
-	}
+	repaint_property_window(current_node);
 }
 
 

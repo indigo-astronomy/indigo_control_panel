@@ -36,13 +36,13 @@ struct PropertyNode;
 struct TreeNode;
 
 
-
 class BrowserWindow : public QMainWindow {
 	Q_OBJECT
 public:
 	explicit BrowserWindow(QWidget *parent = nullptr);
 	virtual ~BrowserWindow();
 	void property_define_delete(indigo_property* property, const char *message, bool action_deleted);
+	void repaint_property_window(TreeNode* node);
 
 signals:
 	void enable_blobs(bool on);
@@ -74,6 +74,7 @@ private:
 	ServiceModel* mServiceModel;
 	PropertyModel* mPropertyModel;
 	TreeNode* current_node;
+
 	void clear_window();
 };
 

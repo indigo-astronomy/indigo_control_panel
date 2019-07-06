@@ -68,6 +68,7 @@ RootNode::~RootNode() {
 }
 
 PropertyModel::PropertyModel() {
+	no_repaint_flag = false;
 	indigo_debug("CALLED: %s\n", __FUNCTION__);
 }
 
@@ -81,10 +82,12 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 		//  Insert the device in alphabetical order
 		device = new DeviceNode(property->device, &root);
 
+		no_repaint_flag = true;
 		device_row = root.children.find_insertion_index_by_label(property->device);
 		beginInsertRows(QModelIndex(), device_row, device_row);
 		root.children.insert_at(device_row, device);
 		endInsertRows();
+		no_repaint_flag = false;
 	}
 
 	//  Find or create TreeNode within device for property->group
@@ -94,10 +97,12 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 		//  Insert the group in alphabetical order
 		group = new GroupNode(property->group, device);
 
+		no_repaint_flag = true;
 		group_row = device->children.find_insertion_index_by_label(property->group);
 		beginInsertRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.insert_at(group_row, group);
 		endInsertRows();
+		no_repaint_flag = false;
 	}
 
 	//  Find or create TreeNode within group for property->name
@@ -107,10 +112,12 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 		//  Insert the property in alphabetical order
 		p = new PropertyNode(property, group);
 
+		no_repaint_flag = true;
 		property_row = group->children.find_insertion_index_by_label(property->label);
 		beginInsertRows(createIndex(group_row, 0, group), property_row, property_row);
 		group->children.insert_at(property_row, p);
 		endInsertRows();
+		no_repaint_flag = false;
 
 		//  Create the ItemNodes
 		for (int i = 0; i < property->count; i++) {
@@ -198,14 +205,13 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 
 	//  If we are deleting whole device - do that
 	if ((property) && (strlen(property->group) == 0)) {
+		no_repaint_flag = true;
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
 		emit(property_deleted(property, message));
 		delete property;
-		//property = nullptr;
-		//delete device;
-		//device = nullptr;
+		no_repaint_flag = false;
 		return;
 	}
 
@@ -217,20 +223,18 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		indigo_debug("Deleting property in group [%s] - NOT FOUND\n", property->group);
 		emit(property_deleted(property, message));
 		delete property;
-		//property = nullptr;
 		return;
 	}
 
 	//  If we are deleting whole group - do that
 	if (strlen(property->name) == 0) {
+		no_repaint_flag = true;
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
 		emit(property_deleted(property, message));
 		delete property;
-		//property = nullptr;
-		//delete group;
-		//group = nullptr;
+		no_repaint_flag = false;
 		return;
 	}
 
@@ -242,20 +246,17 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 		indigo_debug("Deleting property [%s] - NOT FOUND\n", property->name);
 		emit(property_deleted(property, message));
 		delete property;
-		//property = nullptr;
 		return;
 	}
 
-	//bool group_empty = false;
-	//bool device_empty = false;
-
 	//  Remove the property
+	no_repaint_flag = true;
 	indigo_debug("Erasing property [%s] in %p %p\n", property->name, device, group);
 	beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
 	group->children.remove_index(property_row);
 	endRemoveRows();
 	indigo_debug("Erased property [%s]\n", property->name);
-
+	no_repaint_flag = false;
 
 	char devname[255];
 	char groupname[255];
@@ -265,31 +266,27 @@ void PropertyModel::delete_property(indigo_property* property, const char *messa
 	//  Remove the group if empty
 	if (group->children.empty()) {
 		indigo_debug("--- REMOVING EMPTY GROUP %p -> [%s]\n", group, groupname);
+		no_repaint_flag = true;
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
 		device->children.remove_index(group_row);
 		endRemoveRows();
-		//group_empty = true;
+		no_repaint_flag = false;
 		indigo_debug("--- REMOVED EMPTY GROUP [%s]\n", groupname);
 	}
 
 	//  Remove the device if empty
 	if (device->children.empty()) {
 		indigo_debug("--- REMOVING EMPTY DEVICE %p -> [%s]\n", device, devname);
+		no_repaint_flag = true;
 		beginRemoveRows(QModelIndex(), device_row, device_row);
 		root.children.remove_index(device_row);
 		endRemoveRows();
-		//device_empty = true;
-		//device = nullptr;
+		no_repaint_flag = false;
 		indigo_debug("--- REMOVED EMPTY DEVICE [%s]\n", devname);
 	}
-
 	emit(property_deleted(property, message));
-	//delete p;
-	//p = nullptr;
-	delete property;
 
-	//if (group_empty) delete group;
-	//if (device_empty) delete device;
+	delete property;
 }
 
 

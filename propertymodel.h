@@ -243,6 +243,7 @@ class PropertyModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
+	bool no_repaint_flag;
     PropertyModel();
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
