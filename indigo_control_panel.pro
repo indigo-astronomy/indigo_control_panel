@@ -100,4 +100,5 @@ unix {
 }
 
 DISTFILES += \
-	README.md
+	README.md \
+	LICENCE.md \
