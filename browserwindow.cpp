@@ -46,6 +46,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QIcon icon(":resource/appicon.png");
 	this->setWindowIcon(icon);
 
+	current_path = new SelectionPath();
 	mIndigoServers = new QIndigoServers(this);
 
 	//  Set central widget of window
@@ -194,8 +195,6 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 
-	current_node = nullptr;
-
 	//  Start up the client
 	IndigoClient::instance().start();
 
@@ -212,6 +211,7 @@ BrowserWindow::~BrowserWindow () {
 	delete mIndigoServers;
 	delete mServiceModel;
 	delete mPropertyModel;
+	delete current_path;
 }
 
 
@@ -242,60 +242,42 @@ void BrowserWindow::on_property_delete(indigo_property* property, const char *me
         property_define_delete(property, message, true);
 }
 
-#define PP(p) indigo_error("%s PROPERTY %s.%s.%s\n",__FUNCTION__, p->device, p->group, p->name);
-#define PG(p) indigo_error("%s GROUP %s.%s\n",__FUNCTION__, p->device, p->group);
-
 void BrowserWindow::property_define_delete(indigo_property* property, const char *message, bool action_deleted) {
 	Q_UNUSED(message);
-	indigo_debug("%s()\n", __FUNCTION__);
-	PP(property);
 
-	if (current_node == nullptr) return;
-	TreeNode* node = current_node;
-	if (node->node_type == TREE_NODE_PROPERTY) {
+	if (current_path->type == TREE_NODE_ROOT) return;
+
+	if (current_path->type == TREE_NODE_PROPERTY) {
 		/* We can not have selected property to be defined -> so just clean window */
-		PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
-		if (!strcmp(p->property->name, property->name) &&
-		    !strcmp(p->property->device, property->device) &&
-		    !strcmp(p->property->group, property->group)) {
+		if (!strcmp(current_path->property, property->name) &&
+		    !strcmp(current_path->device, property->device) &&
+		    !strcmp(current_path->group, property->group)) {
 			if (action_deleted) {
 				indigo_debug("SELECTED PROPERTY deleted\n");
-				PP(property);
 				clear_window();
 			}
 			return;
 		}
-	} else if (node->node_type == TREE_NODE_GROUP) {
+	} else if (current_path->type == TREE_NODE_GROUP) {
 		/* If we have deleted or defined property update group window */
-		GroupNode* g = reinterpret_cast<GroupNode*>(node);
-		if (g->size() > 0) {
-			PropertyNode* p = g->children.nodes[0];
-			PG(p->property);
-			if (!strcmp(p->property->device, property->device) &&
-			    !strcmp(p->property->group, property->group)) {
-				indigo_debug("PROPERTY IN GROUP defined/deleted\n");
-				PP(property);
-				clear_window();
-				repaint_property_window(node);
-				return;
-			}
+		if (!strcmp(current_path->device, property->device) &&
+		    !strcmp(current_path->group, property->group)) {
+			indigo_debug("PROPERTY IN GROUP defined/deleted\n");
+			clear_window();
+			repaint_property_window(current_path->node);
+			return;
 		}
 	}
 	if (!strcmp(property->name,"")) {
-		if (node->node_type == TREE_NODE_PROPERTY) {
-			PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
-			if (!strcmp(p->property->device, property->device)) {
+		if (current_path->type == TREE_NODE_PROPERTY) {
+			if (!strcmp(current_path->device, property->device)) {
 				indigo_debug("SELECTED DEVICE deleted (Peoperty selected)\n");
-				PP(property);
 				clear_window();
 				return;
 			}
-		} else if (node->node_type == TREE_NODE_GROUP) {
-			GroupNode* g = reinterpret_cast<GroupNode*>(node);
-			PropertyNode* p = g->children.nodes[0];
-			if (!strcmp(p->property->device, property->device)) {
+		} else if (current_path->type == TREE_NODE_GROUP) {
+			if (!strcmp(current_path->device, property->device)) {
 				indigo_debug("SELECTED DEVICE deleted (Group selected)\n");
-				PP(property);
 				clear_window();
 				return;
 			}
@@ -373,7 +355,7 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 	indigo_debug( "SELECTION CHANGED\n");
 
 	//  Deal with the outgoing selection
-	if (current_node != nullptr) {
+	if (current_path->type != TREE_NODE_ROOT) {
 		indigo_debug("SELECTION CHANGED no current node\n");
 		clear_window();
 	}
@@ -381,18 +363,18 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 	if (selected.indexes().empty()) {
 		indigo_debug("SELECTION CHANGED selected.indexes().empty()\n");
 		clear_window();
-		current_node = nullptr;
+		current_path->select(nullptr);
 		return;
 	}
 
 	QModelIndex s = selected.indexes().front();
-	current_node = static_cast<TreeNode*>(s.internalPointer());
-	if (current_node != nullptr) {
-		indigo_debug("SELECTION CHANGED current_node->node_type == %d\n", current_node->node_type);
+	current_path->select(static_cast<TreeNode*>(s.internalPointer()));
+	if (current_path->node != nullptr) {
+		indigo_debug("SELECTION CHANGED current_node->node_type == %d\n", current_path->node->node_type);
 		clear_window();
 	}
 
-	repaint_property_window(current_node);
+	repaint_property_window(current_path->node);
 }
 
 

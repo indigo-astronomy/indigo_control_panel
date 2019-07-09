@@ -195,14 +195,17 @@ struct DeviceNode : public TreeNodeWithChildren<RootNode,GroupNode> {
 
 struct GroupNode : public TreeNodeWithChildren<DeviceNode,PropertyNode> {
     GroupNode(const char* group_name, DeviceNode* parent) : TreeNodeWithChildren(TREE_NODE_GROUP, parent) {
-        strncpy(m_name, group_name, sizeof(m_name));
+		strncpy(m_name, group_name, sizeof(m_name));
+		strncpy(m_device, parent->name(), sizeof(m_device));
     }
     virtual ~GroupNode();
 
+	virtual const char* device() { return m_device; }
     virtual const char* name() { return m_name; }
     virtual int index_of(TreeNode* n) const { assert(n->node_type == TREE_NODE_PROPERTY); return children.index_of(reinterpret_cast<PropertyNode*>(n)); }
 
     char m_name[INDIGO_NAME_SIZE];
+    char m_device[INDIGO_NAME_SIZE];
 };
 
 struct PropertyNode : public TreeNodeWithChildren<GroupNode,ItemNode> {
@@ -210,6 +213,8 @@ public:
     PropertyNode(indigo_property* p, GroupNode* parent) : TreeNodeWithChildren(TREE_NODE_PROPERTY, parent), property(p) {}
     virtual ~PropertyNode();
 
+	virtual const char* device() { return property->device; }
+	virtual const char* group() { return property->group; }
     virtual const char* name() { return property->name; }
     virtual const char* label() { return property->label; }
     virtual int size() const { return 0; }
