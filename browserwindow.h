@@ -36,14 +36,14 @@ class QIndigoServers;
 struct SelectionPath {
 
 	SelectionPath() {
-        device[0]= 0;
-        group[0] = 0;
-        property[0] = 0;
-        node = nullptr;
-        type = TREE_NODE_ROOT;
-    };
+		device[0]= 0;
+		group[0] = 0;
+		property[0] = 0;
+		node = nullptr;
+		type = TREE_NODE_ROOT;
+	};
 
-    void select(TreeNode *node) {
+	void select(TreeNode *node) {
 		this->node = node;
 		if (node == nullptr) {
 			device[0]= 0;
