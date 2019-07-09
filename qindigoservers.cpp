@@ -99,10 +99,10 @@ void QIndigoServers::onAddService(IndigoService &indigo_service) {
 
 	if (indigo_service.isQZeroConfService) {
 		//item->setForeground(QBrush(QColor("#99FF00")));
-		item->setData(Qt::DecorationRole,QIcon("resource/bonjour_service.png"));
+		item->setData(Qt::DecorationRole,QIcon(":resource/bonjour_service.png"));
 	} else {
 		//item->setForeground(QBrush(QColor("#FFFFFF")));
-		item->setData(Qt::DecorationRole,QIcon("resource/manual_service.png"));
+		item->setData(Qt::DecorationRole,QIcon(":resource/manual_service.png"));
 	}
 	m_server_list->addItem(item);
 }
