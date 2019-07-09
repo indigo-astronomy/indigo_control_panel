@@ -36,6 +36,7 @@
 #include "qindigoservers.h"
 #include "logger.h"
 #include "conf.h"
+#include "version.h"
 
 void write_conf();
 
@@ -452,7 +453,9 @@ void BrowserWindow::on_about_act() {
 	msgBox.setIconPixmap(pixmap.scaledToWidth(96, Qt::SmoothTransformation));
 	msgBox.setText(
 		"<b>INDIGO Control Panel</b><br>"
-		"Version 0.1-1-POC</b><br><br>"
+		"Version "
+		PANEL_VERSION
+		"</b><br><br>"
 		"Authors:<br>"
 		"Rumen G.Bogdanovski<br>"
 		"David Hulse<br><br>"

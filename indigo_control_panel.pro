@@ -59,7 +59,7 @@ RESOURCES += \
 	resource/dome-grey.png \
 	resource/dome-green.png
 
-# Additional import path used to resolve QML modules in Qt Creator's code model
+# Additional import path used to resolve QML modules in Qt Creator\'s code model
 QML_IMPORT_PATH =
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
@@ -71,6 +71,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+	version.h \
 	servicemodel.h \
 	browserwindow.h \
 	indigoservice.h \

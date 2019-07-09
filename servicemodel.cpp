@@ -22,7 +22,7 @@
 #include <indigo_client.h>
 #include "conf.h"
 
-#define SERVICE_FILENAME ".indigo_panel.services"
+#define SERVICE_FILENAME ".indigo_control_panel.services"
 
 
 ServiceModel::ServiceModel(const QByteArray &type) {
