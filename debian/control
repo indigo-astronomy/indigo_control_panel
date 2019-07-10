@@ -1,0 +1,15 @@
+Source: indigo-control-panel
+Section: science
+Priority: optional
+Maintainer: Rumen Bogdanovski <rumen@skyarchive.org>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 3.9.5
+Homepage: https://github.com/indigo-astronomy/control-panel
+Vcs-Git: git://github.com/indigo-astronomy/control-panel.git
+
+Package: indigo-control-panel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, indigo (>= 2.0-95)
+Description: INDIGO Control Panel
+ INDIGO Control Panel is a program for browsing and
+ and modifying INDIGO properties.
