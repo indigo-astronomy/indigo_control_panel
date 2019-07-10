@@ -142,8 +142,8 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 				}
 			}
 		}
+		emit(property_defined(property, message));
 	}
-	emit(property_defined(property, message));
 	//indigo_debug("Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 }
 
@@ -310,10 +310,6 @@ QModelIndex PropertyModel::index(int row, int column, const QModelIndex &parent)
 }
 
 
-/* THIS fails:
-Process terminating with default action of signal 11 (SIGSEGV)
-==29106==  Access not within mapped region at address 0x0
-*/
 QModelIndex PropertyModel::parent(const QModelIndex &child) const {
 	if (!child.isValid())
 		return QModelIndex();
