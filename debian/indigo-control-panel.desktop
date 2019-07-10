@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=INDIGO Control Panel
+Comment=INDIGO Control Panel
+Exec=indigo_control_panel
+Icon=indigo-control-panel.png
+Terminal=false
+Type=Application
+Categories=Education;Science;Astronomy;
+Keywords=astronomy
