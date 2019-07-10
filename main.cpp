@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	indigo_main_argc = argc;
 
 	/* This is important if coma is used for numeric it breaks everything */
-	unsetenv("LC_NUMERIC");
+	qunsetenv("LC_NUMERIC");
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 	memset(&conf,0,sizeof(conf_t));
