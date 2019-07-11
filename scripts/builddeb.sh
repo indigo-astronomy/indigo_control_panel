@@ -28,6 +28,9 @@ GIT_VERSION=$(git describe --tags)
 # If parameter is provided, try this tag to checkout and build package.
 [ "$#" -eq 1 ] && GIT_VERSION=${1}
 
+# Get current branch
+CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2);
+
 # Checkout the desired tag/version we want to build packages.
 git checkout ${GIT_VERSION} >/dev/null 2>&1
 [ $? -ne 0 ] && { echo "version '${1}' does not exists in git"; exit 1; }
@@ -43,3 +46,6 @@ dpkg-buildpackage \-us \-uc \-I.git \-I\*.out[0-9]\* \-I\*.swp
 
 # Cleanup debian/changelog.
 rm -f debian/changelog
+
+# Return to current branch
+git checkout $CURRENT_BRANCH
