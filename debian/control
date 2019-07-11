@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Rumen Bogdanovski <rumen@skyarchive.org>
 Build-Depends: debhelper (>= 10)
 Standards-Version: 3.9.5
-Homepage: https://github.com/indigo-astronomy/control-panel
+Homepage: https://www.indigo-astronomy.org
 Vcs-Git: git://github.com/indigo-astronomy/control-panel.git
 
 Package: indigo-control-panel
