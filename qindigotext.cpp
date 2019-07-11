@@ -27,8 +27,16 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 	text = new QLineEdit();
+	char tooltip[1600];
 	text->setObjectName("INDIGO_property");
-	if (m_property->perm == INDIGO_RO_PERM) text->setReadOnly(true);
+	if (m_property->perm == INDIGO_RO_PERM) {
+		snprintf(tooltip, sizeof(tooltip), "%s: read only", m_item->label);
+		text->setToolTip(tooltip);
+		text->setReadOnly(true);
+	} else {
+		snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
+		text->setToolTip(tooltip);
+	}
 	update();
 
 	//  Lay the labels out somehow in the widget

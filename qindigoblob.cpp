@@ -33,6 +33,9 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 	text = new QLineEdit();
+	char tooltip[1600];
+	snprintf(tooltip, sizeof(tooltip), "%s URL: read only (in legacy mode is empty)", m_item->label);
+	text->setToolTip(tooltip);
 	text->setObjectName("INDIGO_property");
 	if (m_property->perm == INDIGO_RO_PERM) {
 		text->setReadOnly(true);

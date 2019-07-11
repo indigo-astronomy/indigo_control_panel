@@ -28,12 +28,43 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 	text_value = new QLineEdit();
+	char tooltip[2100];
+	snprintf(tooltip, sizeof(tooltip), "%s value, read only", m_item->label);
+	text_value->setToolTip(tooltip);
 	text_value->setObjectName("INDIGO_property");
 	text_value->setReadOnly(true);
 	text_target = nullptr;
 	m_dirty = false;
 	if (m_property->perm != INDIGO_RO_PERM) {
 		text_target = new QLineEdit();
+		if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm') {
+			snprintf (
+				tooltip,
+				sizeof(tooltip),
+				"%s, range: [%s, %s] step: %s",
+				m_item->label, indigo_dtos(m_item->number.min, NULL),
+				indigo_dtos(m_item->number.max, NULL),
+				indigo_dtos(m_item->number.step, NULL)
+			);
+		} else {
+			char format[1600];
+			snprintf (
+				format,
+				sizeof(tooltip),
+				"%s, range: [%s, %s] step: %s",
+				m_item->label, m_item->number.format,
+				m_item->number.format,
+				m_item->number.format
+			);
+			snprintf (
+				tooltip,
+				sizeof(tooltip),
+				format, m_item->number.min,
+				m_item->number.max,
+				m_item->number.step
+			);
+		}
+		text_target->setToolTip(tooltip);
 		text_target->setObjectName("INDIGO_property");
 	}
 	update();
@@ -46,11 +77,11 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 	hbox->setSpacing(0);
 	hbox->addWidget(label, 35);
 	if (m_property->perm == INDIGO_RO_PERM)
-		hbox->addWidget(text_value, 65);
+		hbox->addWidget(text_value, 33);
 	else {
-		hbox->addWidget(text_value, 30);
+		hbox->addWidget(text_value, 16);
 		hbox->addSpacing(5);
-		hbox->addWidget(text_target, 30);
+		hbox->addWidget(text_target, 16);
 		connect(text_target, &QLineEdit::textEdited, this, &QIndigoNumber::dirty);
 	}
 }

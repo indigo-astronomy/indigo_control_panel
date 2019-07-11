@@ -287,6 +287,7 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 
 		//  Add Display button
 		QPushButton *displayb = new QPushButton("&Preview...");
+		displayb->setToolTip("Preview BLOB with the default viewer");
 		displayb->setObjectName("INDIGO_property");
 		displayb->setDefault(true);
 		displayb->setMinimumWidth(75);
@@ -294,6 +295,7 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 
 		//  Add Save button
 		QPushButton* saveb = new QPushButton("&Save BLOB");
+		saveb->setToolTip("Save BLOB to your home folder");
 		saveb->setObjectName("INDIGO_property");
 		saveb->setDefault(true);
 		saveb->setMinimumWidth(75);
