@@ -28,7 +28,8 @@ SOURCES += \
 	qindigonumber.cpp \
 	qindigolight.cpp \
 	qindigoblob.cpp \
-	qindigoservers.cpp
+        qindigoservers.cpp
+
 
 RESOURCES += \
 	qdarkstyle/style.qrc \
@@ -59,6 +60,7 @@ RESOURCES += \
 	resource/dome-grey.png \
 	resource/dome-green.png
 
+
 # Additional import path used to resolve QML modules in Qt Creator\'s code model
 QML_IMPORT_PATH =
 
@@ -84,8 +86,9 @@ HEADERS += \
 	qindigolight.h \
 	qindigoblob.h \
 	qindigoservers.h \
-	logger.h \
-	conf.h
+        logger.h \
+        conf.h
+
 
 include(qtzeroconf/qtzeroconf.pri)
 
@@ -94,11 +97,37 @@ include(qtzeroconf/qtzeroconf.pri)
 #    PKGCONFIG += indigo
 #}
 
+INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
+
 unix {
-	INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
 	LIBS += -L"$${PWD}/indigo/build/lib" -lindigo
 }
 
 DISTFILES += \
 	README.md \
 	LICENCE.md \
+
+win32 {
+        DEFINES += INDIGO_WINDOWS
+
+        SOURCES += \
+            indigo/indigo_libs/indigo_base64.c \
+            indigo/indigo_libs/indigo_bus.c \
+            indigo/indigo_libs/indigo_client.c \
+            indigo/indigo_libs/indigo_client_xml.c \
+            indigo/indigo_libs/indigo_version.c \
+            indigo/indigo_libs/indigo_io.c \
+            indigo/indigo_libs/indigo_xml.c
+
+        HEADERS += \
+            indigo/indigo_libs/indigo_base64.h \
+            indigo/indigo_libs/indigo_base64_luts.h \
+            indigo/indigo_libs/indigo_bus.h \
+            indigo/indigo_libs/indigo_client.h \
+            indigo/indigo_libs/indigo_client_xml.h \
+            indigo/indigo_libs/indigo_config.h \
+            indigo/indigo_libs/indigo_io.h \
+            indigo/indigo_libs/indigo_version.h \
+            indigo/indigo_libs/indigo_xml.h \
+            indigo/indigo_libs/indigo_names.h
+}
