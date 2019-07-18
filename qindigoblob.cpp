@@ -126,19 +126,19 @@ void QIndigoBLOB::save_blob_item(){
 
 
 void QIndigoBLOB::preview_blob_item(){
-    if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != nullptr)) {
+	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != nullptr)) {
 		char file_name[PATH_LEN];
 		char url[PATH_LEN+100];
-        char prefix[PATH_LEN] = "/tmp";
+		char prefix[PATH_LEN] = "/tmp";
 
 #if defined(INDIGO_WINDOWS)
-        // Get temp with url dir separators instead of windows native
-        strcpy(prefix, QDir::fromNativeSeparators(qgetenv("TEMP").constData()).toUtf8().constData());
+		// Get temp with url dir separators instead of windows native
+		strcpy(prefix, QDir::fromNativeSeparators(qgetenv("TEMP").constData()).toUtf8().constData());
 #endif
-        indigo_error("PREFIX: %s\n", prefix);
-        if (save_blob_item_with_prefix(prefix, file_name)) {
-            snprintf(url, sizeof(url), "file:///%s", file_name);
-            if(QDesktopServices::openUrl(QUrl(url))) {
+		indigo_debug("PREFIX: %s\n", prefix);
+		if (save_blob_item_with_prefix(prefix, file_name)) {
+			snprintf(url, sizeof(url), "file:///%s", file_name);
+			if(QDesktopServices::openUrl(QUrl(url))) {
 				return;
 			}
 		}
@@ -154,10 +154,10 @@ bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name
 	do {
 
 #if defined(INDIGO_WINDOWS)
-        sprintf(file_name, "%s\\blob_%03d%s", prefix, file_no++, m_item->blob.format);
+		sprintf(file_name, "%s\\blob_%03d%s", prefix, file_no++, m_item->blob.format);
 		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, 0);
 #else
-        sprintf(file_name, "%s/blob_%03d%s", prefix, file_no++, m_item->blob.format);
+		sprintf(file_name, "%s/blob_%03d%s", prefix, file_no++, m_item->blob.format);
 		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
 #endif
 	} while ((fd < 0) && (errno == EEXIST));
