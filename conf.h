@@ -22,6 +22,12 @@
 
 #include "indigo_bus.h"
 
+#if defined(INDIGO_WINDOWS)
+#define PATH_LEN 4096
+#else
+#define PATH_LEN PATH_MAX
+#endif
+
 #define CONFIG_FILENAME ".indigo_control_panel.conf"
 
 typedef struct {

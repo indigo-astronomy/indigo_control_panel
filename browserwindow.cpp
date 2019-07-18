@@ -224,7 +224,18 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	if (!message) return;
 
 	gettimeofday(&tmnow, NULL);
-	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
+#if defined(INDIGO_WINDOWS)
+    struct tm *lt;
+    time_t rawtime;
+    lt = localtime((const time_t *) &(tmnow.tv_sec));
+    if (lt == NULL) {
+        time(&rawtime);
+        lt = localtime(&rawtime);
+    }
+    strftime(timestamp, sizeof(log_line), "%H:%M:%S", lt);
+#else
+    strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
+#endif
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
 	if (property)
 		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);

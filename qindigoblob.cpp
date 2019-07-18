@@ -24,6 +24,7 @@
 #include <QDesktopServices>
 #include <QHBoxLayout>
 #include "qindigoblob.h"
+#include "conf.h"
 
 
 QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent)
@@ -104,9 +105,9 @@ void close_fd(int fd) {
 
 void QIndigoBLOB::save_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-		char file_name[PATH_MAX];
-		char message[PATH_MAX+100];
-		char cwd[PATH_MAX];
+        char file_name[PATH_LEN];
+        char message[PATH_LEN+100];
+        char cwd[PATH_LEN];
 
 		if (!getcwd(cwd, sizeof(cwd))) {
 			cwd[0] = '\0';
@@ -125,8 +126,8 @@ void QIndigoBLOB::save_blob_item(){
 
 void QIndigoBLOB::preview_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-		char file_name[PATH_MAX];
-		char url[PATH_MAX+100];
+        char file_name[PATH_LEN];
+        char url[PATH_LEN+100];
 
 		if (save_blob_item_with_prefix("/tmp", file_name)) {
 			snprintf(url, sizeof(url), "file://%s", file_name);
