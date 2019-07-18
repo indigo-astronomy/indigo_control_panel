@@ -105,9 +105,9 @@ void close_fd(int fd) {
 
 void QIndigoBLOB::save_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-        char file_name[PATH_LEN];
-        char message[PATH_LEN+100];
-        char cwd[PATH_LEN];
+		char file_name[PATH_LEN];
+		char message[PATH_LEN+100];
+		char cwd[PATH_LEN];
 
 		if (!getcwd(cwd, sizeof(cwd))) {
 			cwd[0] = '\0';
@@ -126,8 +126,8 @@ void QIndigoBLOB::save_blob_item(){
 
 void QIndigoBLOB::preview_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-        char file_name[PATH_LEN];
-        char url[PATH_LEN+100];
+		char file_name[PATH_LEN];
+		char url[PATH_LEN+100];
 
 		if (save_blob_item_with_prefix("/tmp", file_name)) {
 			snprintf(url, sizeof(url), "file://%s", file_name);
@@ -147,7 +147,7 @@ bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name
 	do {
 		sprintf(file_name, "%s/blob_%03d%s", prefix, file_no++, m_item->blob.format);
 #if defined(INDIGO_WINDOWS)
-        fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, 0);
+		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, 0);
 #else
 		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
 #endif

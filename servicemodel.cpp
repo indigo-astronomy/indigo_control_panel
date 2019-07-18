@@ -38,8 +38,8 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 
 
 void ServiceModel::saveManualServices() {
-    char filename[PATH_LEN];
-    snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
+	char filename[PATH_LEN];
+	snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
 	FILE * file= fopen(filename, "w");
 	if (file != NULL) {
 		for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
@@ -53,11 +53,11 @@ void ServiceModel::saveManualServices() {
 
 
 void ServiceModel::loadManualServices() {
-    char filename[PATH_LEN];
+	char filename[PATH_LEN];
 	char name[256]={0};
 	char host[256]={0};
 	int port=7624;
-    snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
 	FILE * file= fopen(filename, "r");
 	if (file != NULL) {
 		indigo_debug("########## file open\n");
