@@ -147,9 +147,9 @@ bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name
 	do {
 		sprintf(file_name, "%s/blob_%03d%s", prefix, file_no++, m_item->blob.format);
 #if defined(INDIGO_WINDOWS)
-        fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, 0);
+		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, 0);
 #else
-        fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, S_IRUSR | S_IWUSR);
+		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
 #endif
 	} while ((fd < 0) && (errno == EEXIST));
 
