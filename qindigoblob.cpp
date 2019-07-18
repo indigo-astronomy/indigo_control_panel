@@ -133,12 +133,13 @@ void QIndigoBLOB::preview_blob_item(){
 
 #if defined(INDIGO_WINDOWS)
 		// Get temp with url dir separators instead of windows native
-        strcpy(prefix, qgetenv("TEMP").constData());
+		strcpy(prefix, qgetenv("TEMP").constData());
 #endif
 		indigo_debug("PREFIX: %s\n", prefix);
 		if (save_blob_item_with_prefix(prefix, file_name)) {
-            snprintf(url, sizeof(url), "file:///%s", file_name);
-            if(QDesktopServices::openUrl(QUrl(QDir::fromNativeSeparators(url)))) {
+			snprintf(url, sizeof(url), "file:///%s", file_name);
+			// change to url separators instead of windows native (for windows)
+			if(QDesktopServices::openUrl(QUrl(QDir::fromNativeSeparators(url)))) {
 				return;
 			}
 		}
