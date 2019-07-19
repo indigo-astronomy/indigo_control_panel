@@ -17,6 +17,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QRegularExpression>
+#include <QDir>
 #include "indigoservice.h"
 #include "servicemodel.h"
 #include <indigo_client.h>
@@ -39,7 +40,7 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 
 void ServiceModel::saveManualServices() {
 	char filename[PATH_LEN];
-	snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), SERVICE_FILENAME);
 	FILE * file= fopen(filename, "w");
 	if (file != NULL) {
 		for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
@@ -57,7 +58,7 @@ void ServiceModel::loadManualServices() {
 	char name[256]={0};
 	char host[256]={0};
 	int port=7624;
-	snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), SERVICE_FILENAME);
 	FILE * file= fopen(filename, "r");
 	if (file != NULL) {
 		indigo_debug("########## file open\n");

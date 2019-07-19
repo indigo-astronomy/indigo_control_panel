@@ -18,6 +18,7 @@
 
 
 #include <QFile>
+#include <QDir>
 #include <QTextStream>
 //#include <unistd.h>
 #include "browserwindow.h"
@@ -27,7 +28,7 @@ conf_t conf;
 
 void write_conf() {
 	char filename[PATH_LEN];
-	snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), CONFIG_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), CONFIG_FILENAME);
 	FILE * file= fopen(filename, "wb");
 	if (file != nullptr) {
 		fwrite(&conf, sizeof(conf), 1, file);
@@ -37,7 +38,7 @@ void write_conf() {
 
 void read_conf() {
 	char filename[PATH_LEN];
-	snprintf(filename, PATH_LEN, "%s/%s", getenv("HOME"), CONFIG_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), CONFIG_FILENAME);
 	FILE * file= fopen(filename, "rb");
 	if (file != nullptr) {
 		fread(&conf, sizeof(conf), 1, file);
