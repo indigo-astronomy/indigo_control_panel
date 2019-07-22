@@ -141,20 +141,51 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	rootLayout->addWidget(view);
 
 	mProperties = new QTreeView;
-	form_panel = new QWidget();
-	form_layout = new QVBoxLayout();
-	form_layout->setMargin(0);
-	form_panel->setLayout(form_layout);
+	mProperties->setObjectName("PROPERTY_TREE");
+	mProperties->setStyleSheet(
+		"#PROPERTY_TREE { border-bottom-right-radius: 0;"
+		"border-top-right-radius: 0; }"
+	);
+	QWidget *form_panel = new QWidget();
+	mFormLayout = new QVBoxLayout();
+	mFormLayout->setSpacing(0);
+	//mFormLayout->setContentsMargins(1, 1, 1, 1);
+	mFormLayout->setMargin(0);
+	form_panel->setLayout(mFormLayout);
+
+	QWidget *selection_panel = new QWidget();
+	QVBoxLayout *selection_layout = new QVBoxLayout();
+	selection_layout->setSpacing(0);
+	selection_layout->setMargin(0);
+	selection_panel->setLayout(selection_layout);
+	selection_layout->addWidget(mProperties);
+
+	mSelectionLine = new QLabel();
+	mSelectionLine->setObjectName("SELECTION_TEXT");
+	mSelectionLine->setStyleSheet(
+		"#SELECTION_TEXT { font-weight: bold;"
+		"background-color: #353535;"
+		"border-bottom-left-radius: 0;"
+		"border-top-left-radius: 0;"
+		"border-bottom-right-radius: 0; }"
+	);
 
 	mScrollArea = new QScrollArea();
+	mScrollArea->setObjectName("PROPERTY_AREA");
+	mScrollArea->setStyleSheet(
+		"#PROPERTY_AREA { border-bottom-left-radius: 0;"
+		"border-top-left-radius: 0;"
+		"border-top-right-radius: 0; }"
+	);
 	mScrollArea->setWidgetResizable(true);
 	mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	form_layout->addWidget(mScrollArea);
+	mFormLayout->addWidget(mSelectionLine);
+	mFormLayout->addWidget(mScrollArea);
 	mScrollArea->setMinimumWidth(600);
 
 	QSplitter* hSplitter = new QSplitter;
-	hSplitter->addWidget(mProperties);
+	hSplitter->addWidget(selection_panel);
 	hSplitter->addWidget(form_panel);
 	hSplitter->setStretchFactor(0, 45);
 	hSplitter->setStretchFactor(2, 55);
@@ -208,7 +239,8 @@ BrowserWindow::~BrowserWindow () {
 	indigo_debug("CALLED: %s\n", __FUNCTION__);
 	delete mLog;
 	delete mProperties;
-	delete form_panel;
+	delete mSelectionLine;
+	delete mFormLayout;
 	delete mIndigoServers;
 	delete mServiceModel;
 	delete mPropertyModel;
@@ -225,16 +257,16 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 
 	gettimeofday(&tmnow, NULL);
 #if defined(INDIGO_WINDOWS)
-    struct tm *lt;
-    time_t rawtime;
-    lt = localtime((const time_t *) &(tmnow.tv_sec));
-    if (lt == NULL) {
-        time(&rawtime);
-        lt = localtime(&rawtime);
-    }
-    strftime(timestamp, sizeof(log_line), "%H:%M:%S", lt);
+	struct tm *lt;
+	time_t rawtime;
+	lt = localtime((const time_t *) &(tmnow.tv_sec));
+	if (lt == NULL) {
+		time(&rawtime);
+		lt = localtime(&rawtime);
+	}
+	strftime(timestamp, sizeof(log_line), "%H:%M:%S", lt);
 #else
-    strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
+	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
 #endif
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
 	if (property)
@@ -300,23 +332,31 @@ void BrowserWindow::property_define_delete(indigo_property* property, const char
 
 void BrowserWindow::clear_window() {
 	indigo_debug("CLEAR_WINDOW!\n");
-	delete form_layout;
-
-	form_layout = new QVBoxLayout();
-	form_layout->setMargin(0);
-	form_panel->setLayout(form_layout);
+	mSelectionLine->setText("");
+	delete mScrollArea;
 
 	mScrollArea = new QScrollArea();
+	mScrollArea->setObjectName("PROPERTY_AREA");
+	mScrollArea->setStyleSheet(
+		"#PROPERTY_AREA { border-bottom-left-radius: 0;"
+		"border-top-left-radius: 0;"
+		"border-top-right-radius: 0; }"
+	);
 	mScrollArea->setWidgetResizable(true);
 	mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	form_layout->addWidget(mScrollArea);
+	mFormLayout->addWidget(mScrollArea);
 	mScrollArea->setMinimumWidth(600);
 }
 
 void BrowserWindow::repaint_property_window(TreeNode* node) {
+	char selected_str[PATH_LEN] = "";
+
 	if (node != nullptr && node->node_type == TREE_NODE_PROPERTY) {
 		indigo_debug( "SELECTION CHANGED current_node->node_type == TREE_NODE_PROPERTY\n");
+
+		snprintf(selected_str, PATH_LEN, "%s . %s", current_path->device, current_path->property);
+		mSelectionLine->setText(selected_str);
 
 		PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
 		QIndigoProperty* ip = new QIndigoProperty(p->property);
@@ -342,6 +382,8 @@ void BrowserWindow::repaint_property_window(TreeNode* node) {
 		playout->setContentsMargins(10, 10, 10, 10);
 		playout->setSizeConstraint(QLayout::SetMinimumSize);
 		ppanel->setLayout(playout);
+		snprintf(selected_str, PATH_LEN, "%s . %s", current_path->device, current_path->group);
+		mSelectionLine->setText(selected_str);
 
 		//  Iterate properties
 		for (int i = 0; i < g->children.count; i++) {
@@ -358,6 +400,8 @@ void BrowserWindow::repaint_property_window(TreeNode* node) {
 	} else if (node != nullptr && node->node_type == TREE_NODE_DEVICE) {
 		indigo_debug("SELECTION CHANGED node->node_type == TREE_NODE_DEVICE\n");
 		clear_window();
+		snprintf(selected_str, PATH_LEN, "%s", current_path->device);
+		mSelectionLine->setText(selected_str);
 	}
 }
 
@@ -374,8 +418,8 @@ void BrowserWindow::on_selection_changed(const QItemSelection &selected, const Q
 
 	if (selected.indexes().empty()) {
 		indigo_debug("SELECTION CHANGED selected.indexes().empty()\n");
-		clear_window();
 		current_path->select(nullptr);
+		clear_window();
 		return;
 	}
 

@@ -110,8 +110,8 @@ private:
 	QPlainTextEdit* mLog;
 	QTreeView* mProperties;
 	QScrollArea* mScrollArea;
-	QWidget* form_panel;
-	QVBoxLayout* form_layout;
+	QLabel* mSelectionLine;
+	QVBoxLayout* mFormLayout;
 
 	QIndigoServers *mIndigoServers;
 	ServiceModel* mServiceModel;
