@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
 	f.open(QFile::ReadOnly | QFile::Text);
 	QTextStream ts(&f);
 	app.setStyleSheet(ts.readAll());
+	f.close();
 
 	BrowserWindow browser_window;
 	browser_window.show();

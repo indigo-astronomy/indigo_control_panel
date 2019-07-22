@@ -28,11 +28,12 @@ SOURCES += \
 	qindigonumber.cpp \
 	qindigolight.cpp \
 	qindigoblob.cpp \
-        qindigoservers.cpp
+	qindigoservers.cpp
 
 
 RESOURCES += \
 	qdarkstyle/style.qrc \
+	resource/control_panel.qss \
 	resource/appicon.png \
 	resource/bonjour_service.png \
 	resource/manual_service.png \

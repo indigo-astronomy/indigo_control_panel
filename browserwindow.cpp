@@ -47,6 +47,12 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QIcon icon(":resource/appicon.png");
 	this->setWindowIcon(icon);
 
+	QFile f(":resource/control_panel.qss");
+	f.open(QFile::ReadOnly | QFile::Text);
+	QTextStream ts(&f);
+	this->setStyleSheet(ts.readAll());
+	f.close();
+
 	current_path = new SelectionPath();
 	mIndigoServers = new QIndigoServers(this);
 
@@ -141,42 +147,27 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	rootLayout->addWidget(view);
 
 	mProperties = new QTreeView;
-	mProperties->setObjectName("PROPERTY_TREE");
-	mProperties->setStyleSheet(
-		"#PROPERTY_TREE { border-bottom-right-radius: 0;"
-		"border-top-right-radius: 0; }"
-	);
 	QWidget *form_panel = new QWidget();
 	mFormLayout = new QVBoxLayout();
 	mFormLayout->setSpacing(0);
-	//mFormLayout->setContentsMargins(1, 1, 1, 1);
-	mFormLayout->setMargin(0);
+	mFormLayout->setContentsMargins(1, 0, 0, 0);
+	//mFormLayout->setMargin(0);
 	form_panel->setLayout(mFormLayout);
 
 	QWidget *selection_panel = new QWidget();
 	QVBoxLayout *selection_layout = new QVBoxLayout();
 	selection_layout->setSpacing(0);
-	selection_layout->setMargin(0);
+	selection_layout->setContentsMargins(0, 0, 1, 0);
+	//selection_layout->setMargin(0);
 	selection_panel->setLayout(selection_layout);
 	selection_layout->addWidget(mProperties);
 
 	mSelectionLine = new QLabel();
 	mSelectionLine->setObjectName("SELECTION_TEXT");
-	mSelectionLine->setStyleSheet(
-		"#SELECTION_TEXT { font-weight: bold;"
-		"background-color: #353535;"
-		"border-bottom-left-radius: 0;"
-		"border-top-left-radius: 0;"
-		"border-bottom-right-radius: 0; }"
-	);
 
 	mScrollArea = new QScrollArea();
 	mScrollArea->setObjectName("PROPERTY_AREA");
-	mScrollArea->setStyleSheet(
-		"#PROPERTY_AREA { border-bottom-left-radius: 0;"
-		"border-top-left-radius: 0;"
-		"border-top-right-radius: 0; }"
-	);
+
 	mScrollArea->setWidgetResizable(true);
 	mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -337,11 +328,6 @@ void BrowserWindow::clear_window() {
 
 	mScrollArea = new QScrollArea();
 	mScrollArea->setObjectName("PROPERTY_AREA");
-	mScrollArea->setStyleSheet(
-		"#PROPERTY_AREA { border-bottom-left-radius: 0;"
-		"border-top-left-radius: 0;"
-		"border-top-right-radius: 0; }"
-	);
 	mScrollArea->setWidgetResizable(true);
 	mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
