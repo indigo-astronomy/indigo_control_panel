@@ -399,6 +399,18 @@ void BrowserWindow::repaint_property_window(TreeNode* node) {
 		ppanel->show();
 	} else if (node != nullptr && node->node_type == TREE_NODE_DEVICE) {
 		indigo_debug("SELECTION CHANGED node->node_type == TREE_NODE_DEVICE\n");
+		DeviceNode* d = reinterpret_cast<DeviceNode*>(node);
+		//  Iterate Groups and find "Main" and select it
+		for (int i = 0; i < d->children.count; i++) {
+			GroupNode* g = d->children.nodes[i];
+			if (!strcmp(g->name(), "Main")) {
+				current_path->select(g);
+				repaint_property_window(current_path->node);
+				return;
+			}
+		}
+		// There is no "Main" goroup
+		indigo_debug("No \"Main\" group, clearing window.\n");
 		clear_window();
 		snprintf(selected_str, PATH_LEN, "%s", current_path->device);
 		mSelectionLine->setText(selected_str);
@@ -406,7 +418,6 @@ void BrowserWindow::repaint_property_window(TreeNode* node) {
 }
 
 void BrowserWindow::on_selection_changed(const QItemSelection &selected, const QItemSelection &) {
-
 	if (mPropertyModel->no_repaint_flag) return;
 	indigo_debug( "SELECTION CHANGED\n");
 
