@@ -1825,6 +1825,14 @@ QSplitter::separator {
     margin: 0;
 }
 
+QSplitter::handle:horizontal {
+    width: 2px;
+}
+
+QSplitter::handle:vertical {
+    height: 2px;
+}
+
 QSplitter::separator:hover {
     background-color: #787878;
 }
