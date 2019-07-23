@@ -120,12 +120,7 @@ void QIndigoNumber::reset() {
 
 void QIndigoNumber::apply() {
 	if (text_target) {
-		char num_str[INDIGO_VALUE_SIZE];
-		strncpy(num_str, (char*)text_target->text().trimmed().toStdString().c_str(), INDIGO_VALUE_SIZE);
-		// Accept ',' as decimal separator
-		char *found = strchr(num_str, ',');
-		if (found) *found = '.';
-		m_item->number.value = m_item->number.target = indigo_stod(num_str);
+		m_item->number.value = m_item->number.target = indigo_stod((char*)text_target->text().trimmed().toStdString().c_str());
 		reset();
 	}
 }

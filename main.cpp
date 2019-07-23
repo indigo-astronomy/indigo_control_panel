@@ -50,17 +50,16 @@ int main(int argc, char *argv[]) {
 	indigo_main_argv = (const char**)argv;
 	indigo_main_argc = argc;
 
-	/* This is important if coma is used for numeric it breaks everything */
-	qunsetenv("LC_NUMERIC");
-	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
 	memset(&conf,0,sizeof(conf_t));
 	conf.blobs_enabled = true;
 	conf.auto_connect = true;
 	conf.indigo_use_host_suffix = true;
 	conf.use_state_icons = false;
+	conf.use_system_locale = false;
 	conf.indigo_log_level = INDIGO_LOG_INFO;
 	read_conf();
+
+	if (!conf.use_system_locale) qunsetenv("LC_NUMERIC");
 
 	indigo_set_log_level(conf.indigo_log_level);
 
@@ -68,6 +67,8 @@ int main(int argc, char *argv[]) {
 	indigo_use_host_suffix = conf.indigo_use_host_suffix;
 
 	QApplication app(argc, argv);
+
+	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 	QFile f(":qdarkstyle/style.qss");
 	f.open(QFile::ReadOnly | QFile::Text);

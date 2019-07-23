@@ -104,6 +104,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act->setChecked(conf.use_state_icons);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_state_icons_changed);
 
+	act = menu->addAction(tr("Use locale specific &decimal separator"));
+	act->setCheckable(true);
+	act->setChecked(conf.use_system_locale);
+	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_system_locale_changed);
+
 	menu->addSeparator();
 	QActionGroup *log_group = new QActionGroup(this);
 	log_group->setExclusive(true);
@@ -474,6 +479,18 @@ void BrowserWindow::on_use_state_icons_changed(bool status) {
 	conf.use_state_icons = status;
 	write_conf();
 	repaint_property_window(current_path->node);
+	indigo_debug("%s\n", __FUNCTION__);
+}
+
+
+void BrowserWindow::on_use_system_locale_changed(bool status) {
+	conf.use_system_locale = status;
+	write_conf();
+	if (conf.use_system_locale){
+		on_property_log(nullptr, "Locale specific decimal separator will be used on next application start");
+	} else {
+		on_property_log(nullptr, "Dot decimal separator will be used on next application start");
+	}
 	indigo_debug("%s\n", __FUNCTION__);
 }
 

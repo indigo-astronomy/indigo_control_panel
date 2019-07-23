@@ -36,6 +36,7 @@ typedef struct {
 	bool indigo_use_host_suffix;
 	indigo_log_levels indigo_log_level;
 	bool use_state_icons;
+	bool use_system_locale;
 	char unused[1000];
 } conf_t;
 
