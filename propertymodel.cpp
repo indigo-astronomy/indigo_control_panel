@@ -25,6 +25,7 @@
 #include "propertymodel.h"
 #include "qindigoproperty.h"
 #include <indigo_names.h>
+#include "conf.h"
 
 extern indigo_client client;
 
@@ -361,11 +362,20 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 				case INDIGO_IDLE_STATE:
 					return QPixmap(":resource/led-grey.png");
 				case INDIGO_BUSY_STATE:
-					return QPixmap(":resource/led-orange.png");
+					if (conf.indigo_use_state_icons)
+						return QPixmap(":resource/led-orange-cb.png");
+					else
+						return QPixmap(":resource/led-orange.png");
 				case INDIGO_ALERT_STATE:
-					return QPixmap(":resource/led-red.png");
+					if (conf.indigo_use_state_icons)
+						return QPixmap(":resource/led-red-cb.png");
+					else
+						return QPixmap(":resource/led-red.png");
 				case INDIGO_OK_STATE:
-					return QPixmap(":resource/led-green.png");
+					if (conf.indigo_use_state_icons)
+						return QPixmap(":resource/led-green-cb.png");
+					else
+						return QPixmap(":resource/led-green.png");
 				}
 			} else if (node->node_type == TREE_NODE_DEVICE) {
 				DeviceNode* d = reinterpret_cast<DeviceNode*>(node);

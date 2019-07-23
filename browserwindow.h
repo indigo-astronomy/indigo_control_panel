@@ -98,6 +98,7 @@ public slots:
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
 	void on_use_suffix_changed(bool status);
+	void on_use_state_icons_changed(bool status);
 	void on_log_error();
 	void on_log_info();
 	void on_log_debug();

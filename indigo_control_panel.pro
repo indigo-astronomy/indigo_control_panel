@@ -41,6 +41,9 @@ RESOURCES += \
 	resource/led-grey.png \
 	resource/led-green.png \
 	resource/led-orange.png \
+	resource/led-red-cb.png \
+	resource/led-green-cb.png \
+	resource/led-orange-cb.png \
 	resource/led-grey-dev.png \
 	resource/led-green-dev.png \
 	resource/server.png \

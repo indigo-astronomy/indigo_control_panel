@@ -99,6 +99,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act->setChecked(conf.indigo_use_host_suffix);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_suffix_changed);
 
+	act = menu->addAction(tr("Use &icons for property state"));
+	act->setCheckable(true);
+	act->setChecked(conf.indigo_use_state_icons);
+	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_state_icons_changed);
+
 	menu->addSeparator();
 	QActionGroup *log_group = new QActionGroup(this);
 	log_group->setExclusive(true);
@@ -461,6 +466,14 @@ void BrowserWindow::on_bonjour_changed(bool status) {
 void BrowserWindow::on_use_suffix_changed(bool status) {
 	conf.indigo_use_host_suffix = status;
 	write_conf();
+	indigo_debug("%s\n", __FUNCTION__);
+}
+
+
+void BrowserWindow::on_use_state_icons_changed(bool status) {
+	conf.indigo_use_state_icons = status;
+	write_conf();
+	repaint_property_window(current_path->node);
 	indigo_debug("%s\n", __FUNCTION__);
 }
 

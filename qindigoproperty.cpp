@@ -29,6 +29,7 @@
 #include "qindigoswitch.h"
 #include "qindigolight.h"
 #include "qindigoblob.h"
+#include "conf.h"
 
 
 QIndigoProperty::QIndigoProperty(indigo_property* property, QWidget *parent) : QWidget(parent), m_property(property) {
@@ -72,7 +73,10 @@ void QIndigoProperty::update_property_view() {
 		);
 		break;
 	case INDIGO_BUSY_STATE:
-		m_led->setPixmap(QPixmap(":resource/led-orange.png"));
+		if (conf.indigo_use_state_icons)
+			m_led->setPixmap(QPixmap(":resource/led-orange-cb.png"));
+		else
+			m_led->setPixmap(QPixmap(":resource/led-orange.png"));
 		this->setStyleSheet(
 			"#INDIGO_property { background-color: #353520; border: 0px}"
 			"QLineEdit#INDIGO_property { background-color: #252520}"
@@ -81,7 +85,10 @@ void QIndigoProperty::update_property_view() {
 		);
 		break;
 	case INDIGO_ALERT_STATE:
-		m_led->setPixmap(QPixmap(":resource/led-red.png"));
+		if (conf.indigo_use_state_icons)
+			m_led->setPixmap(QPixmap(":resource/led-red-cb.png"));
+		else
+			m_led->setPixmap(QPixmap(":resource/led-red.png"));
 		this->setStyleSheet(
 			"#INDIGO_property { background-color: #352222; border: 0px}"
 			"QLineEdit#INDIGO_property { background-color: #252222}"
@@ -90,7 +97,10 @@ void QIndigoProperty::update_property_view() {
 		);
 		break;
 	case INDIGO_OK_STATE:
-		m_led->setPixmap(QPixmap(":resource/led-green.png"));
+		if (conf.indigo_use_state_icons)
+			m_led->setPixmap(QPixmap(":resource/led-green-cb.png"));
+		else
+			m_led->setPixmap(QPixmap(":resource/led-green.png"));
 		this->setStyleSheet(
 			"#INDIGO_property { background-color: #203220; border: 0px}"
 			"QLineEdit#INDIGO_property { background-color: #202520}"

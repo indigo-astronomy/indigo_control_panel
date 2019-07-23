@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
 	conf.blobs_enabled = true;
 	conf.auto_connect = true;
 	conf.indigo_use_host_suffix = true;
+	conf.indigo_use_state_icons = false;
 	conf.indigo_log_level = INDIGO_LOG_INFO;
 	read_conf();
 
