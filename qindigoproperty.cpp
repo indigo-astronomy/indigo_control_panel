@@ -73,7 +73,7 @@ void QIndigoProperty::update_property_view() {
 		);
 		break;
 	case INDIGO_BUSY_STATE:
-		if (conf.indigo_use_state_icons)
+		if (conf.use_state_icons)
 			m_led->setPixmap(QPixmap(":resource/led-orange-cb.png"));
 		else
 			m_led->setPixmap(QPixmap(":resource/led-orange.png"));
@@ -85,7 +85,7 @@ void QIndigoProperty::update_property_view() {
 		);
 		break;
 	case INDIGO_ALERT_STATE:
-		if (conf.indigo_use_state_icons)
+		if (conf.use_state_icons)
 			m_led->setPixmap(QPixmap(":resource/led-red-cb.png"));
 		else
 			m_led->setPixmap(QPixmap(":resource/led-red.png"));
@@ -97,7 +97,7 @@ void QIndigoProperty::update_property_view() {
 		);
 		break;
 	case INDIGO_OK_STATE:
-		if (conf.indigo_use_state_icons)
+		if (conf.use_state_icons)
 			m_led->setPixmap(QPixmap(":resource/led-green-cb.png"));
 		else
 			m_led->setPixmap(QPixmap(":resource/led-green.png"));

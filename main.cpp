@@ -20,7 +20,6 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
-//#include <unistd.h>
 #include "browserwindow.h"
 #include <conf.h>
 
@@ -46,6 +45,7 @@ void read_conf() {
 	}
 }
 
+
 int main(int argc, char *argv[]) {
 	indigo_main_argv = (const char**)argv;
 	indigo_main_argc = argc;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	conf.blobs_enabled = true;
 	conf.auto_connect = true;
 	conf.indigo_use_host_suffix = true;
-	conf.indigo_use_state_icons = false;
+	conf.use_state_icons = false;
 	conf.indigo_log_level = INDIGO_LOG_INFO;
 	read_conf();
 

@@ -101,7 +101,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	act = menu->addAction(tr("Use &icons for property state"));
 	act->setCheckable(true);
-	act->setChecked(conf.indigo_use_state_icons);
+	act->setChecked(conf.use_state_icons);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_state_icons_changed);
 
 	menu->addSeparator();
@@ -471,7 +471,7 @@ void BrowserWindow::on_use_suffix_changed(bool status) {
 
 
 void BrowserWindow::on_use_state_icons_changed(bool status) {
-	conf.indigo_use_state_icons = status;
+	conf.use_state_icons = status;
 	write_conf();
 	repaint_property_window(current_path->node);
 	indigo_debug("%s\n", __FUNCTION__);

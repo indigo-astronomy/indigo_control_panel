@@ -362,17 +362,17 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 				case INDIGO_IDLE_STATE:
 					return QPixmap(":resource/led-grey.png");
 				case INDIGO_BUSY_STATE:
-					if (conf.indigo_use_state_icons)
+					if (conf.use_state_icons)
 						return QPixmap(":resource/led-orange-cb.png");
 					else
 						return QPixmap(":resource/led-orange.png");
 				case INDIGO_ALERT_STATE:
-					if (conf.indigo_use_state_icons)
+					if (conf.use_state_icons)
 						return QPixmap(":resource/led-red-cb.png");
 					else
 						return QPixmap(":resource/led-red.png");
 				case INDIGO_OK_STATE:
-					if (conf.indigo_use_state_icons)
+					if (conf.use_state_icons)
 						return QPixmap(":resource/led-green-cb.png");
 					else
 						return QPixmap(":resource/led-green.png");
