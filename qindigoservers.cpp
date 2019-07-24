@@ -28,10 +28,22 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 	m_button_box = new QDialogButtonBox;
 	m_service_line = new QLineEdit;
 	m_service_line->setMinimumWidth(300);
+	m_service_line->setToolTip(
+		"service formats:\n"
+		"        service@hostname:port\n"
+		"        hostname:port\n"
+		"        hostname\n"
+		"\nservice can be any user defined name,\n"
+		"if ommited hostname will be used."
+	);
 	//m_add_button = m_button_box->addButton(tr("Add service"), QDialogButtonBox::ActionRole);
 	m_add_button = new QPushButton(" &Add ");
 	m_add_button->setDefault(true);
 	m_remove_button = m_button_box->addButton(tr("Remove selected"), QDialogButtonBox::ActionRole);
+	m_remove_button->setToolTip(
+		"Remove highlighted service.\n"
+		"Only manually added services can be removed."
+	);
 	m_close_button = m_button_box->addButton(tr("Close"), QDialogButtonBox::ActionRole);
 
 	QVBoxLayout* viewLayout = new QVBoxLayout;
@@ -112,7 +124,11 @@ void QIndigoServers::onAddManualService() {
 	int port = 7624;
 	QString hostname;
 	QString service;
-	QString service_str = m_service_line->text();
+	QString service_str = m_service_line->text().trimmed();
+	if (service_str.isEmpty()) {
+		indigo_debug("Trying to add empty service!");
+		return;
+	}
 	QStringList parts = service_str.split(':', QString::SkipEmptyParts);
 	if (parts.size() > 2) {
 		indigo_error("%s(): Service format error.\n",__FUNCTION__);
