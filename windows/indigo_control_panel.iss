@@ -29,6 +29,7 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 WizardSmallImageFile=appicon.bmp
+WizardImageFile=logo.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
