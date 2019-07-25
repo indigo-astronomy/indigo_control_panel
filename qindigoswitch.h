@@ -20,7 +20,7 @@
 #ifndef QINDIGOSWITCH_H
 #define QINDIGOSWITCH_H
 
-#include <indigo_bus.h>
+#include <indigo/indigo_bus.h>
 #include <QCheckBox>
 
 

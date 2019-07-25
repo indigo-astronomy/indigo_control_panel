@@ -124,14 +124,14 @@ win32 {
             indigo/indigo_libs/indigo_xml.c
 
         HEADERS += \
-            indigo/indigo_libs/indigo_base64.h \
-            indigo/indigo_libs/indigo_base64_luts.h \
-            indigo/indigo_libs/indigo_bus.h \
-            indigo/indigo_libs/indigo_client.h \
-            indigo/indigo_libs/indigo_client_xml.h \
-            indigo/indigo_libs/indigo_config.h \
-            indigo/indigo_libs/indigo_io.h \
-            indigo/indigo_libs/indigo_version.h \
-            indigo/indigo_libs/indigo_xml.h \
-            indigo/indigo_libs/indigo_names.h
+            indigo/indigo_libs/indigo/indigo_base64.h \
+            indigo/indigo_libs/indigo/indigo_base64_luts.h \
+            indigo/indigo_libs/indigo/indigo_bus.h \
+            indigo/indigo_libs/indigo/indigo_client.h \
+            indigo/indigo_libs/indigo/indigo_client_xml.h \
+            indigo/indigo_libs/indigo/indigo_config.h \
+            indigo/indigo_libs/indigo/indigo_io.h \
+            indigo/indigo_libs/indigo/indigo_version.h \
+            indigo/indigo_libs/indigo/indigo_xml.h \
+            indigo/indigo_libs/indigo/indigo_names.h
 }

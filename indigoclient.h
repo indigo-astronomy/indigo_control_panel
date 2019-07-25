@@ -21,7 +21,7 @@
 #define INDIGOCLIENT_H
 
 #include <QObject>
-#include <indigo_bus.h>
+#include <indigo/indigo_bus.h>
 #include "logger.h"
 
 

@@ -22,7 +22,7 @@
 
 #include <QAbstractItemModel>
 #include <QLabel>
-#include <indigo_bus.h>
+#include <indigo/indigo_bus.h>
 #include <assert.h>
 
 enum TreeNodeType {

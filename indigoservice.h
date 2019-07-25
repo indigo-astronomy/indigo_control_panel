@@ -22,7 +22,7 @@
 
 #include <QObject>
 #include <qzeroconf.h>
-#include <indigo_client.h>
+#include <indigo/indigo_client.h>
 
 
 class IndigoService

@@ -22,7 +22,7 @@
 
 #include <QFrame>
 #include <QLabel>
-#include <indigo_bus.h>
+#include <indigo/indigo_bus.h>
 
 
 class QVBoxLayout;

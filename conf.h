@@ -20,7 +20,7 @@
 #ifndef CONF_H
 #define CONF_H
 
-#include "indigo_bus.h"
+#include <indigo/indigo_bus.h>
 
 #if defined(INDIGO_WINDOWS)
 #define PATH_LEN 4096

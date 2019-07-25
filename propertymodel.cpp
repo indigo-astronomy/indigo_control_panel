@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include "propertymodel.h"
 #include "qindigoproperty.h"
-#include <indigo_names.h>
+#include <indigo/indigo_names.h>
 #include "conf.h"
 
 extern indigo_client client;

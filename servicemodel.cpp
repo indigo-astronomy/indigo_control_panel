@@ -20,7 +20,7 @@
 #include <QDir>
 #include "indigoservice.h"
 #include "servicemodel.h"
-#include <indigo_client.h>
+#include <indigo/indigo_client.h>
 #include "conf.h"
 
 #define SERVICE_FILENAME ".indigo_control_panel.services"

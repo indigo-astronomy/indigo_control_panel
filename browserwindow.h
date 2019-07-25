@@ -22,7 +22,7 @@
 
 #include <QApplication>
 #include <QMainWindow>
-#include <indigo_bus.h>
+#include <indigo/indigo_bus.h>
 #include <propertymodel.h>
 
 class QPlainTextEdit;

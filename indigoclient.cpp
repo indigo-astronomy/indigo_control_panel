@@ -17,7 +17,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include <indigo_client.h>
+#include <indigo/indigo_client.h>
 #include "indigoclient.h"
 #include "conf.h"
 
