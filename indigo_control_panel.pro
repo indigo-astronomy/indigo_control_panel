@@ -1,5 +1,5 @@
 QT += core gui widgets network
-CONFIG += c++11 debug
+CONFIG += c++11 release
 
 OBJECTS_DIR=object
 MOC_DIR=moc
