@@ -50,6 +50,13 @@ int main(int argc, char *argv[]) {
 	indigo_main_argv = (const char**)argv;
 	indigo_main_argc = argc;
 
+#if defined(INDIGO_WINDOWS)
+#define LOG_FILENAME "indigo_control_panel.log"
+    char filename[PATH_LEN];
+    snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), LOG_FILENAME);
+    freopen(filename,"w", stderr);
+#endif
+
 	memset(&conf,0,sizeof(conf_t));
 	conf.blobs_enabled = true;
 	conf.auto_connect = true;
