@@ -109,17 +109,18 @@ void QIndigoBLOB::save_blob_item(){
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 		char file_name[PATH_LEN];
 		char message[PATH_LEN+100];
-        char location[PATH_LEN];
+		char location[PATH_LEN];
 
-        if (QStandardPaths::displayName(QStandardPaths::PicturesLocation).length() > 0) {
-            QString qlocation = QDir::toNativeSeparators(QDir::homePath() + tr("/") + QStandardPaths::displayName(QStandardPaths::PicturesLocation));
-            strncpy(location, qlocation.toUtf8().constData(), PATH_LEN);
-        } else {
-            if (!getcwd(location, sizeof(location))) {
-                location[0] = '\0';
-            }
-        }
-        if (save_blob_item_with_prefix(location, file_name)) {
+		if (QStandardPaths::displayName(QStandardPaths::PicturesLocation).length() > 0) {
+			QString qlocation = QDir::toNativeSeparators(QDir::homePath() + tr("/") + QStandardPaths::displayName(QStandardPaths::PicturesLocation));
+			strncpy(location, qlocation.toUtf8().constData(), PATH_LEN);
+		} else {
+			if (!getcwd(location, sizeof(location))) {
+				location[0] = '\0';
+			}
+		}
+
+		if (save_blob_item_with_prefix(location, file_name)) {
 			snprintf(message, sizeof(message), "Image saved to '%s'", file_name);
 			m_logger->log(NULL, message);
 		} else {
