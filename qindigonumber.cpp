@@ -50,7 +50,7 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 			char format[1600];
 			snprintf (
 				format,
-				sizeof(tooltip),
+				sizeof(format),
 				"%s, range: [%s, %s] step: %s",
 				m_item->label, m_item->number.format,
 				m_item->number.format,
