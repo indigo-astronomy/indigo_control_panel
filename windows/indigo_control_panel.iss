@@ -3,7 +3,7 @@
 
 #define Arch "64"
 #define MyAppName "INDIGO Control Panel"
-#define MyAppVersion "0.2-2"
+#define MyAppVersion "0.2-3"
 #define MyAppPublisher "INDIGO Initiative"
 #define MyAppURL "http://www.indigo-astronomy.org"
 #define MyAppExeName "indigo_control_panel.exe"
