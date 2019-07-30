@@ -25,10 +25,11 @@
 #include <conf.h>
 
 conf_t conf;
+char config_path[PATH_LEN];
 
 void write_conf() {
 	char filename[PATH_LEN];
-	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), CONFIG_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", config_path, CONFIG_FILENAME);
 	FILE * file= fopen(filename, "wb");
 	if (file != nullptr) {
 		fwrite(&conf, sizeof(conf), 1, file);
@@ -38,7 +39,7 @@ void write_conf() {
 
 void read_conf() {
 	char filename[PATH_LEN];
-	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), CONFIG_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", config_path, CONFIG_FILENAME);
 	FILE * file= fopen(filename, "rb");
 	if (file != nullptr) {
 		fread(&conf, sizeof(conf), 1, file);
@@ -54,6 +55,7 @@ int main(int argc, char *argv[]) {
 	// create config path if it does not exist
 	QDir dir("");
 	dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation));
+	strncpy(config_path, QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), PATH_LEN);
 
 #if defined(INDIGO_WINDOWS)
 #define LOG_FILENAME "indigo_control_panel.log"

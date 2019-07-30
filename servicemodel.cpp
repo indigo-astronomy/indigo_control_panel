@@ -40,7 +40,7 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 
 void ServiceModel::saveManualServices() {
 	char filename[PATH_LEN];
-	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", config_path, SERVICE_FILENAME);
 	FILE * file= fopen(filename, "w");
 	if (file != NULL) {
 		for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
@@ -58,7 +58,7 @@ void ServiceModel::loadManualServices() {
 	char name[256]={0};
 	char host[256]={0};
 	int port=7624;
-	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", config_path, SERVICE_FILENAME);
 	FILE * file= fopen(filename, "r");
 	if (file != NULL) {
 		indigo_debug("Services file open: %s\n", filename);

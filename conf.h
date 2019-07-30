@@ -41,5 +41,6 @@ typedef struct {
 } conf_t;
 
 extern conf_t conf;
+extern char config_path[PATH_LEN];
 
 #endif // CONF_H
