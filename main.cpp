@@ -28,7 +28,7 @@ conf_t conf;
 
 void write_conf() {
 	char filename[PATH_LEN];
-    snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), CONFIG_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), CONFIG_FILENAME);
 	FILE * file= fopen(filename, "wb");
 	if (file != nullptr) {
 		fwrite(&conf, sizeof(conf), 1, file);
@@ -38,7 +38,7 @@ void write_conf() {
 
 void read_conf() {
 	char filename[PATH_LEN];
-    snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), CONFIG_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), CONFIG_FILENAME);
 	FILE * file= fopen(filename, "rb");
 	if (file != nullptr) {
 		fread(&conf, sizeof(conf), 1, file);
@@ -51,15 +51,15 @@ int main(int argc, char *argv[]) {
 	indigo_main_argv = (const char**)argv;
 	indigo_main_argc = argc;
 
-    // create config path if it does not exist
-    QDir dir("");
-    dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation));
+	// create config path if it does not exist
+	QDir dir("");
+	dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation));
 
 #if defined(INDIGO_WINDOWS)
 #define LOG_FILENAME "indigo_control_panel.log"
-    char filename[PATH_LEN];
-    snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), LOG_FILENAME);
-    freopen(filename,"w", stderr);
+	char filename[PATH_LEN];
+	snprintf(filename, PATH_LEN, "%s/%s", QDir::homePath().toUtf8().constData(), LOG_FILENAME);
+	freopen(filename,"w", stderr);
 #endif
 
 	memset(&conf,0,sizeof(conf_t));

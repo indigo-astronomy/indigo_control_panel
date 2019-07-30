@@ -28,7 +28,7 @@
 #define PATH_LEN PATH_MAX
 #endif
 
-#define CONFIG_FILENAME ".indigo_control_panel.conf"
+#define CONFIG_FILENAME "indigo_control_panel.conf"
 
 typedef struct {
 	bool blobs_enabled;

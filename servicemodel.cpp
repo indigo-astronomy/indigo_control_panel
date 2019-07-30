@@ -23,7 +23,7 @@
 #include <indigo/indigo_client.h>
 #include "conf.h"
 
-#define SERVICE_FILENAME ".indigo_control_panel.services"
+#define SERVICE_FILENAME "indigo_control_panel.services"
 
 
 ServiceModel::ServiceModel(const QByteArray &type) {
@@ -40,7 +40,7 @@ ServiceModel::ServiceModel(const QByteArray &type) {
 
 void ServiceModel::saveManualServices() {
 	char filename[PATH_LEN];
-    snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), SERVICE_FILENAME);
 	FILE * file= fopen(filename, "w");
 	if (file != NULL) {
 		for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
@@ -58,12 +58,12 @@ void ServiceModel::loadManualServices() {
 	char name[256]={0};
 	char host[256]={0};
 	int port=7624;
-    snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), SERVICE_FILENAME);
+	snprintf(filename, PATH_LEN, "%s/%s", QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).toUtf8().constData(), SERVICE_FILENAME);
 	FILE * file= fopen(filename, "r");
 	if (file != NULL) {
-        indigo_debug("Services file open: %s\n", filename);
+		indigo_debug("Services file open: %s\n", filename);
 		while (fscanf(file,"%[^@]@%[^:]:%d\n", name, host, &port) == 3) {
-			indigo_debug("########## %s@%s:%d\n", name, host, port);
+			indigo_debug("Loading service: %s@%s:%d\n", name, host, port);
 			addService(QByteArray(name), QByteArray(host), port);
 		}
 		fclose(file);
