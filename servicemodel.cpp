@@ -100,7 +100,7 @@ bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 		return false;
 	}
 
-	indigo_debug("SERVICE ADDED Manually [%s]\n", name.constData());
+	indigo_debug("SERVICE ADDED MANUALLY [%s]\n", name.constData());
 
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
 	IndigoService* indigo_service = new IndigoService(name, host, port);
@@ -151,7 +151,7 @@ bool ServiceModel::disconnectService(QByteArray name) {
 		return false;
 	}
 	IndigoService* indigo_service = mServices.at(i);
-	indigo_debug("CONNECTING TO SERVICE [%s] on %s:%d\n", name.constData(), indigo_service->host().constData(), indigo_service->port());
+	indigo_debug("DISCONNECTING FROM SERVICE [%s] on %s:%d\n", name.constData(), indigo_service->host().constData(), indigo_service->port());
 
 	return indigo_service->disconnect();
 }
@@ -203,7 +203,7 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 
 
 void ServiceModel::onServiceUpdated(QZeroConfService service) {
-	indigo_debug("SERVICE ADDED [%s] on %s:%d\n", service.name().constData(), service.host().constData(), service.port());
+	indigo_debug("SERVICE UPDATED [%s] on %s:%d\n", service.name().constData(), service.host().constData(), service.port());
 //	int i = findService(service.name());
 //	if (i != -1) {
 //		IndigoService s(service);
@@ -214,13 +214,13 @@ void ServiceModel::onServiceUpdated(QZeroConfService service) {
 
 
 void ServiceModel::onServiceRemoved(QZeroConfService service) {
-	indigo_debug("SERVICE REMOVED [%s]\n", service.name().toUtf8().constData());
+	indigo_debug("REMOVE SERVICE [%s]\n", service.name().toUtf8().constData());
 
 	//qDebug() << "Service Removed " << service.name();
 	int i = findService(service.name().toUtf8());
 	if (i != -1) {
 		IndigoService* indigo_service = mServices.at(i);
-		indigo_debug("SERVICE REMOVED WWWWW [%s]\n", service.name().toUtf8().constData());
+		indigo_debug("SERVICE REMOVED [%s]\n", service.name().toUtf8().constData());
 		beginRemoveRows(QModelIndex(), i, i);
 		mServices.removeAt(i);
 		endRemoveRows();
