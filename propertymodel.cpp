@@ -188,6 +188,7 @@ void PropertyModel::update_property(indigo_property* property, const char *messa
 		QModelIndex index = createIndex(device_row, 0, device);
 		emit(dataChanged(index, index));
 	}
+	indigo_release_property(property);
 }
 
 void PropertyModel::delete_property(indigo_property* property, const char *message) {
