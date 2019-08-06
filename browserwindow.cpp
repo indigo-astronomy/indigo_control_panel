@@ -212,13 +212,14 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(mIndigoServers, &QIndigoServers::requestAddManualService, mServiceModel, &ServiceModel::onRequestAddManualService);
 	connect(mIndigoServers, &QIndigoServers::requestRemoveManualService, mServiceModel, &ServiceModel::onRequestRemoveManualService);
 
-	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
-	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
-	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);
-
+	// NOTE: logging should be before update and delete of properties as they release the copy!!!
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_property_log);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_property_log);
+
+	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
+	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
+	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);
 
 	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define);
 	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_delete);
@@ -284,7 +285,7 @@ void BrowserWindow::on_property_define(indigo_property* property, const char *me
 }
 
 void BrowserWindow::on_property_delete(indigo_property* property, const char *message) {
-        property_define_delete(property, message, true);
+	property_define_delete(property, message, true);
 }
 
 void BrowserWindow::property_define_delete(indigo_property* property, const char *message, bool action_deleted) {
