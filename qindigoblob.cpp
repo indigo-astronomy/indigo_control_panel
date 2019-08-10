@@ -27,6 +27,8 @@
 #include <QHBoxLayout>
 #include "qindigoblob.h"
 #include "conf.h"
+#include <QPixmap>
+#include <QBitmap>
 
 
 QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent)
@@ -35,6 +37,10 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	m_logger = &Logger::instance();
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
+
+	image = new QLabel();
+	image->setObjectName("INDIGO_property");
+
 	text = new QLineEdit();
 	char tooltip[1600];
 	snprintf(tooltip, sizeof(tooltip), "%s URL: read only (in legacy mode is empty)", m_item->label);
@@ -46,13 +52,23 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	update();
 
 	//  Lay the labels out somehow in the widget
+	QVBoxLayout* vbox = new QVBoxLayout();
+	setLayout(vbox);
 	QHBoxLayout* hbox = new QHBoxLayout();
-	setLayout(hbox);
+	QWidget* base = new QWidget();
+	base->setObjectName("INDIGO_property");
+	base->setLayout(hbox);
 	hbox->setAlignment(Qt::AlignLeft);
 	hbox->setMargin(0);
 	hbox->setSpacing(0);
 	hbox->addWidget(label, 20);
 	hbox->addWidget(text, 80);
+
+	vbox->setAlignment(Qt::AlignLeft);
+	vbox->setMargin(0);
+	vbox->setSpacing(10);
+	vbox->addWidget(image);
+	vbox->addWidget(base);
 
 	connect(text, &QLineEdit::textEdited, this, &QIndigoBLOB::dirty);
 }
@@ -68,6 +84,15 @@ void QIndigoBLOB::update() {
 	//  Apply update from indigo bus only if not being edited
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
+		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
+			QImage* qimage = new QImage();
+			qimage->loadFromData((const uchar*)m_item->blob.value, m_item->blob.size, "JPG");
+			QPixmap pixmap = QPixmap::fromImage(*qimage);
+			int w = image->width();
+			image->setPixmap(pixmap.scaledToWidth(w * .83, Qt::SmoothTransformation));
+			image->setMask(pixmap.mask());
+			image->show();
+		}
 	}
 }
 

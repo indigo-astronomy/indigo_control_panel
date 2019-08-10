@@ -48,6 +48,7 @@ public slots:
 private:
 	Logger* m_logger;
 	QLabel* label;
+	QLabel* image;
 	QLineEdit* text;
 	bool m_dirty;
 };
