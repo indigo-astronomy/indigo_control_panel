@@ -16,6 +16,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#if !defined(INDIGO_WINDOWS)
+#define USE_LIBJPEG
+#endif
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -30,6 +33,9 @@
 #include <QPixmap>
 #include <QBitmap>
 
+#if defined(USE_LIBJPEG)
+#include <jpeglib.h>
+#endif
 
 QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent)
 	: QWidget(parent), QIndigoItem(p, property, item), m_dirty(false) {
@@ -75,6 +81,81 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 }
 
 
+QImage* QIndigoBLOB::decompress_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
+#if !defined(USE_LIBJPEG)
+
+	QImage* img = new QImage();
+	img->loadFromData((const uchar*)jpg_buffer, jpg_size, "JPG");
+	return img;
+
+#else // INDIGO Mac and Linux
+
+	int rc;
+
+	unsigned char *bmp_buffer;
+	unsigned long bmp_size;
+
+	struct jpeg_decompress_struct cinfo;
+	struct jpeg_error_mgr jerr;
+
+	int row_stride, width, height, pixel_size, color_space;
+
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_decompress(&cinfo);
+
+	jpeg_mem_src(&cinfo, jpg_buffer, jpg_size);
+
+	rc = jpeg_read_header(&cinfo, TRUE);
+
+	if (rc != 1) {
+		indigo_error("File does not seem to be a normal JPEG");
+		return nullptr;
+	}
+
+	jpeg_start_decompress(&cinfo);
+
+	width = cinfo.output_width;
+	height = cinfo.output_height;
+	pixel_size = cinfo.output_components;
+	color_space = cinfo.out_color_space;
+
+	bmp_size = width * height * pixel_size;
+	bmp_buffer = (unsigned char*)malloc(bmp_size);
+
+	row_stride = width * pixel_size;
+
+	indigo_debug("Proc: Image is %d by %d with %d components (CS: %d)", width, height, pixel_size, color_space);
+
+	while (cinfo.output_scanline < cinfo.output_height) {
+		unsigned char *buffer_array[1];
+		buffer_array[0] = bmp_buffer + \
+						   (cinfo.output_scanline) * row_stride;
+
+		jpeg_read_scanlines(&cinfo, buffer_array, 1);
+
+	}
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+
+	QImage* img;
+	if (color_space == JCS_GRAYSCALE) {
+		img = new QImage(width, height, QImage::Format_Indexed8);
+	} else if (color_space == JCS_RGB) {
+		img = new QImage(width, height, QImage::Format_RGB888);
+	} else {
+		return nullptr;
+	}
+
+	for (int y = 0; y < img->height(); y++) {
+		memcpy(img->scanLine(y), bmp_buffer + y * img->bytesPerLine(), img->bytesPerLine());
+	}
+
+	free(bmp_buffer);
+	return img;
+#endif
+}
+
+
 QIndigoBLOB::~QIndigoBLOB() {
 	//delete label;
 	//delete text;
@@ -86,12 +167,11 @@ void QIndigoBLOB::update() {
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
 		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-			QImage* qimage = new QImage();
-			qimage->loadFromData((const uchar*)m_item->blob.value, m_item->blob.size, "JPG");
+			QImage* qimage = decompress_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+			if (qimage == nullptr) return;
+
 			QPixmap pixmap = QPixmap::fromImage(*qimage);
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
-			//image->setMask(pixmap.mask());
-			image->show();
 		}
 	}
 }
@@ -130,7 +210,7 @@ void close_fd(int fd) {
 }
 
 
-void QIndigoBLOB::save_blob_item(){
+void QIndigoBLOB::save_blob_item() {
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 		char file_name[PATH_LEN];
 		char message[PATH_LEN+100];
@@ -156,7 +236,7 @@ void QIndigoBLOB::save_blob_item(){
 }
 
 
-void QIndigoBLOB::preview_blob_item(){
+void QIndigoBLOB::preview_blob_item() {
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != nullptr)) {
 		char file_name[PATH_LEN];
 		char url[PATH_LEN+100];

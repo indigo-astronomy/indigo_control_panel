@@ -90,8 +90,8 @@ HEADERS += \
 	qindigolight.h \
 	qindigoblob.h \
 	qindigoservers.h \
-        logger.h \
-        conf.h
+	logger.h \
+	conf.h
 
 
 include(qtzeroconf/qtzeroconf.pri)
@@ -104,7 +104,8 @@ include(qtzeroconf/qtzeroconf.pri)
 INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
 
 unix {
-	LIBS += -L"$${PWD}/indigo/build/lib" -lindigo
+	INCLUDEPATH += "$${PWD}/indigo/build/include"
+	LIBS += -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg
 }
 
 DISTFILES += \
