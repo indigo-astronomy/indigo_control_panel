@@ -183,7 +183,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	mScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	mFormLayout->addWidget(mSelectionLine);
 	mFormLayout->addWidget(mScrollArea);
-	mScrollArea->setMinimumWidth(600);
+	mScrollArea->setMinimumWidth(PROPERTY_AREA_MIN_WIDTH);
 
 	QSplitter* hSplitter = new QSplitter;
 	hSplitter->addWidget(selection_panel);

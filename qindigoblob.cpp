@@ -64,10 +64,11 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	hbox->addWidget(label, 20);
 	hbox->addWidget(text, 80);
 
-	vbox->setAlignment(Qt::AlignLeft);
+	vbox->setAlignment(Qt::AlignHCenter);
 	vbox->setMargin(0);
 	vbox->setSpacing(10);
 	vbox->addWidget(image);
+	vbox->setAlignment(image, Qt::AlignHCenter);
 	vbox->addWidget(base);
 
 	connect(text, &QLineEdit::textEdited, this, &QIndigoBLOB::dirty);
@@ -88,9 +89,8 @@ void QIndigoBLOB::update() {
 			QImage* qimage = new QImage();
 			qimage->loadFromData((const uchar*)m_item->blob.value, m_item->blob.size, "JPG");
 			QPixmap pixmap = QPixmap::fromImage(*qimage);
-			int w = image->width();
-			image->setPixmap(pixmap.scaledToWidth(w * .83, Qt::SmoothTransformation));
-			image->setMask(pixmap.mask());
+			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
+			//image->setMask(pixmap.mask());
 			image->show();
 		}
 	}

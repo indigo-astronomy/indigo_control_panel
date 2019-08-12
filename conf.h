@@ -28,6 +28,9 @@
 #define PATH_LEN PATH_MAX
 #endif
 
+#define PROPERTY_AREA_MIN_WIDTH 620
+#define PREVIEW_WIDTH 550
+
 #define CONFIG_FILENAME "indigo_control_panel.conf"
 
 typedef struct {
