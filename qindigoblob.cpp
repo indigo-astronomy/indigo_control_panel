@@ -167,10 +167,14 @@ void QIndigoBLOB::update() {
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
 		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-			QImage* qimage = decompress_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
-			if (qimage == nullptr) return;
-
-			QPixmap pixmap = QPixmap::fromImage(*qimage);
+			QImage* img;
+			if (!strcmp(m_item->blob.format, ".jpeg") || !strcmp(m_item->blob.format, ".jpg")) {
+				img = decompress_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+			} else {
+				img = nullptr;
+			}
+			if (img == nullptr) return;
+			QPixmap pixmap = QPixmap::fromImage(*img);
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 		}
 	}
