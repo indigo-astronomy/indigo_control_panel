@@ -104,8 +104,8 @@ include(qtzeroconf/qtzeroconf.pri)
 INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
 
 unix {
-	INCLUDEPATH += "$${PWD}/indigo/build/include"
-	LIBS += -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg
+	INCLUDEPATH += "$${PWD}/libjpeg"
+	LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg
 }
 
 DISTFILES += \
