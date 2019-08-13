@@ -81,81 +81,6 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 }
 
 
-QImage* QIndigoBLOB::decompress_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
-#if !defined(USE_LIBJPEG)
-
-	QImage* img = new QImage();
-	img->loadFromData((const uchar*)jpg_buffer, jpg_size, "JPG");
-	return img;
-
-#else // INDIGO Mac and Linux
-
-	int rc;
-
-	unsigned char *bmp_buffer;
-	unsigned long bmp_size;
-
-	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
-
-	int row_stride, width, height, pixel_size, color_space;
-
-	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_decompress(&cinfo);
-
-	jpeg_mem_src(&cinfo, jpg_buffer, jpg_size);
-
-	rc = jpeg_read_header(&cinfo, TRUE);
-
-	if (rc != 1) {
-		indigo_error("File does not seem to be a normal JPEG");
-		return nullptr;
-	}
-
-	jpeg_start_decompress(&cinfo);
-
-	width = cinfo.output_width;
-	height = cinfo.output_height;
-	pixel_size = cinfo.output_components;
-	color_space = cinfo.out_color_space;
-
-	bmp_size = width * height * pixel_size;
-	bmp_buffer = (unsigned char*)malloc(bmp_size);
-
-	row_stride = width * pixel_size;
-
-	indigo_debug("Proc: Image is %d by %d with %d components (CS: %d)", width, height, pixel_size, color_space);
-
-	while (cinfo.output_scanline < cinfo.output_height) {
-		unsigned char *buffer_array[1];
-		buffer_array[0] = bmp_buffer + \
-						   (cinfo.output_scanline) * row_stride;
-
-		jpeg_read_scanlines(&cinfo, buffer_array, 1);
-
-	}
-	jpeg_finish_decompress(&cinfo);
-	jpeg_destroy_decompress(&cinfo);
-
-	QImage* img;
-	if (color_space == JCS_GRAYSCALE) {
-		img = new QImage(width, height, QImage::Format_Indexed8);
-	} else if (color_space == JCS_RGB) {
-		img = new QImage(width, height, QImage::Format_RGB888);
-	} else {
-		return nullptr;
-	}
-
-	for (int y = 0; y < img->height(); y++) {
-		memcpy(img->scanLine(y), bmp_buffer + y * img->bytesPerLine(), img->bytesPerLine());
-	}
-
-	free(bmp_buffer);
-	return img;
-#endif
-}
-
-
 QIndigoBLOB::~QIndigoBLOB() {
 	//delete label;
 	//delete text;
@@ -168,7 +93,8 @@ void QIndigoBLOB::update() {
 		text->setText(m_item->blob.url);
 		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
 			QImage* img;
-			if (!strcmp(m_item->blob.format, ".jpeg") || !strcmp(m_item->blob.format, ".jpg")) {
+			if (!strcmp(m_item->blob.format, ".jpeg") ||
+			    !strcmp(m_item->blob.format, ".jpg")) {
 				img = decompress_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
 			} else {
 				img = nullptr;
@@ -285,4 +211,72 @@ bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name
 		close_fd(fd);
 	}
 	return true;
+}
+
+
+QImage* QIndigoBLOB::decompress_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
+#if !defined(USE_LIBJPEG)
+
+	QImage* img = new QImage();
+	img->loadFromData((const uchar*)jpg_buffer, jpg_size, "JPG");
+	return img;
+
+#else // INDIGO Mac and Linux
+
+	unsigned char *bmp_buffer;
+	unsigned long bmp_size;
+
+	struct jpeg_decompress_struct cinfo;
+	struct jpeg_error_mgr jerr;
+
+	int row_stride, width, height, pixel_size, color_space;
+
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_decompress(&cinfo);
+
+	jpeg_mem_src(&cinfo, jpg_buffer, jpg_size);
+
+	int rc = jpeg_read_header(&cinfo, TRUE);
+	if (rc != 1) {
+		indigo_error("JPEG: Data does not seem to be JPEG");
+		return nullptr;
+	}
+	jpeg_start_decompress(&cinfo);
+
+	width = cinfo.output_width;
+	height = cinfo.output_height;
+	pixel_size = cinfo.output_components;
+	color_space = cinfo.out_color_space;
+
+	bmp_size = width * height * pixel_size;
+	bmp_buffer = (unsigned char*)malloc(bmp_size);
+
+	indigo_debug("JPEG: Image is %d x %d (BPP: %d CS: %d)", width, height, pixel_size*8, color_space);
+
+	row_stride = width * pixel_size;
+	while (cinfo.output_scanline < cinfo.output_height) {
+		unsigned char *buffer_array[1];
+		buffer_array[0] = bmp_buffer + (cinfo.output_scanline) * row_stride;
+		jpeg_read_scanlines(&cinfo, buffer_array, 1);
+	}
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+
+	QImage* img;
+	if (color_space == JCS_GRAYSCALE) {
+		img = new QImage(width, height, QImage::Format_Indexed8);
+	} else if (color_space == JCS_RGB) {
+		img = new QImage(width, height, QImage::Format_RGB888);
+	} else {
+		indigo_error("JPEG: Unsupported colour space (CS: %d)", color_space);
+		return nullptr;
+	}
+
+	for (int y = 0; y < img->height(); y++) {
+		memcpy(img->scanLine(y), bmp_buffer + y * img->bytesPerLine(), img->bytesPerLine());
+	}
+
+	free(bmp_buffer);
+	return img;
+#endif
 }
