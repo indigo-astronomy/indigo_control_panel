@@ -97,13 +97,18 @@ void QIndigoBLOB::update() {
 			    !strcmp(m_item->blob.format, ".jpg")) {
 				img = decompress_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
 			} else {
-				img = nullptr;
+				QPixmap pixmap(":resource/no-preview.png");
+				image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
+				return;
 			}
 			if (img == nullptr) return;
 			QPixmap pixmap = QPixmap::fromImage(*img);
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
+			return;
 		}
 	}
+	QPixmap pixmap(":resource/no-preview.png");
+	image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 }
 
 

@@ -37,6 +37,7 @@ RESOURCES += \
 	resource/appicon.png \
 	resource/bonjour_service.png \
 	resource/manual_service.png \
+	resource/no-preview.png \
 	resource/led-red.png \
 	resource/led-grey.png \
 	resource/led-green.png \
