@@ -30,6 +30,7 @@
 #include <QHBoxLayout>
 #include "qindigoblob.h"
 #include "conf.h"
+#include <fits/fits.h>
 #include <QPixmap>
 #include <QBitmap>
 
@@ -95,7 +96,10 @@ void QIndigoBLOB::update() {
 			QImage* img;
 			if (!strcmp(m_item->blob.format, ".jpeg") ||
 			    !strcmp(m_item->blob.format, ".jpg")) {
-				img = decompress_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+				img = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+			}else if (!strcmp(m_item->blob.format, ".fits") ||
+			          !strcmp(m_item->blob.format, ".fit")) {
+				img = process_fits((unsigned char*)m_item->blob.value);
 			} else {
 				QPixmap pixmap(":resource/no-preview.png");
 				image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
@@ -219,7 +223,7 @@ bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name
 }
 
 
-QImage* QIndigoBLOB::decompress_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
+QImage* QIndigoBLOB::process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
 #if !defined(USE_LIBJPEG)
 
 	QImage* img = new QImage();
@@ -284,4 +288,41 @@ QImage* QIndigoBLOB::decompress_jpeg(unsigned char *jpg_buffer, unsigned long jp
 	free(bmp_buffer);
 	return img;
 #endif
+}
+
+
+QImage* QIndigoBLOB::process_fits(unsigned char *fits_buffer) {
+	unsigned char *bmp_buffer;
+	unsigned long bmp_size;
+	fits_header header;
+
+	printf("fits_read_header = %d\n",fits_read_header(fits_buffer,&header));
+
+	char *fits_data = (char*)malloc(fits_get_buffer_size(&header));
+
+	printf("fits_process_data = %d\n", fits_process_data(fits_buffer, &header, fits_data));
+
+	indigo_error("JPEG: BITPIX= %d", header.bitpix);
+	QImage* img = new QImage(header.naxisn[0], header.naxisn[1], QImage::Format_RGB888);
+	if (header.bitpix == 8) {
+		for (int y = 0; y < img->height(); y++) {
+			memcpy(img->scanLine(y), fits_buffer + y * img->bytesPerLine(), img->bytesPerLine());
+		}
+	} else if (header.bitpix == 16) {
+		uint16_t* fits_buf = (uint16_t*)fits_data;
+		for (int y = 0; y < img->height(); ++y) {
+			for (int x = 0; x < img->width(); ++x) {
+				int value = fits_buf[y * img->width() + x]/256;
+				img->setPixel(x, y, qRgb(value,value,value));
+			}
+		}
+	} else {
+		indigo_error("JPEG: Unsupported bitpix (BITPIX= %d)", header.bitpix);
+		return nullptr;
+	}
+
+
+
+	free(fits_data);
+	return img;
 }

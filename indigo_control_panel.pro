@@ -28,7 +28,8 @@ SOURCES += \
 	qindigonumber.cpp \
 	qindigolight.cpp \
 	qindigoblob.cpp \
-	qindigoservers.cpp
+	qindigoservers.cpp \
+	fits/fits.c
 
 
 RESOURCES += \
@@ -92,6 +93,7 @@ HEADERS += \
 	qindigoblob.h \
 	qindigoservers.h \
 	logger.h \
+	fits/fits.h \
 	conf.h
 
 

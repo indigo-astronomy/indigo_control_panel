@@ -37,7 +37,8 @@ public:
 	virtual void reset();
 	virtual void apply();
 	bool save_blob_item_with_prefix(const char *prefix, char *file_name);
-	QImage* decompress_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size);
+	QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size);
+	QImage* process_fits(unsigned char *fits_buffer);
 
 signals:
 
