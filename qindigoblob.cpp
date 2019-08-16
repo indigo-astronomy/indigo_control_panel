@@ -45,6 +45,8 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 
+	preview = nullptr;
+
 	image = new QLabel();
 	image->setObjectName("INDIGO_property");
 
@@ -83,6 +85,7 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 
 
 QIndigoBLOB::~QIndigoBLOB() {
+	if (preview) delete preview;
 	//delete label;
 	//delete text;
 }
@@ -92,25 +95,26 @@ void QIndigoBLOB::update() {
 	//  Apply update from indigo bus only if not being edited
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
-		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL)) {
-			QImage* img;
+		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL) && (preview == nullptr)) {
 			if (!strcmp(m_item->blob.format, ".jpeg") ||
 			    !strcmp(m_item->blob.format, ".jpg")) {
-				img = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+				preview = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
 			}else if (!strcmp(m_item->blob.format, ".fits") ||
 			          !strcmp(m_item->blob.format, ".fit")) {
-				img = process_fits((unsigned char*)m_item->blob.value);
+				preview = process_fits((unsigned char*)m_item->blob.value);
 			} else {
 				QPixmap pixmap(":resource/no-preview.png");
 				image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 				return;
 			}
-			if (img == nullptr) return;
-			QPixmap pixmap = QPixmap::fromImage(*img);
+			if (preview == nullptr) return;
+			QPixmap pixmap = QPixmap::fromImage(*preview);
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 			return;
 		}
 	}
+	delete(preview);
+	preview = nullptr;
 	QPixmap pixmap(":resource/no-preview.png");
 	image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 }
@@ -292,53 +296,80 @@ QImage* QIndigoBLOB::process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_s
 
 
 QImage* QIndigoBLOB::process_fits(unsigned char *fits_buffer) {
-	unsigned char *bmp_buffer;
-	unsigned long bmp_size;
 	fits_header header;
 	int *hist;
+	int range, max, min = 0, sum = 0;
 
-	printf("fits_read_header = %d\n",fits_read_header(fits_buffer,&header));
+	int res = fits_read_header(fits_buffer, &header);
+	if (res != FITS_OK) {
+		indigo_error("FITS: Error parsing header");
+		return nullptr;
+	}
 
-	if (header.bitpix==16)
+	if (header.bitpix==16) {
+		max=65535;
 		hist = (int*)malloc(65536*sizeof(int));
-	else if (header.bitpix==8)
+	} else if (header.bitpix==8) {
+		max=255;
 		hist = (int*)malloc(256*sizeof(int));
-	else {
-		indigo_error("JPEG: Unsupported bitpix (BITPIX= %d)", header.bitpix);
+	} else {
+		indigo_error("FITS: Unsupported bitpix (BITPIX= %d)", header.bitpix);
 		return nullptr;
 	}
 
 	char *fits_data = (char*)malloc(fits_get_buffer_size(&header));
 
-	printf("fits_process_data = %d\n", fits_process_data_with_hist(fits_buffer, &header, fits_data, hist));
+	res = fits_process_data_with_hist(fits_buffer, &header, fits_data, hist);
+	if (res != FITS_OK) {
+		indigo_error("FITS: Error processing data");
+		return nullptr;
+	}
 
-	indigo_error("JPEG: BITPIX= %d", header.bitpix);
+	indigo_error("FITS: BITPIX= %d", header.bitpix);
 	int pix_cnt = header.naxisn[0] * header.naxisn[1];
 	int thresh = 0.005 * pix_cnt;
 
 	QImage* img = new QImage(header.naxisn[0], header.naxisn[1], QImage::Format_RGB888);
 	if (header.bitpix == 8) {
-		for (int y = 0; y < img->height(); y++) {
-			memcpy(img->scanLine(y), fits_buffer + y * img->bytesPerLine(), img->bytesPerLine());
-		}
-	} else if (header.bitpix == 16) {
-		int max=65535;
-		int sum = 0;
 		while (sum < thresh) {
 			sum += hist[max--];
 		}
+		while (hist[min++] == 0);
+
+		range = max - min;
+		double scale = 256.0 / range;
+		indigo_error("FITS: SUM = %d THRESH = %d max = %d min = %d", sum, thresh, max, min);
+
+		uint8_t* fits_buf = (uint8_t*)fits_data;
+		for (int y = 0; y < img->height(); ++y) {
+			for (int x = 0; x < img->width(); ++x) {
+				int value = fits_buf[y * img->width() + x] - min;
+				if (value >= range) value = 255;
+				else value *= scale;
+				img->setPixel(x, y, qRgb(value, value, value));
+			}
+		}
+	} else if (header.bitpix == 16) {
+		while (sum < thresh) {
+			sum += hist[max--];
+		}
+		while (hist[min++] == 0);
+
+		range = max - min;
+		double scale = 256.0 / range; // + 1;
+		indigo_error("FITS: SUM = %d THRESH = %d max = %d min = %d", sum, thresh, max, min);
+
 		uint16_t* fits_buf = (uint16_t*)fits_data;
 		for (int y = 0; y < img->height(); ++y) {
 			for (int x = 0; x < img->width(); ++x) {
-				int scale = max/256+1;
-				int value = fits_buf[y * img->width() + x];
-				if (value >= max) value = 255;
-				else value /= scale;
-				img->setPixel(x, y, qRgb(value,value,value));
+				int value = fits_buf[y * img->width() + x] - min;
+				if (value >= range) value = 255;
+				else value *= scale;
+				img->setPixel(x, y, qRgb(value, value, value));
 			}
 		}
 	} else {
-		indigo_error("JPEG: Unsupported bitpix (BITPIX= %d)", header.bitpix);
+		indigo_error("FITS: Unsupported bitpix (BITPIX= %d)", header.bitpix);
 		free(hist);
 		free(fits_data);
 		return nullptr;

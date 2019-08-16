@@ -21,6 +21,7 @@
 #include "fits.h"
 #include <string.h>
 #include <stdio.h>
+#include <indigo/indigo_bus.h>
 
 static int fits_header_init(fits_header *header, fits_header_state state) {
 	header->state = state;
@@ -300,7 +301,7 @@ int fits_process_data_with_hist(const uint8_t *fits_data, fits_header *header, c
 	}
 	indigo_log("size = %d\n", size);
 	if (header->bitpix == 16 && header->naxis == 2) {
-		if (hist) memset(hist, 0, 65536);
+		if (hist) memset(hist, 0, 65536 * sizeof (hist[0]));
 		short *raw = (short *)(fits_data + header->data_offset);
 		uint16_t *native = (uint16_t *)native_data;
 		if (little_endian) {
@@ -320,7 +321,7 @@ int fits_process_data_with_hist(const uint8_t *fits_data, fits_header *header, c
 		}
 		return FITS_OK;
 	} else if (header->bitpix == 8 && header->naxis == 2) {
-		if (hist) memset(hist, 0, 256);
+		if (hist) memset(hist, 0, 256*sizeof(hist[0]));
 		uint8_t *raw = (uint8_t *)(fits_data + header->data_offset);
 		uint8_t *native = (uint8_t *)native_data;
 		for (int i = 0; i < size; i++) {

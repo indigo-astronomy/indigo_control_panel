@@ -33,8 +33,8 @@ typedef enum fits_error {
 	FITS_INVALIDDATA = -1,
 } fits_error;
 
-#define indigo_error printf
-#define indigo_log printf
+//#define indigo_error printf
+//#define indigo_log printf
 
 typedef enum fits_headerState {
 	STATE_SIMPLE,

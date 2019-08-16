@@ -52,6 +52,7 @@ private:
 	QLabel* label;
 	QLabel* image;
 	QLineEdit* text;
+	QImage* preview;
 	bool m_dirty;
 };
 
