@@ -295,34 +295,56 @@ QImage* QIndigoBLOB::process_fits(unsigned char *fits_buffer) {
 	unsigned char *bmp_buffer;
 	unsigned long bmp_size;
 	fits_header header;
+	int *hist;
 
 	printf("fits_read_header = %d\n",fits_read_header(fits_buffer,&header));
 
+	if (header.bitpix==16)
+		hist = (int*)malloc(65536*sizeof(int));
+	else if (header.bitpix==8)
+		hist = (int*)malloc(256*sizeof(int));
+	else {
+		indigo_error("JPEG: Unsupported bitpix (BITPIX= %d)", header.bitpix);
+		return nullptr;
+	}
+
 	char *fits_data = (char*)malloc(fits_get_buffer_size(&header));
 
-	printf("fits_process_data = %d\n", fits_process_data(fits_buffer, &header, fits_data));
+	printf("fits_process_data = %d\n", fits_process_data_with_hist(fits_buffer, &header, fits_data, hist));
 
 	indigo_error("JPEG: BITPIX= %d", header.bitpix);
+	int pix_cnt = header.naxisn[0] * header.naxisn[1];
+	int thresh = 0.005 * pix_cnt;
+
 	QImage* img = new QImage(header.naxisn[0], header.naxisn[1], QImage::Format_RGB888);
 	if (header.bitpix == 8) {
 		for (int y = 0; y < img->height(); y++) {
 			memcpy(img->scanLine(y), fits_buffer + y * img->bytesPerLine(), img->bytesPerLine());
 		}
 	} else if (header.bitpix == 16) {
+		int max=65535;
+		int sum = 0;
+		while (sum < thresh) {
+			sum += hist[max--];
+		}
 		uint16_t* fits_buf = (uint16_t*)fits_data;
 		for (int y = 0; y < img->height(); ++y) {
 			for (int x = 0; x < img->width(); ++x) {
-				int value = fits_buf[y * img->width() + x]/256;
+				int scale = max/256+1;
+				int value = fits_buf[y * img->width() + x];
+				if (value >= max) value = 255;
+				else value /= scale;
 				img->setPixel(x, y, qRgb(value,value,value));
 			}
 		}
 	} else {
 		indigo_error("JPEG: Unsupported bitpix (BITPIX= %d)", header.bitpix);
+		free(hist);
+		free(fits_data);
 		return nullptr;
 	}
 
-
-
+	free(hist);
 	free(fits_data);
 	return img;
 }

@@ -290,3 +290,45 @@ int fits_process_data(const uint8_t *fits_data, fits_header *header, char *nativ
 	}
 	return FITS_INVALIDDATA;
 }
+
+
+int fits_process_data_with_hist(const uint8_t *fits_data, fits_header *header, char *native_data, int *hist) {
+	int little_endian = 1;
+	int size = 1;
+	for (int i = 0; i < header->naxis; i++){
+		size *= header->naxisn[i];
+	}
+	indigo_log("size = %d\n", size);
+	if (header->bitpix == 16 && header->naxis == 2) {
+		if (hist) memset(hist, 0, 65536);
+		short *raw = (short *)(fits_data + header->data_offset);
+		uint16_t *native = (uint16_t *)native_data;
+		if (little_endian) {
+			for (int i = 0; i < size; i++) {
+				*native = (*raw & 0xff) << 8 | (*raw & 0xff00) >> 8;
+				*native = (*native + header->bzero) * header->bscale;
+				if (hist) hist[*native]++;
+				native++;
+				raw++;
+			}
+		} else {
+			for (int i = 0; i < size; i++) {
+				*native = (*raw++ + header->bzero) * header->bscale;
+				if (hist) hist[*native]++;
+				native++;
+			}
+		}
+		return FITS_OK;
+	} else if (header->bitpix == 8 && header->naxis == 2) {
+		if (hist) memset(hist, 0, 256);
+		uint8_t *raw = (uint8_t *)(fits_data + header->data_offset);
+		uint8_t *native = (uint8_t *)native_data;
+		for (int i = 0; i < size; i++) {
+			*native = (*raw++ + header->bzero) * header->bscale;
+			if (hist) hist[*native]++;
+			native++;
+		}
+		return FITS_OK;
+	}
+	return FITS_INVALIDDATA;
+}
