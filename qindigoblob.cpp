@@ -102,6 +102,8 @@ void QIndigoBLOB::update() {
 			}else if (!strcmp(m_item->blob.format, ".fits") ||
 			          !strcmp(m_item->blob.format, ".fit")) {
 				preview = process_fits((unsigned char*)m_item->blob.value);
+			}else if (!strcmp(m_item->blob.format, ".raw")) {
+				preview = process_raw((unsigned char*)m_item->blob.value);
 			} else {
 				QPixmap pixmap(":resource/no-preview.png");
 				image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
@@ -327,6 +329,42 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer) {
 
 	free(hist);
 	free(fits_data);
+	return img;
+}
+
+
+QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer) {
+	int *hist;
+	int bitpix;
+	indigo_raw_header *header = (indigo_raw_header*)raw_image_buffer;
+	char *raw_data = (char*)raw_image_buffer + sizeof(indigo_raw_header);
+
+	if (header->signature == INDIGO_RAW_MONO16) {
+		bitpix = 16;
+		hist = (int*)malloc(65536*sizeof(int));
+		memset(hist, 0, 65536*sizeof(int));
+		int pixel_count = header->height * header->width;
+		uint16_t* buf = (uint16_t*)raw_data;
+		for (int pix = 0; pix < pixel_count; ++pix) {
+			hist[*buf++]++;
+		}
+	} else if (header->signature == INDIGO_RAW_MONO8) {
+		bitpix = 8;
+		hist = (int*)malloc(256*sizeof(int));
+		memset(hist, 0, 256*sizeof(int));
+		int pixel_count = header->height * header->width;
+		uint8_t* buf = (uint8_t*)raw_data;
+		for (int pix = 0; pix < pixel_count; ++pix) {
+			hist[*buf++]++;
+		}
+	} else {
+		indigo_error("RAW: Unsupported image format (%d)", header->signature);
+		return nullptr;
+	}
+
+	QImage *img = generate_preview(header->width, header->height, bitpix, raw_data, hist, 0.005);
+
+	free(hist);
 	return img;
 }
 
