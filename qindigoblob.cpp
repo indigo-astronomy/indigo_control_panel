@@ -103,7 +103,7 @@ void QIndigoBLOB::update() {
 			          !strcmp(m_item->blob.format, ".fit")) {
 				preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
 			}else if (!strcmp(m_item->blob.format, ".raw")) {
-				preview = process_raw((unsigned char*)m_item->blob.value);
+				preview = process_raw((unsigned char*)m_item->blob.value, m_item->blob.size);
 			} else {
 				QPixmap pixmap(":resource/no-preview.png");
 				image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
@@ -297,7 +297,7 @@ QImage* QIndigoBLOB::process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_s
 }
 
 
-QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, int fits_size) {
+QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, unsigned long fits_size) {
 	fits_header header;
 	int *hist;
 
@@ -333,32 +333,50 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, int fits_size)
 }
 
 
-QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer) {
+QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer, unsigned long raw_size) {
 	int *hist;
 	int bitpix;
+
+	if (sizeof(indigo_raw_header) > raw_size) {
+		indigo_error("RAW: Image buffer is too short: can not fit the header (%dB)", raw_size);
+		return nullptr;
+	}
+
 	indigo_raw_header *header = (indigo_raw_header*)raw_image_buffer;
 	char *raw_data = (char*)raw_image_buffer + sizeof(indigo_raw_header);
 
-	if (header->signature == INDIGO_RAW_MONO16) {
+	int pixel_count = header->height * header->width;
+
+	if (header->signature == INDIGO_RAW_MONO16)
 		bitpix = 16;
+	else if (header->signature == INDIGO_RAW_MONO8)
+		bitpix = 8;
+	else {
+		indigo_error("RAW: Unsupported image format (%d)", header->signature);
+		return nullptr;
+	}
+
+	if ((pixel_count * bitpix / 8 + sizeof(indigo_raw_header)) > raw_size) {
+		indigo_error("RAW: Image buffer is too short: can not fit the image (%dB)", raw_size);
+		return nullptr;
+	}
+
+	if (header->signature == INDIGO_RAW_MONO16) {
 		hist = (int*)malloc(65536*sizeof(int));
 		memset(hist, 0, 65536*sizeof(int));
-		int pixel_count = header->height * header->width;
 		uint16_t* buf = (uint16_t*)raw_data;
 		for (int pix = 0; pix < pixel_count; ++pix) {
 			hist[*buf++]++;
 		}
 	} else if (header->signature == INDIGO_RAW_MONO8) {
-		bitpix = 8;
 		hist = (int*)malloc(256*sizeof(int));
 		memset(hist, 0, 256*sizeof(int));
-		int pixel_count = header->height * header->width;
 		uint8_t* buf = (uint8_t*)raw_data;
 		for (int pix = 0; pix < pixel_count; ++pix) {
 			hist[*buf++]++;
 		}
 	} else {
-		indigo_error("RAW: Unsupported image format (%d)", header->signature);
+		// should not happen - handled above
 		return nullptr;
 	}
 
