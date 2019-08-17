@@ -75,10 +75,10 @@ typedef struct fits_header {
 	int data_offset;
 } fits_header;
 
-int fits_read_header(const uint8_t *fits_data, fits_header *header);
+int fits_read_header(const uint8_t *fits_data, int fits_size, fits_header *header);
 int fits_get_buffer_size(fits_header *header);
-int fits_process_data(const uint8_t *fits_data, fits_header *header, char *native_data);
-int fits_process_data_with_hist(const uint8_t *fits_data, fits_header *header, char *native_data, int *hist);
+int fits_process_data(const uint8_t *fits_data, int fits_size, fits_header *header, char *native_data);
+int fits_process_data_with_hist(const uint8_t *fits_data, int fits_size, fits_header *header, char *native_data, int *hist);
 
 #ifdef __cplusplus
 }

@@ -101,7 +101,7 @@ void QIndigoBLOB::update() {
 				preview = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
 			}else if (!strcmp(m_item->blob.format, ".fits") ||
 			          !strcmp(m_item->blob.format, ".fit")) {
-				preview = process_fits((unsigned char*)m_item->blob.value);
+				preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
 			}else if (!strcmp(m_item->blob.format, ".raw")) {
 				preview = process_raw((unsigned char*)m_item->blob.value);
 			} else {
@@ -297,12 +297,12 @@ QImage* QIndigoBLOB::process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_s
 }
 
 
-QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer) {
+QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, int fits_size) {
 	fits_header header;
 	int *hist;
 
 
-	int res = fits_read_header(raw_fits_buffer, &header);
+	int res = fits_read_header(raw_fits_buffer, fits_size, &header);
 	if (res != FITS_OK) {
 		indigo_error("FITS: Error parsing header");
 		return nullptr;
@@ -319,7 +319,7 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer) {
 
 	char *fits_data = (char*)malloc(fits_get_buffer_size(&header));
 
-	res = fits_process_data_with_hist(raw_fits_buffer, &header, fits_data, hist);
+	res = fits_process_data_with_hist(raw_fits_buffer, fits_size, &header, fits_data, hist);
 	if (res != FITS_OK) {
 		indigo_error("FITS: Error processing data");
 		return nullptr;

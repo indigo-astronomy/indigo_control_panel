@@ -207,10 +207,12 @@ static int fits_header_parse_line(fits_header *header, const uint8_t line[80]) {
 }
 
 
-int fits_read_header(const uint8_t *fits_data, fits_header *header) {
+int fits_read_header(const uint8_t *fits_data, int fits_size, fits_header *header) {
 	const uint8_t *ptr8 = fits_data;
 	int lines_read, i, ret;
 	size_t size;
+
+	if (fits_size < 2880) return FITS_INVALIDDATA;
 
 	lines_read = 1; // to account for first header line, SIMPLE or XTENSION which is not included in packet...
 	fits_header_init(header, STATE_SIMPLE);
@@ -258,13 +260,18 @@ int fits_get_buffer_size(fits_header *header) {
 	return size;
 }
 
-int fits_process_data(const uint8_t *fits_data, fits_header *header, char *native_data) {
+int fits_process_data(const uint8_t *fits_data, int fits_size, fits_header *header, char *native_data) {
 	int little_endian = 1;
 	int size = 1;
 	for (int i = 0; i < header->naxis; i++){
 		size *= header->naxisn[i];
 	}
-	indigo_log("size = %d\n", size);
+
+	indigo_debug("size = %d min_size = %d fits_size = %d\n", size, size * header->bitpix/8 + header->data_offset, fits_size);
+	if ((size * header->bitpix/8 + header->data_offset) > fits_size) {
+		return FITS_INVALIDDATA;
+	}
+
 	if (header->bitpix == 16 && header->naxis == 2) {
 		short *raw = (short *)(fits_data + header->data_offset);
 		short *native = (short *)native_data;
@@ -293,13 +300,18 @@ int fits_process_data(const uint8_t *fits_data, fits_header *header, char *nativ
 }
 
 
-int fits_process_data_with_hist(const uint8_t *fits_data, fits_header *header, char *native_data, int *hist) {
+int fits_process_data_with_hist(const uint8_t *fits_data, int fits_size, fits_header *header, char *native_data, int *hist) {
 	int little_endian = 1;
 	int size = 1;
 	for (int i = 0; i < header->naxis; i++){
 		size *= header->naxisn[i];
 	}
-	indigo_log("size = %d\n", size);
+
+	indigo_debug("size = %d min_size = %d fits_size = %d\n", size, size * header->bitpix/8 + header->data_offset, fits_size);
+	if ((size * header->bitpix/8 + header->data_offset) > fits_size) {
+		return FITS_INVALIDDATA;
+	}
+
 	if (header->bitpix == 16 && header->naxis == 2) {
 		if (hist) memset(hist, 0, 65536 * sizeof (hist[0]));
 		short *raw = (short *)(fits_data + header->data_offset);

@@ -53,7 +53,7 @@ private:
 	virtual void apply();
 	bool save_blob_item_with_prefix(const char *prefix, char *file_name);
 	QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size);
-	QImage* process_fits(unsigned char *fits_buffer);
+	QImage* process_fits(unsigned char *fits_buffer, int fits_size);
 	QImage* process_raw(unsigned char *raw_image_buffer);
 	QImage* generate_preview(int width, int height, int pixel_format, char *image_data, int *hist, double white_threshold);
 };
