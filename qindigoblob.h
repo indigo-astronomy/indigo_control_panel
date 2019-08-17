@@ -33,13 +33,6 @@ public:
 	explicit QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent = nullptr);
 	virtual ~QIndigoBLOB();
 
-	virtual void update();
-	virtual void reset();
-	virtual void apply();
-	bool save_blob_item_with_prefix(const char *prefix, char *file_name);
-	QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size);
-	QImage* process_fits(unsigned char *fits_buffer);
-
 signals:
 
 public slots:
@@ -54,6 +47,14 @@ private:
 	QLineEdit* text;
 	QImage* preview;
 	bool m_dirty;
+
+	virtual void update();
+	virtual void reset();
+	virtual void apply();
+	bool save_blob_item_with_prefix(const char *prefix, char *file_name);
+	QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size);
+	QImage* process_fits(unsigned char *fits_buffer);
+	QImage* generate_preview(int width, int height, int pixel_format, char *image_data, int *hist, double white_threshold);
 };
 
 #endif // QINDIGOBLOB_H
