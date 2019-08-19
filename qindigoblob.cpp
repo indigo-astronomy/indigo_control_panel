@@ -95,25 +95,25 @@ void QIndigoBLOB::update() {
 	//  Apply update from indigo bus only if not being edited
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
-		if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL) && (preview == nullptr)) {
-			if (!strcmp(m_item->blob.format, ".jpeg") ||
-			    !strcmp(m_item->blob.format, ".jpg")) {
-				preview = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
-			}else if (!strcmp(m_item->blob.format, ".fits") ||
-			          !strcmp(m_item->blob.format, ".fit")) {
-				preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
-			}else if (!strcmp(m_item->blob.format, ".raw")) {
-				preview = process_raw((unsigned char*)m_item->blob.value, m_item->blob.size);
-			} else {
-				QPixmap pixmap(":resource/no-preview.png");
-				image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
-				return;
-			}
-			if (preview == nullptr) return;
-			QPixmap pixmap = QPixmap::fromImage(*preview);
+	}
+	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL) && (preview == nullptr)) {
+		if (!strcmp(m_item->blob.format, ".jpeg") ||
+		    !strcmp(m_item->blob.format, ".jpg")) {
+			preview = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+		}else if (!strcmp(m_item->blob.format, ".fits") ||
+		          !strcmp(m_item->blob.format, ".fit")) {
+			preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
+		}else if (!strcmp(m_item->blob.format, ".raw")) {
+			preview = process_raw((unsigned char*)m_item->blob.value, m_item->blob.size);
+		} else {
+			QPixmap pixmap(":resource/no-preview.png");
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 			return;
 		}
+		if (preview == nullptr) return;
+		QPixmap pixmap = QPixmap::fromImage(*preview);
+		image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
+		return;
 	}
 	delete(preview);
 	preview = nullptr;
