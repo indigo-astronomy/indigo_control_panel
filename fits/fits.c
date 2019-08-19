@@ -231,11 +231,6 @@ int fits_read_header(const uint8_t *fits_data, int fits_size, fits_header *heade
 		return FITS_INVALIDDATA;
 	}
 
-	if (!header->rgb && header->naxis != 2) {
-		indigo_error("unsupported number of dimensions, NAXIS = %d\n", header->naxis);
-		return FITS_INVALIDDATA;
-	}
-
 	if (header->blank_found && (header->bitpix == -32 || header->bitpix == -64)) {
 		indigo_log("BLANK keyword found but BITPIX = %d\n. Ignoring BLANK", header->bitpix);
 		header->blank_found = 0;
@@ -272,7 +267,7 @@ int fits_process_data(const uint8_t *fits_data, int fits_size, fits_header *head
 		return FITS_INVALIDDATA;
 	}
 
-	if (header->bitpix == 16 && header->naxis == 2) {
+	if (header->bitpix == 16 && header->naxis > 0) {
 		short *raw = (short *)(fits_data + header->data_offset);
 		short *native = (short *)native_data;
 		if (little_endian) {
@@ -288,7 +283,7 @@ int fits_process_data(const uint8_t *fits_data, int fits_size, fits_header *head
 			}
 		}
 		return FITS_OK;
-	} else if (header->bitpix == 8 && header->naxis == 2) {
+	} else if (header->bitpix == 8 && header->naxis > 0) {
 		uint8_t *raw = (uint8_t *)(fits_data + header->data_offset);
 		uint8_t *native = (uint8_t *)native_data;
 		for (int i = 0; i < size; i++) {
@@ -312,7 +307,7 @@ int fits_process_data_with_hist(const uint8_t *fits_data, int fits_size, fits_he
 		return FITS_INVALIDDATA;
 	}
 
-	if (header->bitpix == 16 && header->naxis == 2) {
+	if (header->bitpix == 16 && header->naxis > 0) {
 		if (hist) memset(hist, 0, 65536 * sizeof (hist[0]));
 		short *raw = (short *)(fits_data + header->data_offset);
 		uint16_t *native = (uint16_t *)native_data;
@@ -332,7 +327,7 @@ int fits_process_data_with_hist(const uint8_t *fits_data, int fits_size, fits_he
 			}
 		}
 		return FITS_OK;
-	} else if (header->bitpix == 8 && header->naxis == 2) {
+	} else if (header->bitpix == 8 && header->naxis > 0) {
 		if (hist) memset(hist, 0, 256*sizeof(hist[0]));
 		uint8_t *raw = (uint8_t *)(fits_data + header->data_offset);
 		uint8_t *native = (uint8_t *)native_data;

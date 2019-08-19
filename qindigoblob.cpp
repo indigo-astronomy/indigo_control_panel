@@ -300,7 +300,7 @@ QImage* QIndigoBLOB::process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_s
 QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, unsigned long fits_size) {
 	fits_header header;
 	int *hist;
-
+	pixel_format pix_format;
 
 	int res = fits_read_header(raw_fits_buffer, fits_size, &header);
 	if (res != FITS_OK) {
@@ -308,10 +308,18 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, unsigned long 
 		return nullptr;
 	}
 
-	if (header.bitpix==16) {
+	if ((header.bitpix==16) && (header.naxis == 2)){
 		hist = (int*)malloc(65536*sizeof(int));
-	} else if (header.bitpix==8) {
+		pix_format = MONO_16;
+	} else if ((header.bitpix==16) && (header.naxis == 3)){
+		hist = (int*)malloc(65536*sizeof(int));
+		pix_format = FITS_RGB_48;
+	} else if ((header.bitpix==8) && (header.naxis == 2)){
 		hist = (int*)malloc(256*sizeof(int));
+		pix_format = MONO_8;
+	} else if ((header.bitpix==8) && (header.naxis == 3)){
+		hist = (int*)malloc(256*sizeof(int));
+		pix_format = FITS_RGB_24;
 	} else {
 		indigo_error("FITS: Unsupported bitpix (BITPIX= %d)", header.bitpix);
 		return nullptr;
@@ -325,7 +333,7 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, unsigned long 
 		return nullptr;
 	}
 
-	QImage *img = generate_preview(header.naxisn[0], header.naxisn[1], header.bitpix, fits_data, hist, 0.005);
+	QImage *img = generate_preview(header.naxisn[0], header.naxisn[1], pix_format, fits_data, hist, 0.005);
 
 	free(hist);
 	free(fits_data);
@@ -335,6 +343,7 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, unsigned long 
 
 QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer, unsigned long raw_size) {
 	int *hist;
+	pixel_format pix_format;
 	int bitpix;
 
 	if (sizeof(indigo_raw_header) > raw_size) {
@@ -347,11 +356,24 @@ QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer, unsigned long 
 
 	int pixel_count = header->height * header->width;
 
-	if (header->signature == INDIGO_RAW_MONO16)
+	switch (header->signature) {
+	case INDIGO_RAW_MONO16:
+		pix_format = MONO_16;
 		bitpix = 16;
-	else if (header->signature == INDIGO_RAW_MONO8)
+		break;
+	case INDIGO_RAW_MONO8:
+		pix_format = MONO_8;
 		bitpix = 8;
-	else {
+		break;
+	case INDIGO_RAW_RGB24:
+		pix_format = RAW_RGB_24;
+		bitpix = 8;
+		break;
+	case INDIGO_RAW_RGB48:
+		pix_format = RAW_RGB_48;
+		bitpix = 16;
+		break;
+	default:
 		indigo_error("RAW: Unsupported image format (%d)", header->signature);
 		return nullptr;
 	}
@@ -361,14 +383,16 @@ QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer, unsigned long 
 		return nullptr;
 	}
 
-	if (header->signature == INDIGO_RAW_MONO16) {
+	if ((header->signature == INDIGO_RAW_MONO16) ||
+	    (header->signature == INDIGO_RAW_RGB48)) {
 		hist = (int*)malloc(65536*sizeof(int));
 		memset(hist, 0, 65536*sizeof(int));
 		uint16_t* buf = (uint16_t*)raw_data;
 		for (int pix = 0; pix < pixel_count; ++pix) {
 			hist[*buf++]++;
 		}
-	} else if (header->signature == INDIGO_RAW_MONO8) {
+	} else if ((header->signature == INDIGO_RAW_MONO8) ||
+	           (header->signature == INDIGO_RAW_RGB24)) {
 		hist = (int*)malloc(256*sizeof(int));
 		memset(hist, 0, 256*sizeof(int));
 		uint8_t* buf = (uint8_t*)raw_data;
@@ -380,7 +404,7 @@ QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer, unsigned long 
 		return nullptr;
 	}
 
-	QImage *img = generate_preview(header->width, header->height, bitpix, raw_data, hist, 0.005);
+	QImage *img = generate_preview(header->width, header->height, pix_format, raw_data, hist, 0.005);
 
 	free(hist);
 	return img;
@@ -392,11 +416,18 @@ QImage* QIndigoBLOB::generate_preview(int width, int height, int pix_format, cha
 	int pix_cnt = width * height;
 	int thresh = white_threshold * pix_cnt;
 
-	if (pix_format == 8) {
+	switch (pix_format) {
+	case MONO_8:
+	case RAW_RGB_24:
+	case FITS_RGB_24:
 		max = 255;
-	} else if (pix_format == 16) {
+		break;
+	case MONO_16:
+	case RAW_RGB_48:
+	case FITS_RGB_48:
 		max = 65535;
-	} else {
+		break;
+	default:
 		indigo_error("PREVIEW: Unsupported pixel format (%d)", pix_format);
 		return nullptr;
 	}
@@ -416,24 +447,100 @@ QImage* QIndigoBLOB::generate_preview(int width, int height, int pix_format, cha
 	indigo_debug("PREVIEW: pix_format = %d sum = %d thresh = %d max = %d min = %d", pix_format, sum, thresh, max, min);
 
 	QImage* img = new QImage(width, height, QImage::Format_RGB888);
-	if (pix_format == 8) {
+	if (pix_format == MONO_8) {
 		uint8_t* buf = (uint8_t*)image_data;
+		int index = 0;
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
-				int value = buf[y * width + x] - min;
+				int value = buf[index++] - min;
 				if (value >= range) value = 255;
 				else value *= scale;
 				img->setPixel(x, y, qRgb(value, value, value));
 			}
 		}
-	} else if (pix_format == 16) {
+	} else if (pix_format == MONO_16) {
 		uint16_t* buf = (uint16_t*)image_data;
+		int index = 0;
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
-				int value = buf[y * width + x] - min;
+				int value = buf[index++] - min;
 				if (value >= range) value = 255;
 				else value *= scale;
 				img->setPixel(x, y, qRgb(value, value, value));
+			}
+		}
+	} else if (pix_format == FITS_RGB_24) {
+		int channel_offest = width * height;
+		uint8_t* buf = (uint8_t*)image_data;
+		int index = 0;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				int value_r = buf[index] - min;
+				int value_g = buf[index + channel_offest] - min;
+				int value_b = buf[index + 2 * channel_offest] - min;
+				index++;
+				if (value_r >= range) value_r = 255;
+				else value_r *= scale;
+				if (value_g >= range) value_g = 255;
+				else value_g *= scale;
+				if (value_b >= range) value_b = 255;
+				else value_b *= scale;
+				img->setPixel(x, y, qRgb(value_r, value_g, value_b));
+			}
+		}
+	} else if (pix_format == FITS_RGB_48) {
+		int channel_offest = width * height;
+		uint16_t* buf = (uint16_t*)image_data;
+		int index = 0;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				int value_r = buf[index] - min;
+				int value_g = buf[index + channel_offest] - min;
+				int value_b = buf[index + 2 * channel_offest] - min;
+				index++;
+				if (value_r >= range) value_r = 255;
+				else value_r *= scale;
+				if (value_g >= range) value_g = 255;
+				else value_g *= scale;
+				if (value_b >= range) value_b = 255;
+				else value_b *= scale;
+				img->setPixel(x, y, qRgb(value_r, value_g, value_b));
+			}
+		}
+	} else if (pix_format == RAW_RGB_24) {
+		uint8_t* buf = (uint8_t*)image_data;
+		int index = 0;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				int value_r = buf[index++] - min;
+				int value_g = buf[index++] - min;
+				int value_b = buf[index++] - min;
+
+				if (value_r >= range) value_r = 255;
+				else value_r *= scale;
+				if (value_g >= range) value_g = 255;
+				else value_g *= scale;
+				if (value_b >= range) value_b = 255;
+				else value_b *= scale;
+				img->setPixel(x, y, qRgb(value_r, value_g, value_b));
+			}
+		}
+	} else if (pix_format == RAW_RGB_48) {
+		uint16_t* buf = (uint16_t*)image_data;
+		int index = 0;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				int value_r = buf[index++] - min;
+				int value_g = buf[index++] - min;
+				int value_b = buf[index++] - min;
+
+				if (value_r >= range) value_r = 255;
+				else value_r *= scale;
+				if (value_g >= range) value_g = 255;
+				else value_g *= scale;
+				if (value_b >= range) value_b = 255;
+				else value_b *= scale;
+				img->setPixel(x, y, qRgb(value_r, value_g, value_b));
 			}
 		}
 	} else {

@@ -27,6 +27,17 @@
 #include "logger.h"
 
 
+typedef enum {
+	MONO_8 = 1,
+	MONO_16 = 2,
+	MONO_32 = 3,
+	RAW_RGB_24 = 4,
+	RAW_RGB_48 = 5,
+	FITS_RGB_24 = 6,
+	FITS_RGB_48 = 7,
+} pixel_format;
+
+
 class QIndigoBLOB : public QWidget, public QIndigoItem {
 	Q_OBJECT
 public:
