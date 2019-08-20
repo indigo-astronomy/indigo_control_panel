@@ -29,7 +29,8 @@ SOURCES += \
 	qindigolight.cpp \
 	qindigoblob.cpp \
 	qindigoservers.cpp \
-	fits/fits.c
+	fits/fits.c \
+	debayer/debayer.c \
 
 
 RESOURCES += \
@@ -94,6 +95,8 @@ HEADERS += \
 	qindigoservers.h \
 	logger.h \
 	fits/fits.h \
+	debayer/debayer.h \
+	debayer/pixelformat.h \
 	conf.h
 
 

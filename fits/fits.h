@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Rumen G.Bogdanovski & David Hulse
+// Copyright (c) 2019 Rumen G.Bogdanovski
 // All rights reserved.
 //
 // Parts based on Paras Chadha code
@@ -33,8 +33,6 @@ typedef enum fits_error {
 	FITS_INVALIDDATA = -1,
 } fits_error;
 
-//#define indigo_error printf
-//#define indigo_log printf
 
 typedef enum fits_headerState {
 	STATE_SIMPLE,
