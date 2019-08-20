@@ -107,6 +107,9 @@ public slots:
 	void on_servers_act();
 	void on_exit_act();
 	void on_about_act();
+	void on_no_stretch();
+	void on_normal_stretch();
+	void on_hard_stretch();
 
 private:
 	QPlainTextEdit* mLog;

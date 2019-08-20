@@ -110,6 +110,28 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_system_locale_changed);
 
 	menu->addSeparator();
+	QActionGroup *stretch_group = new QActionGroup(this);
+	stretch_group->setExclusive(true);
+
+	act = menu->addAction("Preview Levels Stretch: N&one");
+	act->setCheckable(true);
+	if (conf.preview_stretch_level == STRETCH_NONE) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_no_stretch);
+	stretch_group->addAction(act);
+
+	act = menu->addAction("Preview Levels Stretch: &Normal");
+	act->setCheckable(true);
+	if (conf.preview_stretch_level == STRETCH_NORMAL) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_normal_stretch);
+	stretch_group->addAction(act);
+
+	act = menu->addAction("Preview Levels Stretch: &Hard");
+	act->setCheckable(true);
+	if (conf.preview_stretch_level == STRETCH_HARD) act->setChecked(true);
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_hard_stretch);
+	stretch_group->addAction(act);
+
+	menu->addSeparator();
 	QActionGroup *log_group = new QActionGroup(this);
 	log_group->setExclusive(true);
 
@@ -494,6 +516,27 @@ void BrowserWindow::on_use_system_locale_changed(bool status) {
 		on_property_log(nullptr, "Dot decimal separator will be used on next application start");
 	}
 	indigo_debug("%s\n", __FUNCTION__);
+}
+
+
+void BrowserWindow::on_no_stretch() {
+	conf.preview_stretch_level = STRETCH_NONE;
+	write_conf();
+	indigo_error("%s\n", __FUNCTION__);
+}
+
+
+void BrowserWindow::on_normal_stretch() {
+	conf.preview_stretch_level = STRETCH_NORMAL;
+	write_conf();
+	indigo_error("%s\n", __FUNCTION__);
+}
+
+
+void BrowserWindow::on_hard_stretch() {
+	conf.preview_stretch_level = STRETCH_HARD;
+	write_conf();
+	indigo_error("%s\n", __FUNCTION__);
 }
 
 

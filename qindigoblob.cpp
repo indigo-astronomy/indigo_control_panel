@@ -105,6 +105,25 @@ void QIndigoBLOB::update() {
 		}else if (!strcmp(m_item->blob.format, ".fits") ||
 		          !strcmp(m_item->blob.format, ".fit")) {
 			preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
+					 /* DUMMY TEST CODE */
+					/*
+					  FILE *file;
+					  char *buffer;
+					  unsigned long fileLen;
+					  char name[100] = "fits/m16.fits";
+
+					  file = fopen(name, "rb");
+					  fseek(file, 0, SEEK_END);
+					  fileLen=ftell(file);
+					  fseek(file, 0, SEEK_SET);
+
+					  buffer=(char *)malloc(fileLen+1);
+
+					  fread(buffer, fileLen, 1, file);
+					  fclose(file);
+
+					  preview = process_fits((unsigned char*)buffer, fileLen+1);
+					*/
 		}else if (!strcmp(m_item->blob.format, ".raw")) {
 			preview = process_raw((unsigned char*)m_item->blob.value, m_item->blob.size);
 		} else {
@@ -355,7 +374,8 @@ QImage* QIndigoBLOB::process_fits(unsigned char *raw_fits_buffer, unsigned long 
 		}
 	}
 
-	QImage *img = generate_preview(header.naxisn[0], header.naxisn[1], pix_format, fits_data, hist, 0.005);
+	QImage *img = generate_preview(header.naxisn[0], header.naxisn[1],
+	        pix_format, fits_data, hist, preview_stretch_lut[conf.preview_stretch_level]);
 
 	free(hist);
 	free(fits_data);
@@ -426,7 +446,8 @@ QImage* QIndigoBLOB::process_raw(unsigned char *raw_image_buffer, unsigned long 
 		return nullptr;
 	}
 
-	QImage *img = generate_preview(header->width, header->height, pix_format, raw_data, hist, 0.005);
+	QImage *img = generate_preview(header->width, header->height,
+	        pix_format, raw_data, hist, preview_stretch_lut[conf.preview_stretch_level]);
 
 	free(hist);
 	return img;
