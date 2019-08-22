@@ -22,7 +22,7 @@
 #include "blobpreview.h"
 #include "conf.h"
 
-QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
+QImage* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size) {
 #if !defined(USE_LIBJPEG)
 
 	QImage* img = new QImage();
@@ -90,7 +90,7 @@ QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size) {
 }
 
 
-QImage* process_fits(unsigned char *raw_fits_buffer, unsigned long fits_size) {
+QImage* create_fits_preview(unsigned char *raw_fits_buffer, unsigned long fits_size) {
 	fits_header header;
 	int *hist;
 	unsigned int pix_format = 0;
@@ -146,7 +146,7 @@ QImage* process_fits(unsigned char *raw_fits_buffer, unsigned long fits_size) {
 		}
 	}
 
-	QImage *img = generate_preview(header.naxisn[0], header.naxisn[1],
+	QImage *img = create_preview(header.naxisn[0], header.naxisn[1],
 	        pix_format, fits_data, hist, preview_stretch_lut[conf.preview_stretch_level]);
 
 	free(hist);
@@ -155,7 +155,7 @@ QImage* process_fits(unsigned char *raw_fits_buffer, unsigned long fits_size) {
 }
 
 
-QImage* process_raw(unsigned char *raw_image_buffer, unsigned long raw_size) {
+QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_size) {
 	int *hist;
 	unsigned int pix_format;
 	int bitpix;
@@ -218,7 +218,7 @@ QImage* process_raw(unsigned char *raw_image_buffer, unsigned long raw_size) {
 		return nullptr;
 	}
 
-	QImage *img = generate_preview(header->width, header->height,
+	QImage *img = create_preview(header->width, header->height,
 	        pix_format, raw_data, hist, preview_stretch_lut[conf.preview_stretch_level]);
 
 	free(hist);
@@ -226,7 +226,7 @@ QImage* process_raw(unsigned char *raw_image_buffer, unsigned long raw_size) {
 }
 
 
-QImage* generate_preview(int width, int height, int pix_format, char *image_data, int *hist, double white_threshold) {
+QImage* create_preview(int width, int height, int pix_format, char *image_data, int *hist, double white_threshold) {
 	int range, max, min = 0, sum;
 	int pix_cnt = width * height;
 	int thresh = white_threshold * pix_cnt;

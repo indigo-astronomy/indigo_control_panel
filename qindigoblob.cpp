@@ -24,12 +24,10 @@
 #include <QDesktopServices>
 #include <QStandardPaths>
 #include <QHBoxLayout>
+#include <QPixmap>
 #include "qindigoblob.h"
 #include "conf.h"
 #include "blobpreview.h"
-#include <debayer/pixelformat.h>
-#include <QPixmap>
-#include <QBitmap>
 
 
 QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent)
@@ -95,14 +93,14 @@ void QIndigoBLOB::update() {
 		    !strcmp(m_item->blob.format, ".jpg") ||
 		    !strcmp(m_item->blob.format, ".JPG") ||
 		    !strcmp(m_item->blob.format, ".JPEG")) {
-			preview = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
+			preview = create_jpeg_preview((unsigned char*)m_item->blob.value, m_item->blob.size);
 		} else if (!strcmp(m_item->blob.format, ".fits") ||
 		           !strcmp(m_item->blob.format, ".fit") ||
 		           !strcmp(m_item->blob.format, ".fts") ||
 		           !strcmp(m_item->blob.format, ".FITS") ||
 		           !strcmp(m_item->blob.format, ".FIT") ||
 		           !strcmp(m_item->blob.format, ".FTS")) {
-			preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
+			preview = create_fits_preview((unsigned char*)m_item->blob.value, m_item->blob.size);
 					 /* DUMMY TEST CODE */
 					/*
 					  FILE *file;
@@ -120,11 +118,11 @@ void QIndigoBLOB::update() {
 					  fread(buffer, fileLen, 1, file);
 					  fclose(file);
 
-					  preview = process_fits((unsigned char*)buffer, fileLen+1);
+					  preview = create_fits_preview((unsigned char*)buffer, fileLen+1);
 					*/
 		} else if (!strcmp(m_item->blob.format, ".raw") ||
 		           !strcmp(m_item->blob.format, ".RAW")) {
-			preview = process_raw((unsigned char*)m_item->blob.value, m_item->blob.size);
+			preview = create_raw_preview((unsigned char*)m_item->blob.value, m_item->blob.size);
 		} else {
 			QPixmap pixmap(":resource/no-preview.png");
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
@@ -201,7 +199,7 @@ void QIndigoBLOB::save_blob_item() {
 }
 
 
-void QIndigoBLOB::preview_blob_item() {
+void QIndigoBLOB::view_blob_item() {
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != nullptr)) {
 		char file_name[PATH_LEN];
 		char url[PATH_LEN+100];
