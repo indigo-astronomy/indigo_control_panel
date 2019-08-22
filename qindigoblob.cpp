@@ -100,10 +100,16 @@ void QIndigoBLOB::update() {
 	}
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL) && (preview == nullptr)) {
 		if (!strcmp(m_item->blob.format, ".jpeg") ||
-		    !strcmp(m_item->blob.format, ".jpg")) {
+		    !strcmp(m_item->blob.format, ".jpg") ||
+		    !strcmp(m_item->blob.format, ".JPG") ||
+		    !strcmp(m_item->blob.format, ".JPEG")) {
 			preview = process_jpeg((unsigned char*)m_item->blob.value, m_item->blob.size);
-		}else if (!strcmp(m_item->blob.format, ".fits") ||
-		          !strcmp(m_item->blob.format, ".fit")) {
+		} else if (!strcmp(m_item->blob.format, ".fits") ||
+		           !strcmp(m_item->blob.format, ".fit") ||
+		           !strcmp(m_item->blob.format, ".fts") ||
+		           !strcmp(m_item->blob.format, ".FITS") ||
+		           !strcmp(m_item->blob.format, ".FIT") ||
+		           !strcmp(m_item->blob.format, ".FTS")) {
 			preview = process_fits((unsigned char*)m_item->blob.value, m_item->blob.size);
 					 /* DUMMY TEST CODE */
 					/*
@@ -124,7 +130,8 @@ void QIndigoBLOB::update() {
 
 					  preview = process_fits((unsigned char*)buffer, fileLen+1);
 					*/
-		}else if (!strcmp(m_item->blob.format, ".raw")) {
+		} else if (!strcmp(m_item->blob.format, ".raw") ||
+		           !strcmp(m_item->blob.format, ".RAW")) {
 			preview = process_raw((unsigned char*)m_item->blob.value, m_item->blob.size);
 		} else {
 			QPixmap pixmap(":resource/no-preview.png");
