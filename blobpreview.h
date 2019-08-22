@@ -16,41 +16,21 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef _BLOBPREVIEW_H
+#define _BLOBPREVIEW_H
 
-#ifndef QINDIGOBLOB_H
-#define QINDIGOBLOB_H
+#include <QImage>
 
-#include <QLabel>
-#include <QLineEdit>
-#include <QWidget>
-#include "qindigoswitch.h"
-#include "logger.h"
+#if !defined(INDIGO_WINDOWS)
+#define USE_LIBJPEG
+#endif
+#if defined(USE_LIBJPEG)
+#include <jpeglib.h>
+#endif
 
-class QIndigoBLOB : public QWidget, public QIndigoItem {
-	Q_OBJECT
-public:
-	explicit QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent = nullptr);
-	virtual ~QIndigoBLOB();
+QImage* process_jpeg(unsigned char *jpg_buffer, unsigned long jpg_size);
+QImage* process_fits(unsigned char *fits_buffer, unsigned long fits_size);
+QImage* process_raw(unsigned char *raw_image_buffer, unsigned long raw_size);
+QImage* generate_preview(int width, int height, int pixel_format, char *image_data, int *hist, double white_threshold);
 
-signals:
-
-public slots:
-	void dirty();
-	void save_blob_item();
-	void preview_blob_item();
-
-private:
-	Logger* m_logger;
-	QLabel* label;
-	QLabel* image;
-	QLineEdit* text;
-	QImage* preview;
-	bool m_dirty;
-
-	virtual void update();
-	virtual void reset();
-	virtual void apply();
-	bool save_blob_item_with_prefix(const char *prefix, char *file_name);
-};
-
-#endif // QINDIGOBLOB_H
+#endif /* _BLOBPREVIEW_H */
