@@ -420,7 +420,7 @@ QImage* create_preview(int width, int height, int pix_format, char *image_data, 
 QImage* create_preview(indigo_property *property, indigo_item *item) {
 	QImage *preview = nullptr;
 	if (property->type != INDIGO_BLOB_VECTOR) return nullptr;
-	if ((property->state == INDIGO_OK_STATE) && (item->blob.value != NULL) && (preview == nullptr)) {
+	if ((property->state == INDIGO_OK_STATE) && (item->blob.value != NULL)) {
 		if (!strcmp(item->blob.format, ".jpeg") ||
 			!strcmp(item->blob.format, ".jpg") ||
 			!strcmp(item->blob.format, ".JPG") ||
