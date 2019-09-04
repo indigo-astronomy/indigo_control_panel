@@ -89,46 +89,12 @@ void QIndigoBLOB::update() {
 		text->setText(m_item->blob.url);
 	}
 	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL) && (preview == nullptr)) {
-		if (!strcmp(m_item->blob.format, ".jpeg") ||
-		    !strcmp(m_item->blob.format, ".jpg") ||
-		    !strcmp(m_item->blob.format, ".JPG") ||
-		    !strcmp(m_item->blob.format, ".JPEG")) {
-			preview = create_jpeg_preview((unsigned char*)m_item->blob.value, m_item->blob.size);
-		} else if (!strcmp(m_item->blob.format, ".fits") ||
-		           !strcmp(m_item->blob.format, ".fit") ||
-		           !strcmp(m_item->blob.format, ".fts") ||
-		           !strcmp(m_item->blob.format, ".FITS") ||
-		           !strcmp(m_item->blob.format, ".FIT") ||
-		           !strcmp(m_item->blob.format, ".FTS")) {
-			preview = create_fits_preview((unsigned char*)m_item->blob.value, m_item->blob.size);
-					 /* DUMMY TEST CODE */
-					/*
-					  FILE *file;
-					  char *buffer;
-					  unsigned long fileLen;
-					  char name[100] = "fits/m16.fits";
-
-					  file = fopen(name, "rb");
-					  fseek(file, 0, SEEK_END);
-					  fileLen=ftell(file);
-					  fseek(file, 0, SEEK_SET);
-
-					  buffer=(char *)malloc(fileLen+1);
-
-					  fread(buffer, fileLen, 1, file);
-					  fclose(file);
-
-					  preview = create_fits_preview((unsigned char*)buffer, fileLen+1);
-					*/
-		} else if (!strcmp(m_item->blob.format, ".raw") ||
-		           !strcmp(m_item->blob.format, ".RAW")) {
-			preview = create_raw_preview((unsigned char*)m_item->blob.value, m_item->blob.size);
-		} else {
+		preview = create_preview(m_property, m_item);
+		if (preview == nullptr) {
 			QPixmap pixmap(":resource/no-preview.png");
 			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 			return;
 		}
-		if (preview == nullptr) return;
 		QPixmap pixmap = QPixmap::fromImage(*preview);
 		image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 		return;

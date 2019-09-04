@@ -416,3 +416,46 @@ QImage* create_preview(int width, int height, int pix_format, char *image_data, 
 	}
 	return img;
 }
+
+QImage* create_preview(indigo_property *property, indigo_item *item) {
+	QImage *preview = nullptr;
+	if (property->type != INDIGO_BLOB_VECTOR) return nullptr;
+	if ((property->state == INDIGO_OK_STATE) && (item->blob.value != NULL) && (preview == nullptr)) {
+		if (!strcmp(item->blob.format, ".jpeg") ||
+			!strcmp(item->blob.format, ".jpg") ||
+			!strcmp(item->blob.format, ".JPG") ||
+			!strcmp(item->blob.format, ".JPEG")) {
+			preview = create_jpeg_preview((unsigned char*)item->blob.value, item->blob.size);
+		} else if (!strcmp(item->blob.format, ".fits") ||
+				   !strcmp(item->blob.format, ".fit") ||
+				   !strcmp(item->blob.format, ".fts") ||
+				   !strcmp(item->blob.format, ".FITS") ||
+				   !strcmp(item->blob.format, ".FIT") ||
+				   !strcmp(item->blob.format, ".FTS")) {
+			preview = create_fits_preview((unsigned char*)item->blob.value, item->blob.size);
+					 /* DUMMY TEST CODE */
+					/*
+					  FILE *file;
+					  char *buffer;
+					  unsigned long fileLen;
+					  char name[100] = "fits/m16.fits";
+
+					  file = fopen(name, "rb");
+					  fseek(file, 0, SEEK_END);
+					  fileLen=ftell(file);
+					  fseek(file, 0, SEEK_SET);
+
+					  buffer=(char *)malloc(fileLen+1);
+
+					  fread(buffer, fileLen, 1, file);
+					  fclose(file);
+
+					  preview = create_fits_preview((unsigned char*)buffer, fileLen+1);
+					*/
+		} else if (!strcmp(item->blob.format, ".raw") ||
+				   !strcmp(item->blob.format, ".RAW")) {
+			preview = create_raw_preview((unsigned char*)item->blob.value, item->blob.size);
+		}
+	}
+	return preview;
+}
