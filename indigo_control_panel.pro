@@ -38,6 +38,7 @@ RESOURCES += \
 	qdarkstyle/style.qrc \
 	resource/control_panel.qss \
 	resource/appicon.png \
+	resource/indigo_logo.png \
 	resource/bonjour_service.png \
 	resource/manual_service.png \
 	resource/no-preview.png \

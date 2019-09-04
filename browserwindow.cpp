@@ -574,7 +574,7 @@ void BrowserWindow::on_log_trace() {
 
 void BrowserWindow::on_about_act() {
 	QMessageBox msgBox(this);
-	QPixmap pixmap(":resource/appicon.png");
+	QPixmap pixmap(":resource/indigo_logo.png");
 	msgBox.setWindowTitle("About INDIGO Panel");
 	msgBox.setTextFormat(Qt::RichText);
 	msgBox.setIconPixmap(pixmap.scaledToWidth(96, Qt::SmoothTransformation));
@@ -591,5 +591,5 @@ void BrowserWindow::on_about_act() {
 		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
 	);
 	msgBox.exec();
-	indigo_debug ("%s\n", __FUNCTION__);
+	indigo_debug("%s\n", __FUNCTION__);
 }
