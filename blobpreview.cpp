@@ -22,9 +22,10 @@
 #include "blobpreview.h"
 #include "conf.h"
 
-QHash<QString, QImage*> preview_hash;
+static QHash<QString, QImage*> preview_hash;
+static pthread_mutex_t preview_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-QString create_key(indigo_property *property, indigo_item *item) {
+static QString create_key(indigo_property *property, indigo_item *item) {
 	QString key(property->device);
 	key.append(".");
 	key.append(property->name);
@@ -33,33 +34,7 @@ QString create_key(indigo_property *property, indigo_item *item) {
 	return key;
 }
 
-
-bool create_cached_preview(indigo_property *property, indigo_item *item) {
-	QString key = create_key(property, item);
-	delete_cached_preview(property, item);
-	QImage *preview = create_preview(property, item);
-	indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
-	if (preview != nullptr) {
-		preview_hash.insert(key, preview);
-		return true;
-	}
-	return false;
-}
-
-
-QImage* get_cached_preview(indigo_property *property, indigo_item *item) {
-	QString key = create_key(property, item);
-	if (preview_hash.contains(key)) {
-		QImage *preview = preview_hash.value(key);
-		indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
-		return preview;
-	}
-	indigo_debug("call: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
-	return nullptr;
-}
-
-
-bool delete_cached_preview(indigo_property *property, indigo_item *item) {
+static bool _delete_cached_preview(indigo_property *property, indigo_item *item) {
 	QString key = create_key(property, item);
 	if (preview_hash.contains(key)) {
 		QImage *preview = preview_hash.value(key);
@@ -70,6 +45,45 @@ bool delete_cached_preview(indigo_property *property, indigo_item *item) {
 		indigo_debug("call: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
 	}
 	return (bool)preview_hash.remove(key);
+}
+
+
+bool create_cached_preview(indigo_property *property, indigo_item *item) {
+	pthread_mutex_lock(&preview_mutex);
+	QString key = create_key(property, item);
+	_delete_cached_preview(property, item);
+	QImage *preview = create_preview(property, item);
+	indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
+	if (preview != nullptr) {
+		preview_hash.insert(key, preview);
+		pthread_mutex_unlock(&preview_mutex);
+		return true;
+	}
+	pthread_mutex_unlock(&preview_mutex);
+	return false;
+}
+
+
+QImage* get_cached_preview(indigo_property *property, indigo_item *item) {
+	pthread_mutex_lock(&preview_mutex);
+	QString key = create_key(property, item);
+	if (preview_hash.contains(key)) {
+		QImage *preview = preview_hash.value(key);
+		indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
+		pthread_mutex_unlock(&preview_mutex);
+		return preview;
+	}
+	indigo_debug("call: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
+	pthread_mutex_unlock(&preview_mutex);
+	return nullptr;
+}
+
+
+bool delete_cached_preview(indigo_property *property, indigo_item *item) {
+	pthread_mutex_lock(&preview_mutex);
+	bool success = _delete_cached_preview(property, item);
+	pthread_mutex_unlock(&preview_mutex);
+	return success;
 }
 
 
