@@ -35,6 +35,9 @@ CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2);
 git checkout ${GIT_VERSION} >/dev/null 2>&1
 [ $? -ne 0 ] && { echo "version '${1}' does not exists in git"; exit 1; }
 
+# Build dependencies
+./build_libs.sh
+
 # Create entry in debian/changelog.
 dch --create --package "indigo-control-panel" --newversion ${GIT_VERSION} --distribution unstable --nomultimaint -t "Build from official upstream."
 
