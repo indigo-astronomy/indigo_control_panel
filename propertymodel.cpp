@@ -22,6 +22,7 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <unistd.h>
+#include "blobpreview.h"
 #include "propertymodel.h"
 #include "qindigoproperty.h"
 #include <indigo/indigo_names.h>
@@ -487,6 +488,32 @@ void PropertyModel::enable_blobs(bool on) {
 						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_NEVER);
 					}
 					indigo_debug("BLOB %s.%s -> mode = %d\n", property->device, property->name, on);
+				}
+			}
+		}
+	}
+}
+
+
+void PropertyModel::rebuild_blob_previews() {
+	for (int dev_index = 0; dev_index < root.size(); dev_index++) {
+		DeviceNode* dev_node = static_cast<DeviceNode*>(root.children[dev_index]);
+		if (dev_node == nullptr) continue;
+		for (int group_index = 0; group_index < dev_node->size(); group_index++) {
+			GroupNode* group_node = static_cast<GroupNode*>(dev_node->children[group_index]);
+			if (group_node == nullptr) continue;
+			for (int prop_index = 0; prop_index < group_node->size(); prop_index++) {
+				PropertyNode* prop_node = static_cast<PropertyNode*>(group_node->children[prop_index]);
+				if (prop_node == nullptr) continue;
+				indigo_property *property = prop_node->property;
+				if (property == nullptr) continue;
+				if (property->type == INDIGO_BLOB_VECTOR) {
+					if (property->state == INDIGO_OK_STATE) {
+						for (int row = 0; row < property->count; row++) {
+							create_cached_preview(property, &property->items[row]);
+						}
+						indigo_debug("Rebuilt BLOB previews for %s.%s\n", property->device, property->name);
+					}
 				}
 			}
 		}

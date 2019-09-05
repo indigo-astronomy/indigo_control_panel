@@ -89,6 +89,7 @@ public:
 
 signals:
 	void enable_blobs(bool on);
+	void rebuild_blob_previews();
 
 public slots:
 	void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);

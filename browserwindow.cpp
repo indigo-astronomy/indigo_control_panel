@@ -250,6 +250,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
+	connect(this, &BrowserWindow::rebuild_blob_previews, mPropertyModel, &PropertyModel::rebuild_blob_previews);
 
 	//  Start up the client
 	IndigoClient::instance().start();
@@ -521,6 +522,8 @@ void BrowserWindow::on_use_system_locale_changed(bool status) {
 
 void BrowserWindow::on_no_stretch() {
 	conf.preview_stretch_level = STRETCH_NONE;
+	emit(rebuild_blob_previews());
+	repaint_property_window(current_path->node);
 	write_conf();
 	indigo_error("%s\n", __FUNCTION__);
 }
@@ -528,6 +531,8 @@ void BrowserWindow::on_no_stretch() {
 
 void BrowserWindow::on_normal_stretch() {
 	conf.preview_stretch_level = STRETCH_NORMAL;
+	emit(rebuild_blob_previews());
+	repaint_property_window(current_path->node);
 	write_conf();
 	indigo_error("%s\n", __FUNCTION__);
 }
@@ -535,6 +540,8 @@ void BrowserWindow::on_normal_stretch() {
 
 void BrowserWindow::on_hard_stretch() {
 	conf.preview_stretch_level = STRETCH_HARD;
+	emit(rebuild_blob_previews());
+	repaint_property_window(current_path->node);
 	write_conf();
 	indigo_error("%s\n", __FUNCTION__);
 }
