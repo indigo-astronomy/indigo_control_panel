@@ -510,7 +510,7 @@ void PropertyModel::rebuild_blob_previews() {
 				if (property->type == INDIGO_BLOB_VECTOR) {
 					if (property->state == INDIGO_OK_STATE) {
 						for (int row = 0; row < property->count; row++) {
-							create_cached_preview(property, &property->items[row]);
+							preview_cache.create(property, &property->items[row]);
 						}
 						indigo_debug("Rebuilt BLOB previews for %s.%s\n", property->device, property->name);
 					}

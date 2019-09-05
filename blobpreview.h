@@ -30,16 +30,36 @@
 #include <jpeglib.h>
 #endif
 
-// extern QHash<QString, QImage*> preview_hash;
-
 QImage* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size);
 QImage* create_fits_preview(unsigned char *fits_buffer, unsigned long fits_size);
 QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_size);
 QImage* create_preview(int width, int height, int pixel_format, char *image_data, int *hist, double white_threshold);
 QImage* create_preview(indigo_property *property, indigo_item *item);
 
-bool create_cached_preview(indigo_property *property, indigo_item *item);
-QImage* get_cached_preview(indigo_property *property, indigo_item *item);
-bool delete_cached_preview(indigo_property *property, indigo_item *item);
+class blob_preview_cache: QHash<QString, QImage*> {
+public:
+	blob_preview_cache(): preview_mutex(PTHREAD_MUTEX_INITIALIZER) {
+	};
+
+	~blob_preview_cache() {
+		blob_preview_cache::iterator i;
+		for (i = begin(); i != end(); ++i) {
+			QImage *preview = i.value();
+			if (preview != nullptr) delete(preview);
+		}
+	};
+
+private:
+	pthread_mutex_t preview_mutex;
+	QString create_key(indigo_property *property, indigo_item *item);
+	bool _remove(indigo_property *property, indigo_item *item);
+
+public:
+	bool create(indigo_property *property, indigo_item *item);
+	QImage* get(indigo_property *property, indigo_item *item);
+	bool remove(indigo_property *property, indigo_item *item);
+};
+
+extern blob_preview_cache preview_cache;
 
 #endif /* _BLOBPREVIEW_H */

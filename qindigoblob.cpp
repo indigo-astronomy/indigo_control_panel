@@ -86,7 +86,7 @@ void QIndigoBLOB::update() {
 		text->setText(m_item->blob.url);
 	}
 
-	QImage *preview = get_cached_preview(m_property, m_item);
+	QImage *preview = preview_cache.get(m_property, m_item);
 	if (preview == nullptr) {
 		QPixmap pixmap(":resource/no-preview.png");
 		image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
