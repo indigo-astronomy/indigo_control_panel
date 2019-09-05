@@ -58,6 +58,10 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 				}
 				create_cached_preview(property, &property->items[row]);
 			}
+		} else {
+			for (int row = 0; row < property->count; row++) {
+				delete_cached_preview(property, &property->items[row]);
+			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
 		break;
@@ -99,6 +103,10 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
 				}
 				create_cached_preview(property, &property->items[row]);
+			}
+		} else {
+			for (int row = 0; row < property->count; row++) {
+				delete_cached_preview(property, &property->items[row]);
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
