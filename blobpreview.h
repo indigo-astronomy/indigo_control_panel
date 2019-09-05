@@ -20,6 +20,7 @@
 #define _BLOBPREVIEW_H
 
 #include <QImage>
+#include <QHash>
 #include <indigo/indigo_client.h>
 
 #if !defined(INDIGO_WINDOWS)
@@ -29,10 +30,16 @@
 #include <jpeglib.h>
 #endif
 
+// extern QHash<QString, QImage*> preview_hash;
+
 QImage* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size);
 QImage* create_fits_preview(unsigned char *fits_buffer, unsigned long fits_size);
 QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_size);
 QImage* create_preview(int width, int height, int pixel_format, char *image_data, int *hist, double white_threshold);
 QImage* create_preview(indigo_property *property, indigo_item *item);
+
+bool create_cached_preview(indigo_property *property, indigo_item *item);
+QImage* get_cached_preview(indigo_property *property, indigo_item *item);
+bool delete_cached_preview(indigo_property *property, indigo_item *item);
 
 #endif /* _BLOBPREVIEW_H */

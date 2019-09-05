@@ -18,6 +18,7 @@
 
 
 #include <indigo/indigo_client.h>
+#include "blobpreview.h"
 #include "indigoclient.h"
 #include "conf.h"
 
@@ -55,6 +56,7 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 				}
+				create_cached_preview(property, &property->items[row]);
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
@@ -96,6 +98,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
 				}
+				create_cached_preview(property, &property->items[row]);
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
@@ -118,6 +121,12 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	Q_UNUSED(client);
 	Q_UNUSED(device);
 	indigo_debug("Deleting property [%s] on device [%s]\n", property->name, property->device);
+
+	if (property->type == INDIGO_BLOB_VECTOR) {
+		for (int row = 0; row < property->count; row++) {
+			delete_cached_preview(property, &property->items[row]);
+		}
+	}
 
 	indigo_property* p = new indigo_property;
 	strcpy(p->device, property->device);

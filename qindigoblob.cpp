@@ -37,8 +37,6 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 
-	preview = nullptr;
-
 	image = new QLabel();
 	image->setObjectName("INDIGO_property");
 
@@ -77,7 +75,6 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 
 
 QIndigoBLOB::~QIndigoBLOB() {
-	if (preview) delete preview;
 	//delete label;
 	//delete text;
 }
@@ -88,20 +85,14 @@ void QIndigoBLOB::update() {
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
 	}
-	if ((m_property->state == INDIGO_OK_STATE) && (m_item->blob.value != NULL) && (preview == nullptr)) {
-		preview = create_preview(m_property, m_item);
-		if (preview == nullptr) {
-			QPixmap pixmap(":resource/no-preview.png");
-			image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
-			return;
-		}
-		QPixmap pixmap = QPixmap::fromImage(*preview);
+
+	QImage *preview = get_cached_preview(m_property, m_item);
+	if (preview == nullptr) {
+		QPixmap pixmap(":resource/no-preview.png");
 		image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 		return;
 	}
-	delete(preview);
-	preview = nullptr;
-	QPixmap pixmap(":resource/no-preview.png");
+	QPixmap pixmap = QPixmap::fromImage(*preview);
 	image->setPixmap(pixmap.scaledToWidth(PREVIEW_WIDTH, Qt::SmoothTransformation));
 }
 

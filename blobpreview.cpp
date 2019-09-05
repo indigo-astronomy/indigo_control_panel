@@ -22,6 +22,57 @@
 #include "blobpreview.h"
 #include "conf.h"
 
+QHash<QString, QImage*> preview_hash;
+
+QString create_key(indigo_property *property, indigo_item *item) {
+	QString key(property->device);
+	key.append(".");
+	key.append(property->name);
+	key.append(".");
+	key.append(item->name);
+	return key;
+}
+
+
+bool create_cached_preview(indigo_property *property, indigo_item *item) {
+	QString key = create_key(property, item);
+	delete_cached_preview(property, item);
+	QImage *preview = create_preview(property, item);
+	indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
+	if (preview != nullptr) {
+		preview_hash.insert(key, preview);
+		return true;
+	}
+	return false;
+}
+
+
+QImage* get_cached_preview(indigo_property *property, indigo_item *item) {
+	QString key = create_key(property, item);
+	if (preview_hash.contains(key)) {
+		QImage *preview = preview_hash.value(key);
+		indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
+		return preview;
+	}
+	indigo_debug("call: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
+	return nullptr;
+}
+
+
+bool delete_cached_preview(indigo_property *property, indigo_item *item) {
+	QString key = create_key(property, item);
+	if (preview_hash.contains(key)) {
+		QImage *preview = preview_hash.value(key);
+		indigo_debug("call: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
+		if (preview != nullptr)
+			delete(preview);
+	} else {
+		indigo_debug("call: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
+	}
+	return (bool)preview_hash.remove(key);
+}
+
+
 QImage* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size) {
 #if !defined(USE_LIBJPEG)
 
@@ -433,7 +484,7 @@ QImage* create_preview(indigo_property *property, indigo_item *item) {
 				   !strcmp(item->blob.format, ".FIT") ||
 				   !strcmp(item->blob.format, ".FTS")) {
 			preview = create_fits_preview((unsigned char*)item->blob.value, item->blob.size);
-					 /* DUMMY TEST CODE */
+					/* DUMMY TEST CODE */
 					/*
 					  FILE *file;
 					  char *buffer;
