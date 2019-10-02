@@ -67,6 +67,10 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	rootLayout->setSizeConstraint(QLayout::SetMinimumSize);
 	central->setLayout(rootLayout);
 
+	//  Create log viewer
+	mLog = new QPlainTextEdit;
+	mLog->setReadOnly(true);
+
 	// Create menubar
 	QMenuBar *menu_bar = new QMenuBar;
 	QMenu *menu = new QMenu("&File");
@@ -80,6 +84,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act = menu->addAction(tr("&Exit"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_exit_act);
 
+	menu_bar->addMenu(menu);
+
+	menu = new QMenu("&Edit");
+	act = menu->addAction(tr("Clear &Log Window"));
+	connect(act, &QAction::triggered, mLog, &QPlainTextEdit::clear);
 	menu_bar->addMenu(menu);
 
 	menu = new QMenu("&Settings");
@@ -214,9 +223,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	hSplitter->setStretchFactor(2, 55);
 	propertyLayout->addWidget(hSplitter, 85);
 
-	//  Create log viewer
-	mLog = new QPlainTextEdit;
-	mLog->setReadOnly(true);
+
 	propertyLayout->addWidget(mLog, 15);
 
 	mServiceModel = new ServiceModel("_indigo._tcp");
@@ -341,12 +348,14 @@ void BrowserWindow::property_define_delete(indigo_property* property, const char
 		if (current_path->type == TREE_NODE_PROPERTY) {
 			if (!strcmp(current_path->device, property->device)) {
 				indigo_debug("SELECTED DEVICE deleted (Peoperty selected)\n");
+				current_path->ClearSelection();
 				clear_window();
 				return;
 			}
 		} else if (current_path->type == TREE_NODE_GROUP) {
 			if (!strcmp(current_path->device, property->device)) {
 				indigo_debug("SELECTED DEVICE deleted (Group selected)\n");
+				current_path->ClearSelection();
 				clear_window();
 				return;
 			}

@@ -36,6 +36,10 @@ class QIndigoServers;
 struct SelectionPath {
 
 	SelectionPath() {
+		ClearSelection();
+	};
+
+	void ClearSelection() {
 		device[0]= 0;
 		group[0] = 0;
 		property[0] = 0;
