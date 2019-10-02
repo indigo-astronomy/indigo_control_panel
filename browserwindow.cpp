@@ -301,12 +301,23 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
 #endif
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
-	if (property)
-		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
-	else
-		snprintf(log_line, 512, "%s %s", timestamp, message);
+	if (property) {
+		switch (property->state) {
+		case INDIGO_ALERT_STATE:
+			snprintf(log_line, 512, "<font color = \"red\">%s %s.%s: %s</font>", timestamp, property->device, property->name, message);
+			break;
+		case INDIGO_BUSY_STATE:
+			snprintf(log_line, 512, "<font color = \"orange\">%s %s.%s: %s</font>", timestamp, property->device, property->name, message);
+			break;
+		default:
+			snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
+			break;
+		}
+	} else {
+		snprintf(log_line, 512, "%s <b>%s</b>", timestamp, message);
+	}
 
-	mLog->appendPlainText(log_line); // Adds the message to the widget
+	mLog->appendHtml(log_line); // Adds the message to the widget
 	indigo_debug("Log window: %s\n", message);
 }
 
