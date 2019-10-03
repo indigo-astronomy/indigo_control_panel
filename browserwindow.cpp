@@ -292,7 +292,7 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	struct tm *lt;
 	time_t rawtime;
 	lt = localtime((const time_t *) &(tmnow.tv_sec));
-	if (lt == NULL) {
+	if (lt == NULL)
 		time(&rawtime);
 		lt = localtime(&rawtime);
 	}
@@ -304,17 +304,20 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	if (property) {
 		switch (property->state) {
 		case INDIGO_ALERT_STATE:
-			snprintf(log_line, 512, "<font color = \"red\">%s %s.%s: %s</font>", timestamp, property->device, property->name, message);
+			snprintf(log_line, 512, "<font color = \"#E00000\">%s %s.%s: %s<\font>", timestamp, property->device, property->name, message);
 			break;
 		case INDIGO_BUSY_STATE:
-			snprintf(log_line, 512, "<font color = \"orange\">%s %s.%s: %s</font>", timestamp, property->device, property->name, message);
+			snprintf(log_line, 512, "<font color = \"orange\">%s %s.%s: %s<\font>", timestamp, property->device, property->name, message);
 			break;
+		//case INDIGO_OK_STATE:
+		//	snprintf(log_line, 512, "<font color = \"#2fc000\">%s <b>%s.%s</b>: %s<\font>", timestamp, property->device, property->name, message);
+		//	break;
 		default:
 			snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
 			break;
 		}
 	} else {
-		snprintf(log_line, 512, "%s <b>%s</b>", timestamp, message);
+		snprintf(log_line, 512, "%s %s", timestamp, message);
 	}
 
 	mLog->appendHtml(log_line); // Adds the message to the widget
