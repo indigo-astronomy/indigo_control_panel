@@ -87,7 +87,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	menu_bar->addMenu(menu);
 
 	menu = new QMenu("&Edit");
-	act = menu->addAction(tr("Clear &Log Window"));
+	act = menu->addAction(tr("Clear &Messages"));
 	connect(act, &QAction::triggered, mLog, &QPlainTextEdit::clear);
 	menu_bar->addMenu(menu);
 
@@ -283,6 +283,7 @@ BrowserWindow::~BrowserWindow () {
 void BrowserWindow::on_property_log(indigo_property* property, const char *message) {
 	char timestamp[16];
 	char log_line[512];
+	char message_line[512];
 	struct timeval tmnow;
 
 	if (!message) return;
@@ -301,19 +302,18 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	strftime(timestamp, sizeof(log_line), "%H:%M:%S", localtime((const time_t *) &tmnow.tv_sec));
 #endif
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
+
+	snprintf(message_line, 512, "%s.%s: %s", property->device, property->name, message);
 	if (property) {
 		switch (property->state) {
 		case INDIGO_ALERT_STATE:
-			snprintf(log_line, 512, "<font color = \"#E00000\">%s %s.%s: %s<\font>", timestamp, property->device, property->name, message);
+			snprintf(log_line, 512, "<font color = \"#E00000\">%s %s<\font>", timestamp, message_line);
 			break;
 		case INDIGO_BUSY_STATE:
-			snprintf(log_line, 512, "<font color = \"orange\">%s %s.%s: %s<\font>", timestamp, property->device, property->name, message);
+			snprintf(log_line, 512, "<font color = \"orange\">%s %s<\font>", timestamp, message_line);
 			break;
-		//case INDIGO_OK_STATE:
-		//	snprintf(log_line, 512, "<font color = \"#2fc000\">%s <b>%s.%s</b>: %s<\font>", timestamp, property->device, property->name, message);
-		//	break;
 		default:
-			snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
+			snprintf(log_line, 512, "%s %s", timestamp, message_line);
 			break;
 		}
 	} else {
@@ -321,7 +321,7 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	}
 
 	mLog->appendHtml(log_line); // Adds the message to the widget
-	indigo_debug("Log window: %s\n", message);
+	indigo_debug("[message] %s\n", message_line);
 }
 
 void BrowserWindow::on_property_define(indigo_property* property, const char *message) {
