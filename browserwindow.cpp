@@ -303,8 +303,8 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 #endif
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
 
-	snprintf(message_line, 512, "%s.%s: %s", property->device, property->name, message);
 	if (property) {
+		snprintf(message_line, 512, "%s.%s: %s", property->device, property->name, message);
 		switch (property->state) {
 		case INDIGO_ALERT_STATE:
 			snprintf(log_line, 512, "<font color = \"#E00000\">%s %s<\font>", timestamp, message_line);
@@ -316,12 +316,13 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 			snprintf(log_line, 512, "%s %s", timestamp, message_line);
 			break;
 		}
+		indigo_debug("[message] %s\n", message_line);
 	} else {
 		snprintf(log_line, 512, "%s %s", timestamp, message);
+		indigo_debug("[message] %s\n", message);
 	}
 
 	mLog->appendHtml(log_line); // Adds the message to the widget
-	indigo_debug("[message] %s\n", message_line);
 }
 
 void BrowserWindow::on_property_define(indigo_property* property, const char *message) {
