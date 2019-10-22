@@ -293,7 +293,7 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 	struct tm *lt;
 	time_t rawtime;
 	lt = localtime((const time_t *) &(tmnow.tv_sec));
-	if (lt == NULL)
+	if (lt == NULL) {
 		time(&rawtime);
 		lt = localtime(&rawtime);
 	}
