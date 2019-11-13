@@ -31,12 +31,12 @@ public:
 
 public:
 	Logger() {};
-	void log(indigo_property* property, const char *message) {
+	void log(indigo_property* property, char *message) {
 		emit(Logger::instance().log_in_window(property, message));
 	}
 
 signals:
-	void log_in_window(indigo_property* property, const char *message);
+	void log_in_window(indigo_property* property, char *message);
 };
 
 inline Logger& Logger::instance() {

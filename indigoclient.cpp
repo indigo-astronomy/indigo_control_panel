@@ -69,7 +69,8 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
 
 	if (message) {
-		static char msg[INDIGO_VALUE_SIZE];
+		static char *msg;
+		msg = (char*)malloc(INDIGO_VALUE_SIZE);
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
 		emit(IndigoClient::instance().property_defined(p, msg));
 	} else {
@@ -115,7 +116,8 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
 	if (message) {
-		static char msg[INDIGO_VALUE_SIZE];
+		static char *msg;
+		msg = (char*)malloc(INDIGO_VALUE_SIZE);
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
 		emit(IndigoClient::instance().property_changed(p, msg));
 	} else {
@@ -142,7 +144,8 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	strcpy(p->name, property->name);
 
 	if (message) {
-		static char msg[INDIGO_VALUE_SIZE];
+		static char *msg;
+		msg = (char*)malloc(INDIGO_VALUE_SIZE);
 		strncpy(msg, message, INDIGO_VALUE_SIZE);
 		emit(IndigoClient::instance().property_deleted(p, msg));
 	} else {
@@ -157,7 +160,8 @@ static indigo_result client_send_message(indigo_client *client, indigo_device *d
 
 	if (!message) return INDIGO_OK;
 
-	static char msg[PATH_MAX];
+	static char *msg;
+	msg = (char*)malloc(INDIGO_VALUE_SIZE);
 	if ((device) && (device->name[0]) && (device->name[0] != '@')) {
 		// We have device name
 		snprintf(msg, sizeof(msg), "%s: %s", device->name, message);

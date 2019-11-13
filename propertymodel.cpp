@@ -75,7 +75,7 @@ PropertyModel::PropertyModel() {
 }
 
 
-void PropertyModel::define_property(indigo_property* property, const char *message) {
+void PropertyModel::define_property(indigo_property* property, char *message) {
 	//  Find or create TreeNode for property->device
 	//indigo_debug("Defining device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 	int device_row = 0;
@@ -150,7 +150,7 @@ void PropertyModel::define_property(indigo_property* property, const char *messa
 }
 
 
-void PropertyModel::update_property(indigo_property* property, const char *message) {
+void PropertyModel::update_property(indigo_property* property, char *message) {
 	//  Find TreeNode for property->device
 	int device_row = 0;
 	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
@@ -192,7 +192,7 @@ void PropertyModel::update_property(indigo_property* property, const char *messa
 	indigo_release_property(property);
 }
 
-void PropertyModel::delete_property(indigo_property* property, const char *message) {
+void PropertyModel::delete_property(indigo_property* property, char *message) {
 	indigo_debug("Deleting property [%s] on device [%s]\n", property->name, property->device);
 
 	//  Find TreeNode for property->device

@@ -88,7 +88,7 @@ class BrowserWindow : public QMainWindow {
 public:
 	explicit BrowserWindow(QWidget *parent = nullptr);
 	virtual ~BrowserWindow();
-	void property_define_delete(indigo_property* property, const char *message, bool action_deleted);
+	void property_define_delete(indigo_property* property, char *message, bool action_deleted);
 	void repaint_property_window(TreeNode* node);
 
 signals:
@@ -97,9 +97,9 @@ signals:
 
 public slots:
 	void on_selection_changed(const QItemSelection &selected, const QItemSelection &deselected);
-	void on_property_log(indigo_property* property, const char *message);
-	void on_property_define(indigo_property* property, const char *message);
-	void on_property_delete(indigo_property* property, const char *message);
+	void on_property_log(indigo_property* property, char *message);
+	void on_property_define(indigo_property* property, char *message);
+	void on_property_delete(indigo_property* property, char *message);
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
 	void on_use_suffix_changed(bool status);

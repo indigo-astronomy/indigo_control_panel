@@ -257,14 +257,14 @@ public:
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
-	void property_updated(indigo_property* property, const char *message);
-	void property_defined(indigo_property* property, const char *message);
-	void property_deleted(indigo_property* property, const char *message);
+	void property_updated(indigo_property* property, char *message);
+	void property_defined(indigo_property* property, char *message);
+	void property_deleted(indigo_property* property, char *message);
 
 public slots:
-	void define_property(indigo_property* property, const char *message);
-	void update_property(indigo_property* property, const char *message);
-	void delete_property(indigo_property* property, const char *message);
+	void define_property(indigo_property* property, char *message);
+	void update_property(indigo_property* property, char *message);
+	void delete_property(indigo_property* property, char *message);
 	void enable_blobs(bool on);
 	void rebuild_blob_previews();
 

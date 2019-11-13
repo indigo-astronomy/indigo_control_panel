@@ -280,7 +280,7 @@ BrowserWindow::~BrowserWindow () {
 }
 
 
-void BrowserWindow::on_property_log(indigo_property* property, const char *message) {
+void BrowserWindow::on_property_log(indigo_property* property, char *message) {
 	char timestamp[16];
 	char log_line[512];
 	char message_line[512];
@@ -321,19 +321,19 @@ void BrowserWindow::on_property_log(indigo_property* property, const char *messa
 		snprintf(log_line, 512, "%s %s", timestamp, message);
 		indigo_debug("[message] %s\n", message);
 	}
-
+	free(message);
 	mLog->appendHtml(log_line); // Adds the message to the widget
 }
 
-void BrowserWindow::on_property_define(indigo_property* property, const char *message) {
+void BrowserWindow::on_property_define(indigo_property* property, char *message) {
 	property_define_delete(property, message, false);
 }
 
-void BrowserWindow::on_property_delete(indigo_property* property, const char *message) {
+void BrowserWindow::on_property_delete(indigo_property* property, char *message) {
 	property_define_delete(property, message, true);
 }
 
-void BrowserWindow::property_define_delete(indigo_property* property, const char *message, bool action_deleted) {
+void BrowserWindow::property_define_delete(indigo_property* property, char *message, bool action_deleted) {
 	Q_UNUSED(message);
 
 	if (current_path->type == TREE_NODE_ROOT) return;
