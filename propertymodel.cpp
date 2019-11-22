@@ -445,7 +445,15 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 						return QPixmap(":resource/dome-grey.png");
 					}
 				}
-				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_WEATHER)) {
+				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_POWERBOX & ~INDIGO_INTERFACE_AUX)) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/powerbox-green.png");
+					default:
+						return QPixmap(":resource/powerbox-grey.png");
+					}
+				}
+				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_WEATHER & ~INDIGO_INTERFACE_AUX)) {
 					switch (d->state) {
 					case INDIGO_OK_STATE:
 						return QPixmap(":resource/weather-green.png");

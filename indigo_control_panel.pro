@@ -69,7 +69,10 @@ RESOURCES += \
 	resource/dome-grey.png \
 	resource/dome-green.png \
 	resource/weather-grey.png \
-	resource/weather-green.png
+	resource/weather-green.png \
+	resource/powerbox-grey.png \
+	resource/powerbox-green.png
+
 
 
 # Additional import path used to resolve QML modules in Qt Creator\'s code model
