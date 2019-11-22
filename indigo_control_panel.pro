@@ -71,7 +71,9 @@ RESOURCES += \
 	resource/weather-grey.png \
 	resource/weather-green.png \
 	resource/powerbox-grey.png \
-	resource/powerbox-green.png
+	resource/powerbox-green.png \
+	resource/flatbox-grey.png \
+	resource/flatbox-green.png
 
 
 
