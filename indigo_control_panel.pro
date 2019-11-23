@@ -73,8 +73,11 @@ RESOURCES += \
 	resource/powerbox-grey.png \
 	resource/powerbox-green.png \
 	resource/flatbox-grey.png \
-	resource/flatbox-green.png
-
+	resource/flatbox-green.png \
+	resource/joystick-grey.png \
+	resource/joystick-green.png \
+	resource/shutter-grey.png \
+	resource/shutter-green.png
 
 
 # Additional import path used to resolve QML modules in Qt Creator\'s code model
