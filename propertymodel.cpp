@@ -477,6 +477,14 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 						return QPixmap(":resource/shutter-grey.png");
 					}
 				}
+				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_SQM & ~INDIGO_INTERFACE_AUX)) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/sqm-green.png");
+					default:
+						return QPixmap(":resource/sqm-grey.png");
+					}
+				}
 				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_LIGHTBOX & ~INDIGO_INTERFACE_AUX)) {
 					switch (d->state) {
 					case INDIGO_OK_STATE:
