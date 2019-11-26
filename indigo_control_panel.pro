@@ -79,7 +79,9 @@ RESOURCES += \
 	resource/shutter-grey.png \
 	resource/shutter-green.png \
 	resource/sqm-grey.png \
-	resource/sqm-green.png
+	resource/sqm-green.png \
+	resource/dustcap-grey.png \
+	resource/dustcap-green.png
 
 
 # Additional import path used to resolve QML modules in Qt Creator\'s code model

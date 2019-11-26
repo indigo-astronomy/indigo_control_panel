@@ -493,6 +493,14 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 						return QPixmap(":resource/flatbox-grey.png");
 					}
 				}
+				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_DUSTCAP & ~INDIGO_INTERFACE_AUX)) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/dustcap-green.png");
+					default:
+						return QPixmap(":resource/dustcap-grey.png");
+					}
+				}
 				if (d->m_interface == 0) { // server
 						return QPixmap(":resource/server.png");
 				}
