@@ -242,9 +242,10 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(mIndigoServers, &QIndigoServers::requestRemoveManualService, mServiceModel, &ServiceModel::onRequestRemoveManualService);
 
 	// NOTE: logging should be before update and delete of properties as they release the copy!!!
-	connect(&IndigoClient::instance(), &IndigoClient::property_defined, this, &BrowserWindow::on_property_log);
-	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_property_log);
-	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_property_log);
+	connect(&IndigoClient::instance(), &IndigoClient::property_defined, this, &BrowserWindow::on_message_sent);
+	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_message_sent);
+	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_message_sent);
+	connect(&IndigoClient::instance(), &IndigoClient::message_sent, this, &BrowserWindow::on_message_sent);
 
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
@@ -253,7 +254,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define);
 	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_delete);
 
-	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_property_log);
+	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_window_log);
 
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
@@ -280,7 +281,12 @@ BrowserWindow::~BrowserWindow () {
 }
 
 
-void BrowserWindow::on_property_log(indigo_property* property, char *message) {
+void BrowserWindow::on_message_sent(indigo_property* property, char *message) {
+	on_window_log(property, message);
+	free(message);
+}
+
+void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 	char timestamp[16];
 	char log_line[512];
 	char message_line[512];
@@ -321,7 +327,6 @@ void BrowserWindow::on_property_log(indigo_property* property, char *message) {
 		snprintf(log_line, 512, "%s %s", timestamp, message);
 		indigo_debug("[message] %s\n", message);
 	}
-	free(message);
 	mLog->appendHtml(log_line); // Adds the message to the widget
 }
 
@@ -502,8 +507,8 @@ void BrowserWindow::on_exit_act() {
 void BrowserWindow::on_blobs_changed(bool status) {
 	conf.blobs_enabled = status;
 	emit(enable_blobs(status));
-	if(status) on_property_log(NULL, "BLOBs enabled");
-	else on_property_log(NULL, "BLOBs disabled");
+	if(status) on_window_log(NULL, "BLOBs enabled");
+	else on_window_log(NULL, "BLOBs disabled");
 	write_conf();
 	indigo_debug("%s\n", __FUNCTION__);
 }
@@ -536,9 +541,9 @@ void BrowserWindow::on_use_system_locale_changed(bool status) {
 	conf.use_system_locale = status;
 	write_conf();
 	if (conf.use_system_locale){
-		on_property_log(nullptr, "Locale specific decimal separator will be used on next application start");
+		on_window_log(nullptr, "Locale specific decimal separator will be used on next application start");
 	} else {
-		on_property_log(nullptr, "Dot decimal separator will be used on next application start");
+		on_window_log(nullptr, "Dot decimal separator will be used on next application start");
 	}
 	indigo_debug("%s\n", __FUNCTION__);
 }

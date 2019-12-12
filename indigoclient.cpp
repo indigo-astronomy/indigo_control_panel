@@ -168,8 +168,7 @@ static indigo_result client_send_message(indigo_client *client, indigo_device *d
 	} else {
 		snprintf(msg, sizeof(msg), "%s", message);
 	}
-
-	IndigoClient::instance().m_logger->log(NULL, msg);
+	emit(IndigoClient::instance().message_sent(NULL, msg));
 	return INDIGO_OK;
 }
 

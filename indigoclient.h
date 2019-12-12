@@ -41,6 +41,7 @@ signals:
     void property_defined(indigo_property* property, char *message);
     void property_changed(indigo_property* property, char *message);
     void property_deleted(indigo_property* property, char *message);
+    void message_sent(indigo_property* property, char *message);
 };
 
 inline IndigoClient&
