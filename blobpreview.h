@@ -56,6 +56,7 @@ private:
 
 public:
 	bool create(indigo_property *property, indigo_item *item);
+	bool obsolete(indigo_property *property, indigo_item *item);
 	QImage* get(indigo_property *property, indigo_item *item);
 	bool remove(indigo_property *property, indigo_item *item);
 };

@@ -58,6 +58,10 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 				}
 				preview_cache.create(property, &property->items[row]);
 			}
+		} else if(property->state == INDIGO_BUSY_STATE) {
+			for (int row = 0; row < property->count; row++) {
+				preview_cache.obsolete(property, &property->items[row]);
+			}
 		} else {
 			for (int row = 0; row < property->count; row++) {
 				preview_cache.remove(property, &property->items[row]);
@@ -104,6 +108,10 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
 				}
 				preview_cache.create(property, &property->items[row]);
+			}
+		} else if(property->state == INDIGO_BUSY_STATE) {
+			for (int row = 0; row < property->count; row++) {
+				preview_cache.obsolete(property, &property->items[row]);
 			}
 		} else {
 			for (int row = 0; row < property->count; row++) {

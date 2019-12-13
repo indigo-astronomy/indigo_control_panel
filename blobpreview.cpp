@@ -21,6 +21,7 @@
 #include <debayer/pixelformat.h>
 #include "blobpreview.h"
 #include "conf.h"
+#include <QPainter>
 
 blob_preview_cache preview_cache;
 
@@ -45,6 +46,27 @@ bool blob_preview_cache::_remove(indigo_property *property, indigo_item *item) {
 		indigo_debug("preview: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
 	}
 	return (bool)QHash::remove(key);
+}
+
+
+bool blob_preview_cache::obsolete(indigo_property *property, indigo_item *item) {
+	QString key = create_key(property, item);
+	if (contains(key)) {
+		QImage *preview = value(key);
+		indigo_debug("preview: %s(%s) == %p\n", __FUNCTION__, key.toUtf8().constData(), preview);
+		if (preview != nullptr) {
+			QPainter painter(preview);
+			painter.setPen(QColor(241, 183, 1));
+			QFont ft = painter.font();
+			ft.setPixelSize(preview->height()/15);
+			painter.setFont(ft);
+			painter.drawText(preview->width()/20, preview->height()/20, preview->width(), preview->height(), Qt::AlignTop && Qt::AlignLeft, "\u231b Busy...");
+			return true;
+		}
+	} else {
+		indigo_debug("preview: %s(%s) - no preview\n", __FUNCTION__, key.toUtf8().constData());
+	}
+	return false;
 }
 
 
