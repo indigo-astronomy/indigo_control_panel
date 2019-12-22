@@ -266,6 +266,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 	connect(this, &BrowserWindow::rebuild_blob_previews, mPropertyModel, &PropertyModel::rebuild_blob_previews);
 
+	preview_cache.set_stretch_level(conf.preview_stretch_level);
+
 	//  Start up the client
 	IndigoClient::instance().enable_blobs(conf.blobs_enabled);
 	IndigoClient::instance().start();
@@ -571,6 +573,7 @@ void BrowserWindow::on_use_system_locale_changed(bool status) {
 
 void BrowserWindow::on_no_stretch() {
 	conf.preview_stretch_level = STRETCH_NONE;
+	preview_cache.set_stretch_level(conf.preview_stretch_level);
 	emit(rebuild_blob_previews());
 	repaint_property_window(current_path->node);
 	write_conf();
@@ -580,6 +583,7 @@ void BrowserWindow::on_no_stretch() {
 
 void BrowserWindow::on_normal_stretch() {
 	conf.preview_stretch_level = STRETCH_NORMAL;
+	preview_cache.set_stretch_level(conf.preview_stretch_level);
 	emit(rebuild_blob_previews());
 	repaint_property_window(current_path->node);
 	write_conf();
@@ -589,6 +593,7 @@ void BrowserWindow::on_normal_stretch() {
 
 void BrowserWindow::on_hard_stretch() {
 	conf.preview_stretch_level = STRETCH_HARD;
+	preview_cache.set_stretch_level(conf.preview_stretch_level);
 	emit(rebuild_blob_previews());
 	repaint_property_window(current_path->node);
 	write_conf();

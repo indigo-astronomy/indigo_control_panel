@@ -20,10 +20,10 @@
 #include <debayer/debayer.h>
 #include <debayer/pixelformat.h>
 #include "blobpreview.h"
-#include "conf.h"
 #include <QPainter>
 
 blob_preview_cache preview_cache;
+static preview_stretch preview_stretch_level = STRETCH_NORMAL;
 
 const float preview_stretch_lut[] = {
 	0.0,
@@ -38,6 +38,10 @@ QString blob_preview_cache::create_key(indigo_property *property, indigo_item *i
 	key.append(".");
 	key.append(item->name);
 	return key;
+}
+
+void blob_preview_cache::set_stretch_level(preview_stretch level) {
+	preview_stretch_level = level;
 }
 
 bool blob_preview_cache::_remove(indigo_property *property, indigo_item *item) {
@@ -65,7 +69,7 @@ bool blob_preview_cache::obsolete(indigo_property *property, indigo_item *item) 
 			QFont ft = painter.font();
 			ft.setPixelSize(preview->height()/15);
 			painter.setFont(ft);
-			painter.drawText(preview->width()/20, preview->height()/20, preview->width(), preview->height(), Qt::AlignTop && Qt::AlignLeft, "\u231b Busy...");
+			painter.drawText(preview->width()/20, preview->height()/20, preview->width(), preview->height(), Qt::AlignTop & Qt::AlignLeft, "\u231b Busy...");
 			return true;
 		}
 	} else {
@@ -240,7 +244,7 @@ QImage* create_fits_preview(unsigned char *raw_fits_buffer, unsigned long fits_s
 	}
 
 	QImage *img = create_preview(header.naxisn[0], header.naxisn[1],
-	        pix_format, fits_data, hist, preview_stretch_lut[conf.preview_stretch_level]);
+	        pix_format, fits_data, hist, preview_stretch_lut[preview_stretch_level]);
 
 	free(hist);
 	free(fits_data);
@@ -312,7 +316,7 @@ QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_si
 	}
 
 	QImage *img = create_preview(header->width, header->height,
-	        pix_format, raw_data, hist, preview_stretch_lut[conf.preview_stretch_level]);
+	        pix_format, raw_data, hist, preview_stretch_lut[preview_stretch_level]);
 
 	free(hist);
 	return img;

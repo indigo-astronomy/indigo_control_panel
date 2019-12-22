@@ -61,6 +61,7 @@ private:
 	bool _remove(indigo_property *property, indigo_item *item);
 
 public:
+	void set_stretch_level(preview_stretch level);
 	bool create(indigo_property *property, indigo_item *item);
 	bool obsolete(indigo_property *property, indigo_item *item);
 	QImage* get(indigo_property *property, indigo_item *item);
