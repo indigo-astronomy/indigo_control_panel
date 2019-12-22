@@ -30,6 +30,12 @@
 #include <jpeglib.h>
 #endif
 
+typedef enum {
+	STRETCH_NONE = 0,
+	STRETCH_NORMAL = 1,
+	STRETCH_HARD = 2,
+} preview_stretch;
+
 QImage* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size);
 QImage* create_fits_preview(unsigned char *fits_buffer, unsigned long fits_size);
 QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_size);

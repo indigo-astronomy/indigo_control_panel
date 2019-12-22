@@ -28,6 +28,7 @@
 
 QServiceModel::QServiceModel(const QByteArray &type) {
 	m_logger = &Logger::instance();
+	m_auto_connect = true;
 	QTimer *m_timer = new QTimer(this);
 	connect(m_timer, &QTimer::timeout, this, QOverload<>::of(&QServiceModel::onTimer));
 	m_timer->start(3000);
@@ -107,7 +108,7 @@ bool QServiceModel::addService(QByteArray name, QByteArray host, int port) {
 	mServices.append(indigo_service);
 	endInsertRows();
 
-	if (conf.auto_connect) indigo_service->connect();
+	if (m_auto_connect) indigo_service->connect();
 	emit(serviceAdded(*indigo_service));
 	return true;
 }
@@ -197,7 +198,7 @@ void QServiceModel::onServiceAdded(QZeroConfService service) {
 	mServices.append(indigo_service);
 	endInsertRows();
 
-	if (conf.auto_connect) indigo_service->connect();
+	if (m_auto_connect) indigo_service->connect();
 	emit(serviceAdded(*indigo_service));
 }
 

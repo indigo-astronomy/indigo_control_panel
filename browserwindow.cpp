@@ -228,6 +228,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	propertyLayout->addWidget(mLog, 15);
 
 	mServiceModel = new QServiceModel("_indigo._tcp");
+	mServiceModel->enable_auto_connect(conf.auto_connect);
 
 	mPropertyModel = new PropertyModel();
 	mProperties->setHeaderHidden(true);
@@ -534,6 +535,7 @@ void BrowserWindow::on_blobs_changed(bool status) {
 
 void BrowserWindow::on_bonjour_changed(bool status) {
 	conf.auto_connect = status;
+	mServiceModel->enable_auto_connect(conf.auto_connect);
 	write_conf();
 	indigo_debug("%s\n", __FUNCTION__);
 }

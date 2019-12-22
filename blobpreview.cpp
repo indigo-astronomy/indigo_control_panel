@@ -25,6 +25,11 @@
 
 blob_preview_cache preview_cache;
 
+const float preview_stretch_lut[] = {
+	0.0,
+	0.005,
+	0.01
+};
 
 QString blob_preview_cache::create_key(indigo_property *property, indigo_item *item) {
 	QString key(property->device);

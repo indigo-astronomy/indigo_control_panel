@@ -45,6 +45,9 @@ public:
 	bool connectService(QByteArray name);
 	bool disconnectService(QByteArray name);
 	bool removeService(QByteArray name);
+	void enable_auto_connect(bool enable) {
+		m_auto_connect = enable;
+	};
 	virtual QVariant data(const QModelIndex &index, int role) const;
 
 signals:
@@ -68,6 +71,7 @@ private:
     int findService(const QByteArray &name);
 
 	Logger* m_logger;
+	bool m_auto_connect;
     QList<QIndigoService*> mServices;
     QZeroConf m_zeroConf;
 };

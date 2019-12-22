@@ -21,6 +21,7 @@
 #define CONF_H
 
 #include <indigo/indigo_bus.h>
+#include "blobpreview.h"
 
 #if defined(INDIGO_WINDOWS)
 #define PATH_LEN 4096
@@ -32,18 +33,6 @@
 #define PREVIEW_WIDTH 550
 
 #define CONFIG_FILENAME "indigo_control_panel.conf"
-
-const float preview_stretch_lut[] = {
-	0.0,
-	0.005,
-	0.01
-};
-
-typedef enum {
-	STRETCH_NONE = 0,
-	STRETCH_NORMAL = 1,
-	STRETCH_HARD = 2,
-} preview_stretch;
 
 typedef struct {
 	bool blobs_enabled;
