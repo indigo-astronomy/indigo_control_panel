@@ -46,7 +46,7 @@ public:
 		return m_blobs_enabled;
 	};
 
-	void start();
+	void start(char *name);
 
 	Logger* m_logger;
 signals:

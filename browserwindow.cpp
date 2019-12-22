@@ -270,7 +270,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	//  Start up the client
 	IndigoClient::instance().enable_blobs(conf.blobs_enabled);
-	IndigoClient::instance().start();
+	IndigoClient::instance().start("INDIGO Control Panel");
 
 	// load manually configured services
 	mServiceModel->loadManualServices();
