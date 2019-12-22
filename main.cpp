@@ -81,9 +81,8 @@ int main(int argc, char *argv[]) {
 	/* This shall be set only before connecting */
 	indigo_use_host_suffix = conf.indigo_use_host_suffix;
 
-	QApplication app(argc, argv);
-
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	QApplication app(argc, argv);
 
 	QFile f(":qdarkstyle/style.qss");
 	f.open(QFile::ReadOnly | QFile::Text);
