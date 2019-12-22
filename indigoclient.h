@@ -27,42 +27,49 @@
 
 class IndigoClient : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    static IndigoClient& instance();
-    bool m_blobs_enabled;
+	static IndigoClient& instance();
+	bool m_blobs_enabled;
 
 public:
-    IndigoClient();
+	IndigoClient() {
+		m_logger = &Logger::instance();
+		m_blobs_enabled = false;
+	}
 
-    void enable_blobs(bool enable) {
-        m_blobs_enabled = enable;
-    };
+	void enable_blobs(bool enable) {
+		m_blobs_enabled = enable;
+	};
 
-    bool blobs_enabled() {
-        return m_blobs_enabled;
-    };
+	bool blobs_enabled() {
+		return m_blobs_enabled;
+	};
 
-    void start();
+	void start();
 
 	Logger* m_logger;
 signals:
-    void property_defined(indigo_property* property, char *message);
-    void property_changed(indigo_property* property, char *message);
-    void property_deleted(indigo_property* property, char *message);
-    void message_sent(indigo_property* property, char *message);
-    void create_preview(indigo_property* property, indigo_item *item);
-    void obsolete_preview(indigo_property* property, indigo_item *item);
-    void remove_preview(indigo_property* property, indigo_item *item);
+	/* When this signals are issued new copies of the prorpety and message will be passed.
+	   They need to be freed with free() when not needed.
+	*/
+	void property_defined(indigo_property* property, char *message);
+	void property_changed(indigo_property* property, char *message);
+	void property_deleted(indigo_property* property, char *message);
+	void message_sent(indigo_property* property, char *message);
+
+	/* No copy of the property will be made with this signals.
+	   Do not free().
+	*/
+	void create_preview(indigo_property* property, indigo_item *item);
+	void obsolete_preview(indigo_property* property, indigo_item *item);
+	void remove_preview(indigo_property* property, indigo_item *item);
 };
 
-inline IndigoClient&
-IndigoClient::instance()
-{
-   static IndigoClient* me = nullptr;
-   if (!me)
-       me = new IndigoClient();
-   return *me;
+inline IndigoClient& IndigoClient::instance() {
+	static IndigoClient* me = nullptr;
+	if (!me) me = new IndigoClient();
+	return *me;
 }
 
 #endif // INDIGOCLIENT_H

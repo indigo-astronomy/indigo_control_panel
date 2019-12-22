@@ -196,12 +196,6 @@ indigo_client client = {
 	client_detach
 };
 
-
-IndigoClient::IndigoClient() {
-	m_logger = &Logger::instance();
-	m_blobs_enabled = false;
-}
-
 void IndigoClient::start() {
 	indigo_start();
 	indigo_attach_client(&client);
