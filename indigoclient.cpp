@@ -18,9 +18,7 @@
 
 
 #include <indigo/indigo_client.h>
-#include "blobpreview.h"
 #include "indigoclient.h"
-#include "conf.h"
 
 
 static indigo_result client_attach(indigo_client *client) {
@@ -49,22 +47,22 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 	case INDIGO_BLOB_VECTOR:
 		if (device->version < INDIGO_VERSION_2_0)
 			IndigoClient::instance().m_logger->log(property, "BLOB can be used in INDI legacy mode");
-		if (conf.blobs_enabled) { // Enagle blob and let adapter decide URL or ALSO
+		if (IndigoClient::instance().blobs_enabled()) { // Enagle blob and let adapter decide URL or ALSO
 				indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB);
 		}
 		if (property->state == INDIGO_OK_STATE) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 				}
-				preview_cache.create(property, &property->items[row]);
+				emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 			}
 		} else if(property->state == INDIGO_BUSY_STATE) {
 			for (int row = 0; row < property->count; row++) {
-				preview_cache.obsolete(property, &property->items[row]);
+				emit(IndigoClient::instance().obsolete_preview(property, &property->items[row]));
 			}
 		} else {
 			for (int row = 0; row < property->count; row++) {
-				preview_cache.remove(property, &property->items[row]);
+				emit(IndigoClient::instance().remove_preview(property, &property->items[row]));
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
@@ -107,15 +105,15 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
 				}
-				preview_cache.create(property, &property->items[row]);
+				emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 			}
 		} else if(property->state == INDIGO_BUSY_STATE) {
 			for (int row = 0; row < property->count; row++) {
-				preview_cache.obsolete(property, &property->items[row]);
+				emit(IndigoClient::instance().obsolete_preview(property, &property->items[row]));
 			}
 		} else {
 			for (int row = 0; row < property->count; row++) {
-				preview_cache.remove(property, &property->items[row]);
+				emit(IndigoClient::instance().remove_preview(property, &property->items[row]));
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
@@ -142,7 +140,7 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 
 	if (property->type == INDIGO_BLOB_VECTOR) {
 		for (int row = 0; row < property->count; row++) {
-			preview_cache.remove(property, &property->items[row]);
+			emit(IndigoClient::instance().remove_preview(property, &property->items[row]));
 		}
 	}
 
@@ -201,6 +199,7 @@ indigo_client client = {
 
 IndigoClient::IndigoClient() {
 	m_logger = &Logger::instance();
+	m_blobs_enabled = false;
 }
 
 void IndigoClient::start() {

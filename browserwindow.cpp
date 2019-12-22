@@ -34,6 +34,7 @@
 #include "indigoclient.h"
 #include "qindigoproperty.h"
 #include "qindigoservers.h"
+#include "blobpreview.h"
 #include "logger.h"
 #include "conf.h"
 #include "version.h"
@@ -247,6 +248,10 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_message_sent);
 	connect(&IndigoClient::instance(), &IndigoClient::message_sent, this, &BrowserWindow::on_message_sent);
 
+	connect(&IndigoClient::instance(), &IndigoClient::create_preview, this, &BrowserWindow::on_create_preview);
+	connect(&IndigoClient::instance(), &IndigoClient::obsolete_preview, this, &BrowserWindow::on_obsolete_preview);
+	connect(&IndigoClient::instance(), &IndigoClient::remove_preview, this, &BrowserWindow::on_remove_preview);
+
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);
@@ -254,13 +259,14 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define);
 	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_delete);
 
-	connect(&Logger::instance(), &Logger::log_in_window, this, &BrowserWindow::on_window_log);
+	connect(&Logger::instance(), &Logger::do_log, this, &BrowserWindow::on_window_log);
 
 	connect(mProperties->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BrowserWindow::on_selection_changed);
 	connect(this, &BrowserWindow::enable_blobs, mPropertyModel, &PropertyModel::enable_blobs);
 	connect(this, &BrowserWindow::rebuild_blob_previews, mPropertyModel, &PropertyModel::rebuild_blob_previews);
 
 	//  Start up the client
+	IndigoClient::instance().enable_blobs(conf.blobs_enabled);
 	IndigoClient::instance().start();
 
 	// load manually configured services
@@ -280,6 +286,17 @@ BrowserWindow::~BrowserWindow () {
 	delete current_path;
 }
 
+void BrowserWindow::on_create_preview(indigo_property *property, indigo_item *item){
+	preview_cache.create(property, item);
+}
+
+void BrowserWindow::on_obsolete_preview(indigo_property *property, indigo_item *item){
+	preview_cache.obsolete(property, item);
+}
+
+void BrowserWindow::on_remove_preview(indigo_property *property, indigo_item *item){
+	preview_cache.remove(property, item);
+}
 
 void BrowserWindow::on_message_sent(indigo_property* property, char *message) {
 	on_window_log(property, message);
@@ -506,6 +523,7 @@ void BrowserWindow::on_exit_act() {
 
 void BrowserWindow::on_blobs_changed(bool status) {
 	conf.blobs_enabled = status;
+	IndigoClient::instance().enable_blobs(status);
 	emit(enable_blobs(status));
 	if(status) on_window_log(NULL, "BLOBs enabled");
 	else on_window_log(NULL, "BLOBs disabled");

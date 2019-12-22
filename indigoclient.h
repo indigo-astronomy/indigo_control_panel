@@ -30,9 +30,18 @@ class IndigoClient : public QObject
     Q_OBJECT
 public:
     static IndigoClient& instance();
+    bool m_blobs_enabled;
 
 public:
     IndigoClient();
+
+    void enable_blobs(bool enable) {
+        m_blobs_enabled = enable;
+    };
+
+    bool blobs_enabled() {
+        return m_blobs_enabled;
+    };
 
     void start();
 
@@ -42,6 +51,9 @@ signals:
     void property_changed(indigo_property* property, char *message);
     void property_deleted(indigo_property* property, char *message);
     void message_sent(indigo_property* property, char *message);
+    void create_preview(indigo_property* property, indigo_item *item);
+    void obsolete_preview(indigo_property* property, indigo_item *item);
+    void remove_preview(indigo_property* property, indigo_item *item);
 };
 
 inline IndigoClient&

@@ -116,6 +116,9 @@ public slots:
 	void on_no_stretch();
 	void on_normal_stretch();
 	void on_hard_stretch();
+	void on_create_preview(indigo_property *property, indigo_item *item);
+	void on_obsolete_preview(indigo_property *property, indigo_item *item);
+	void on_remove_preview(indigo_property *property, indigo_item *item);
 
 private:
 	QPlainTextEdit* mLog;
