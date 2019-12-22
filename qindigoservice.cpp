@@ -17,9 +17,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "indigoservice.h"
+#include "qindigoservice.h"
 
-IndigoService::IndigoService(const QZeroConfService& _service) :
+QIndigoService::QIndigoService(const QZeroConfService& _service) :
 	m_name(_service.name().toUtf8().constData()),
 	m_host(_service.host().toUtf8().constData()),
 	m_port(_service.port()),
@@ -30,11 +30,11 @@ IndigoService::IndigoService(const QZeroConfService& _service) :
 }
 
 
-IndigoService::IndigoService(const IndigoService &other) : m_service(other.m_service) {
+QIndigoService::QIndigoService(const QIndigoService &other) : m_service(other.m_service) {
 }
 
 
-IndigoService::IndigoService(QByteArray name, QByteArray host, int port) :
+QIndigoService::QIndigoService(QByteArray name, QByteArray host, int port) :
 	m_name(name),
 	m_host(host),
 	m_port(port),
@@ -44,11 +44,11 @@ IndigoService::IndigoService(QByteArray name, QByteArray host, int port) :
 }
 
 
-IndigoService::~IndigoService() {
+QIndigoService::~QIndigoService() {
 }
 
 
-bool IndigoService::connect() {
+bool QIndigoService::connect() {
 	int i = 5; /* 0.5 seconds */
 	prevSocket = -100;
 	indigo_debug("%s(): %s %s %d\n",__FUNCTION__, m_name.constData(), m_host.constData(), m_port);
@@ -61,7 +61,7 @@ bool IndigoService::connect() {
 }
 
 
-bool IndigoService::connected() const {
+bool QIndigoService::connected() const {
 	if (m_server_entry) {
 		return (m_server_entry->socket > 0);
 	}
@@ -70,7 +70,7 @@ bool IndigoService::connected() const {
 }
 
 
-bool IndigoService::disconnect() {
+bool QIndigoService::disconnect() {
 	if (m_server_entry) {
 		indigo_debug("%s(): %s %s %d\n",__FUNCTION__, m_name.constData(), m_host.constData(), m_port);
 		bool res = (indigo_disconnect_server(m_server_entry) == INDIGO_OK);
@@ -81,17 +81,17 @@ bool IndigoService::disconnect() {
 }
 
 
-IndigoService &IndigoService::operator=(const IndigoService &other) {
+QIndigoService &QIndigoService::operator=(const QIndigoService &other) {
 	m_service = other.m_service;
 	return *this;
 }
 
 
-bool IndigoService::operator==(const IndigoService &other) const {
+bool QIndigoService::operator==(const QIndigoService &other) const {
 	return m_service == other.m_service;
 }
 
 
-bool IndigoService::operator!=(const IndigoService &other) const {
+bool QIndigoService::operator!=(const QIndigoService &other) const {
 	return !(*this == other);
 }

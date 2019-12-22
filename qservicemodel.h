@@ -28,16 +28,15 @@
 #include "logger.h"
 
 
-class IndigoService;
+class QIndigoService;
 
 
-class ServiceModel : public QAbstractListModel
+class QServiceModel : public QAbstractListModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-
-    ServiceModel(const QByteArray &type);
+	QServiceModel(const QByteArray &type);
 
 	void saveManualServices();
 	void loadManualServices();
@@ -49,19 +48,19 @@ public:
 	virtual QVariant data(const QModelIndex &index, int role) const;
 
 signals:
-	void serviceAdded(IndigoService &indigo_service);
-	void serviceRemoved(IndigoService &indigo_service);
-	void serviceConnectionChange(IndigoService &indigo_service);
+	void serviceAdded(QIndigoService &indigo_service);
+	void serviceRemoved(QIndigoService &indigo_service);
+	void serviceConnectionChange(QIndigoService &indigo_service);
 
 private Q_SLOTS:
-    void onServiceError(QZeroConf::error_t);
-    void onServiceAdded(QZeroConfService s);
-    void onServiceUpdated(QZeroConfService s);
-    void onServiceRemoved(QZeroConfService s);
+	void onServiceError(QZeroConf::error_t);
+	void onServiceAdded(QZeroConfService s);
+	void onServiceUpdated(QZeroConfService s);
+	void onServiceRemoved(QZeroConfService s);
 	void onTimer();
 public Q_SLOTS:
 	void onRequestConnect(const QString &service);
-	void onRequestAddManualService(IndigoService &indigo_service);
+	void onRequestAddManualService(QIndigoService &indigo_service);
 	void onRequestRemoveManualService(const QString &service);
 	void onRequestDisconnect(const QString &service);
 
@@ -69,8 +68,7 @@ private:
     int findService(const QByteArray &name);
 
 	Logger* m_logger;
-    QList<IndigoService*> mServices;
-
+    QList<QIndigoService*> mServices;
     QZeroConf m_zeroConf;
 };
 

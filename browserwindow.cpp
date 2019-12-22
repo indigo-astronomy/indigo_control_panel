@@ -29,7 +29,7 @@
 #include <QActionGroup>
 #include <sys/time.h>
 #include "browserwindow.h"
-#include "servicemodel.h"
+#include "qservicemodel.h"
 #include "propertymodel.h"
 #include "indigoclient.h"
 #include "qindigoproperty.h"
@@ -227,20 +227,20 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	propertyLayout->addWidget(mLog, 15);
 
-	mServiceModel = new ServiceModel("_indigo._tcp");
+	mServiceModel = new QServiceModel("_indigo._tcp");
 
 	mPropertyModel = new PropertyModel();
 	mProperties->setHeaderHidden(true);
 	mProperties->setModel(mPropertyModel);
 
-	connect(mServiceModel, &ServiceModel::serviceAdded, mIndigoServers, &QIndigoServers::onAddService);
-	connect(mServiceModel, &ServiceModel::serviceRemoved, mIndigoServers, &QIndigoServers::onRemoveService);
-	connect(mServiceModel, &ServiceModel::serviceConnectionChange, mIndigoServers, &QIndigoServers::onConnectionChange);
+	connect(mServiceModel, &QServiceModel::serviceAdded, mIndigoServers, &QIndigoServers::onAddService);
+	connect(mServiceModel, &QServiceModel::serviceRemoved, mIndigoServers, &QIndigoServers::onRemoveService);
+	connect(mServiceModel, &QServiceModel::serviceConnectionChange, mIndigoServers, &QIndigoServers::onConnectionChange);
 
-	connect(mIndigoServers, &QIndigoServers::requestConnect, mServiceModel, &ServiceModel::onRequestConnect);
-	connect(mIndigoServers, &QIndigoServers::requestDisconnect, mServiceModel, &ServiceModel::onRequestDisconnect);
-	connect(mIndigoServers, &QIndigoServers::requestAddManualService, mServiceModel, &ServiceModel::onRequestAddManualService);
-	connect(mIndigoServers, &QIndigoServers::requestRemoveManualService, mServiceModel, &ServiceModel::onRequestRemoveManualService);
+	connect(mIndigoServers, &QIndigoServers::requestConnect, mServiceModel, &QServiceModel::onRequestConnect);
+	connect(mIndigoServers, &QIndigoServers::requestDisconnect, mServiceModel, &QServiceModel::onRequestDisconnect);
+	connect(mIndigoServers, &QIndigoServers::requestAddManualService, mServiceModel, &QServiceModel::onRequestAddManualService);
+	connect(mIndigoServers, &QIndigoServers::requestRemoveManualService, mServiceModel, &QServiceModel::onRequestRemoveManualService);
 
 	// NOTE: logging should be before update and delete of properties as they release the copy!!!
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, this, &BrowserWindow::on_message_sent);

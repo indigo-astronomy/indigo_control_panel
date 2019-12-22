@@ -27,7 +27,7 @@
 
 class QPlainTextEdit;
 class QTreeView;
-class ServiceModel;
+class QServiceModel;
 class QItemSelection;
 class QVBoxLayout;
 class QScrollArea;
@@ -128,7 +128,7 @@ private:
 	QVBoxLayout* mFormLayout;
 
 	QIndigoServers *mIndigoServers;
-	ServiceModel* mServiceModel;
+	QServiceModel* mServiceModel;
 	PropertyModel* mPropertyModel;
 	SelectionPath* current_path;
 

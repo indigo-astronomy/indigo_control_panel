@@ -32,7 +32,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QLineEdit>
-#include "indigoservice.h"
+#include "qindigoservice.h"
 
 class QIndigoServers : public QDialog
 {
@@ -44,14 +44,14 @@ public:
 signals:
 	void requestConnect(const QString &service);
 	void requestDisconnect(const QString &service);
-	void requestAddManualService(IndigoService &indigo_service);
+	void requestAddManualService(QIndigoService &indigo_service);
 	void requestRemoveManualService(const QString &service);
 
 public slots:
-	void onAddService(IndigoService &indigo_service);
-	void onRemoveService(IndigoService &indigo_service);
+	void onAddService(QIndigoService &indigo_service);
+	void onRemoveService(QIndigoService &indigo_service);
 	void highlightChecked(QListWidgetItem* item);
-	void onConnectionChange(IndigoService &indigo_service);
+	void onConnectionChange(QIndigoService &indigo_service);
 	void onAddManualService();
 	void onRemoveManualService();
 

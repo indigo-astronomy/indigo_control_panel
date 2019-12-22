@@ -25,19 +25,19 @@
 #include <indigo/indigo_client.h>
 
 
-class IndigoService
-{
+class QIndigoService {
+
 public:
-    IndigoService(const QZeroConfService& _service);
-    IndigoService(const IndigoService &other);
-	IndigoService(QByteArray name, QByteArray host, int port);
+	QIndigoService(const QZeroConfService& _service);
+	QIndigoService(const QIndigoService &other);
+	QIndigoService(QByteArray name, QByteArray host, int port);
 
-    virtual ~IndigoService();
+	virtual ~QIndigoService();
 
-    IndigoService &operator=(const IndigoService &other);
+	QIndigoService &operator=(const QIndigoService &other);
 
-    bool operator==(const IndigoService &other) const;
-    bool operator!=(const IndigoService &other) const;
+	bool operator==(const QIndigoService &other) const;
+	bool operator!=(const QIndigoService &other) const;
 
 	bool connect();
 	bool connected() const;

@@ -76,7 +76,7 @@ QIndigoServers::QIndigoServers(QWidget *parent): QDialog(parent)
 }
 
 
-void QIndigoServers::onConnectionChange(IndigoService &indigo_service) {
+void QIndigoServers::onConnectionChange(QIndigoService &indigo_service) {
 	QString service_name = indigo_service.name();
 	indigo_debug("Connection State Change [%s] connected = %d\n", service_name.toUtf8().constData(), indigo_service.connected());
 	QListWidgetItem* item = 0;
@@ -94,7 +94,7 @@ void QIndigoServers::onConnectionChange(IndigoService &indigo_service) {
 }
 
 
-void QIndigoServers::onAddService(IndigoService &indigo_service) {
+void QIndigoServers::onAddService(QIndigoService &indigo_service) {
 	QListWidgetItem* item = new QListWidgetItem(
 		indigo_service.name() +
 		tr(" @ ") +
@@ -152,14 +152,14 @@ void QIndigoServers::onAddManualService() {
 		}
 	}
 
-	IndigoService indigo_service(service.toUtf8(), hostname.toUtf8(), port);
+	QIndigoService indigo_service(service.toUtf8(), hostname.toUtf8(), port);
 	emit(requestAddManualService(indigo_service));
 	m_service_line->setText("");
 	indigo_debug("ADD: Service '%s' host '%s' port = %d\n", service.toUtf8().constData(), hostname.toUtf8().constData(), port);
 }
 
 
-void QIndigoServers::onRemoveService(IndigoService &indigo_service) {
+void QIndigoServers::onRemoveService(QIndigoService &indigo_service) {
 	QString service_name = indigo_service.name();
 	QListWidgetItem* item = 0;
 	for(int i = 0; i < m_server_list->count(); ++i){

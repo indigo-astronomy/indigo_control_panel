@@ -18,27 +18,27 @@
 
 #include <QRegularExpression>
 #include <QStandardPaths>
-#include "indigoservice.h"
-#include "servicemodel.h"
+#include "qindigoservice.h"
+#include "qservicemodel.h"
 #include <indigo/indigo_client.h>
 #include "conf.h"
 
 #define SERVICE_FILENAME "indigo_control_panel.services"
 
 
-ServiceModel::ServiceModel(const QByteArray &type) {
+QServiceModel::QServiceModel(const QByteArray &type) {
 	m_logger = &Logger::instance();
 	QTimer *m_timer = new QTimer(this);
-	connect(m_timer, &QTimer::timeout, this, QOverload<>::of(&ServiceModel::onTimer));
+	connect(m_timer, &QTimer::timeout, this, QOverload<>::of(&QServiceModel::onTimer));
 	m_timer->start(3000);
-	connect(&m_zeroConf, &QZeroConf::error, this, &ServiceModel::onServiceError);
-	connect(&m_zeroConf, &QZeroConf::serviceAdded, this, &ServiceModel::onServiceAdded);
-	connect(&m_zeroConf, &QZeroConf::serviceRemoved, this, &ServiceModel::onServiceRemoved);
+	connect(&m_zeroConf, &QZeroConf::error, this, &QServiceModel::onServiceError);
+	connect(&m_zeroConf, &QZeroConf::serviceAdded, this, &QServiceModel::onServiceAdded);
+	connect(&m_zeroConf, &QZeroConf::serviceRemoved, this, &QServiceModel::onServiceRemoved);
 	m_zeroConf.startBrowser(type);
 }
 
 
-void ServiceModel::saveManualServices() {
+void QServiceModel::saveManualServices() {
 	char filename[PATH_LEN];
 	snprintf(filename, PATH_LEN, "%s/%s", config_path, SERVICE_FILENAME);
 	FILE * file= fopen(filename, "w");
@@ -53,7 +53,7 @@ void ServiceModel::saveManualServices() {
 }
 
 
-void ServiceModel::loadManualServices() {
+void QServiceModel::loadManualServices() {
 	char filename[PATH_LEN];
 	char name[256]={0};
 	char host[256]={0};
@@ -71,7 +71,7 @@ void ServiceModel::loadManualServices() {
 }
 
 
-void ServiceModel::onTimer() {
+void QServiceModel::onTimer() {
 	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
 		if (i == nullptr) continue;
 		if ((*i)->m_server_entry == nullptr) continue;
@@ -86,12 +86,12 @@ void ServiceModel::onTimer() {
 }
 
 
-int ServiceModel::rowCount(const QModelIndex &) const {
+int QServiceModel::rowCount(const QModelIndex &) const {
 	return mServices.count();
 }
 
 
-bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
+bool QServiceModel::addService(QByteArray name, QByteArray host, int port) {
 	host = host.trimmed();
 	name = name.trimmed();
 	int i = findService(name);
@@ -103,7 +103,7 @@ bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 	indigo_debug("SERVICE ADDED MANUALLY [%s]\n", name.constData());
 
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
-	IndigoService* indigo_service = new IndigoService(name, host, port);
+	QIndigoService* indigo_service = new QIndigoService(name, host, port);
 	mServices.append(indigo_service);
 	endInsertRows();
 
@@ -113,10 +113,10 @@ bool ServiceModel::addService(QByteArray name, QByteArray host, int port) {
 }
 
 
-bool ServiceModel::removeService(QByteArray name) {
+bool QServiceModel::removeService(QByteArray name) {
 	int i = findService(name);
 	if (i != -1) {
-		IndigoService* indigo_service = mServices.at(i);
+		QIndigoService* indigo_service = mServices.at(i);
 		if (indigo_service->isQZeroConfService) return false;
 		beginRemoveRows(QModelIndex(), i, i);
 		mServices.removeAt(i);
@@ -132,38 +132,38 @@ bool ServiceModel::removeService(QByteArray name) {
 }
 
 
-bool ServiceModel::connectService(QByteArray name) {
+bool QServiceModel::connectService(QByteArray name) {
 	int i = findService(name);
 	if (i == -1) {
 		indigo_debug("SERVICE NOT FOUND [%s]\n", name.constData());
 		return false;
 	}
-	IndigoService* indigo_service = mServices.at(i);
+	QIndigoService* indigo_service = mServices.at(i);
 	indigo_debug("CONNECTING TO SERVICE [%s] on %s:%d\n", name.constData(), indigo_service->host().constData(), indigo_service->port());
 	return indigo_service->connect();
 }
 
 
-bool ServiceModel::disconnectService(QByteArray name) {
+bool QServiceModel::disconnectService(QByteArray name) {
 	int i = findService(name);
 	if (i == -1) {
 		indigo_debug("SERVICE NOT FOUND [%s]\n", name.constData());
 		return false;
 	}
-	IndigoService* indigo_service = mServices.at(i);
+	QIndigoService* indigo_service = mServices.at(i);
 	indigo_debug("DISCONNECTING FROM SERVICE [%s] on %s:%d\n", name.constData(), indigo_service->host().constData(), indigo_service->port());
 
 	return indigo_service->disconnect();
 }
 
 
-QVariant ServiceModel::data(const QModelIndex &index, int role) const {
+QVariant QServiceModel::data(const QModelIndex &index, int role) const {
 	// Ensure the index points to a valid row
 	if (!index.isValid() || index.row() < 0 || index.row() >= mServices.count()) {
 		return QVariant();
 	}
 
-	IndigoService* service = mServices.at(index.row());
+	QIndigoService* service = mServices.at(index.row());
 
 	switch (role) {
 	case Qt::DisplayRole:
@@ -178,12 +178,12 @@ QVariant ServiceModel::data(const QModelIndex &index, int role) const {
 }
 
 
-void ServiceModel::onServiceError(QZeroConf::error_t e) {
+void QServiceModel::onServiceError(QZeroConf::error_t e) {
 	indigo_error("ZEROCONF ERROR %d", e);
 }
 
 
-void ServiceModel::onServiceAdded(QZeroConfService service) {
+void QServiceModel::onServiceAdded(QZeroConfService service) {
 	int i = findService(service.name().toUtf8());
 	if (i != -1) {
 		indigo_debug("SERVICE DUPLICATE [%s]\n", service.name().toUtf8().constData());
@@ -193,7 +193,7 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 	indigo_debug("SERVICE ADDED [%s] on %s:%d\n", service.name().toUtf8().constData(), service.host().toUtf8().constData(), service.port());
 
 	beginInsertRows(QModelIndex(), mServices.count(), mServices.count());
-	IndigoService* indigo_service = new IndigoService(service);
+	QIndigoService* indigo_service = new QIndigoService(service);
 	mServices.append(indigo_service);
 	endInsertRows();
 
@@ -202,7 +202,7 @@ void ServiceModel::onServiceAdded(QZeroConfService service) {
 }
 
 
-void ServiceModel::onServiceUpdated(QZeroConfService service) {
+void QServiceModel::onServiceUpdated(QZeroConfService service) {
 	indigo_debug("SERVICE UPDATED [%s] on %s:%d\n", service.name().constData(), service.host().constData(), service.port());
 //	int i = findService(service.name());
 //	if (i != -1) {
@@ -213,13 +213,13 @@ void ServiceModel::onServiceUpdated(QZeroConfService service) {
 }
 
 
-void ServiceModel::onServiceRemoved(QZeroConfService service) {
+void QServiceModel::onServiceRemoved(QZeroConfService service) {
 	indigo_debug("REMOVE SERVICE [%s]\n", service.name().toUtf8().constData());
 
 	//qDebug() << "Service Removed " << service.name();
 	int i = findService(service.name().toUtf8());
 	if (i != -1) {
-		IndigoService* indigo_service = mServices.at(i);
+		QIndigoService* indigo_service = mServices.at(i);
 		indigo_debug("SERVICE REMOVED [%s]\n", service.name().toUtf8().constData());
 		beginRemoveRows(QModelIndex(), i, i);
 		mServices.removeAt(i);
@@ -232,27 +232,27 @@ void ServiceModel::onServiceRemoved(QZeroConfService service) {
 }
 
 
-void ServiceModel::onRequestConnect(const QString &service) {
+void QServiceModel::onRequestConnect(const QString &service) {
 	connectService(service.toUtf8());
 }
 
 
-void ServiceModel::onRequestDisconnect(const QString &service) {
+void QServiceModel::onRequestDisconnect(const QString &service) {
 	disconnectService(service.toUtf8());
 }
 
-void ServiceModel::onRequestAddManualService(IndigoService &indigo_service) {
+void QServiceModel::onRequestAddManualService(QIndigoService &indigo_service) {
 	if (addService(indigo_service.name(), indigo_service.host(), indigo_service.port()))
 		saveManualServices();
 }
 
 
-void ServiceModel::onRequestRemoveManualService(const QString &service) {
+void QServiceModel::onRequestRemoveManualService(const QString &service) {
 	if (removeService(service.toUtf8())) saveManualServices();
 }
 
 
-int ServiceModel::findService(const QByteArray &name) {
+int QServiceModel::findService(const QByteArray &name) {
 	for (auto i = mServices.constBegin(); i != mServices.constEnd(); ++i) {
 		if ((*i)->name() == name) {
 			return i - mServices.constBegin();

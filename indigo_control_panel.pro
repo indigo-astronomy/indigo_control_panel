@@ -17,9 +17,9 @@ DEFINES += QT_DEPRECATED_WARNINGS QZEROCONF_STATIC
 
 SOURCES += \
 	main.cpp \
-	servicemodel.cpp \
+	qservicemodel.cpp \
 	browserwindow.cpp \
-	indigoservice.cpp \
+	qindigoservice.cpp \
 	propertymodel.cpp \
 	indigoclient.cpp \
 	qindigoproperty.cpp \
@@ -97,9 +97,9 @@ else: unix:!android: target.path = /usr/bin
 
 HEADERS += \
 	version.h \
-	servicemodel.h \
+	qservicemodel.h \
 	browserwindow.h \
-	indigoservice.h \
+	qindigoservice.h \
 	propertymodel.h \
 	indigoclient.h \
 	qindigoproperty.h \
