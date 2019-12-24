@@ -170,9 +170,9 @@ static indigo_result client_send_message(indigo_client *client, indigo_device *d
 	msg = (char*)malloc(INDIGO_VALUE_SIZE);
 	if ((device) && (device->name[0]) && (device->name[0] != '@')) {
 		// We have device name
-		snprintf(msg, sizeof(msg), "%s: %s", device->name, message);
+		snprintf(msg, INDIGO_VALUE_SIZE, "%s: %s", device->name, message);
 	} else {
-		snprintf(msg, sizeof(msg), "%s", message);
+		snprintf(msg, INDIGO_VALUE_SIZE, "%s", message);
 	}
 	emit(IndigoClient::instance().message_sent(NULL, msg));
 	return INDIGO_OK;
