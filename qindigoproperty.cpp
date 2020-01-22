@@ -66,10 +66,10 @@ void QIndigoProperty::update_property_view() {
 	case INDIGO_IDLE_STATE:
 		m_led->setPixmap(QPixmap(":resource/led-grey.png"));
 		this->setStyleSheet(
-			"#INDIGO_property { background-color: #202020 }"
-			"QLineEdit#INDIGO_property { background-color: #202020}"
-			"QPushButton#INDIGO_property { background-color: #222222 }"
-			"QPushButton#INDIGO_property:focus { background-color: #272727 }"
+			"#INDIGO_property { background-color: #272727; border: 0px}"
+			"QLineEdit#INDIGO_property { background-color: #222222}"
+			"QPushButton#INDIGO_property { background-color: #323232 }"
+			"QPushButton#INDIGO_property:focus { background-color: #393939 }"
 		);
 		break;
 	case INDIGO_BUSY_STATE:
