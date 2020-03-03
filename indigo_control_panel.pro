@@ -68,6 +68,8 @@ RESOURCES += \
 	resource/guider-green.png \
 	resource/dome-grey.png \
 	resource/dome-green.png \
+	resource/rotator-grey.png \
+	resource/rotator-green.png \
 	resource/weather-grey.png \
 	resource/weather-green.png \
 	resource/powerbox-grey.png \

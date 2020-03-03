@@ -445,6 +445,14 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 						return QPixmap(":resource/dome-grey.png");
 					}
 				}
+				if (d->m_interface & INDIGO_INTERFACE_ROTATOR) {
+					switch (d->state) {
+					case INDIGO_OK_STATE:
+						return QPixmap(":resource/rotator-green.png");
+					default:
+						return QPixmap(":resource/rotator-grey.png");
+					}
+				}
 				if ((d->m_interface & INDIGO_INTERFACE_AUX) && (d->m_interface & INDIGO_INTERFACE_AUX_POWERBOX & ~INDIGO_INTERFACE_AUX)) {
 					switch (d->state) {
 					case INDIGO_OK_STATE:
