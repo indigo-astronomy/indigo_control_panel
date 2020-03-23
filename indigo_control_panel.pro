@@ -132,7 +132,7 @@ INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
 
 unix {
 	INCLUDEPATH += "$${PWD}/libjpeg"
-	LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg
+	LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -Wl,-Bstatic -lindigo -ljpeg -Wl,-Bdynamic -ldl
 }
 
 DISTFILES += \
