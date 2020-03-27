@@ -119,6 +119,7 @@ void QIndigoProperty::update() {
 	update_property_view();
 
 	//  Update the property on the bus
+	m_property->access_token = indigo_get_device_or_master_token(m_property->device);
 	indigo_change_property(nullptr, m_property);
 }
 
