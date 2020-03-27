@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 1; i < argc; i++) {
 		if ((!strcmp(argv[i], "-T") || !strcmp(argv[i], "--master-token")) && i < argc - 1) {
-			indigo_set_master_token(atoi(argv[i + 1]));
+			indigo_set_master_token(indigo_string_to_token(argv[i + 1]));
 			i++;
 		} else if ((!strcmp(argv[i], "-a") || !strcmp(argv[i], "--acl-file")) && i < argc - 1) {
 			indigo_load_device_tokens_from_file(argv[i + 1]);
