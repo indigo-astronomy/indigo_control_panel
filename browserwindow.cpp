@@ -27,6 +27,7 @@
 #include <QScrollArea>
 #include <QMessageBox>
 #include <QActionGroup>
+#include <QFileDialog>
 #include <sys/time.h>
 #include "browserwindow.h"
 #include "qservicemodel.h"
@@ -77,7 +78,15 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QMenu *menu = new QMenu("&File");
 	QAction *act;
 
-	act = menu->addAction(tr("&Manage Services"));
+	act = menu->addAction(tr("&Load ACL from file..."));
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_acl_load_act);
+
+	act = menu->addAction(tr("&Clear ACL"));
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_acl_clear_act);
+
+	menu->addSeparator();
+
+	act = menu->addAction(tr("&Manage services"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
 
 	menu->addSeparator();
@@ -88,7 +97,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	menu_bar->addMenu(menu);
 
 	menu = new QMenu("&Edit");
-	act = menu->addAction(tr("Clear &Messages"));
+	act = menu->addAction(tr("Clear &messages"));
 	connect(act, &QAction::triggered, mLog, &QPlainTextEdit::clear);
 	menu_bar->addMenu(menu);
 
@@ -630,6 +639,30 @@ void BrowserWindow::on_log_trace() {
 	conf.indigo_log_level = INDIGO_LOG_TRACE;
 	indigo_set_log_level(conf.indigo_log_level);
 	write_conf();
+}
+
+
+void BrowserWindow::on_acl_load_act() {
+	QString filter = "INDIGO Access Control List (*.iacl);; All files (*)";
+	QString file_name = QFileDialog::getOpenFileName(this, "Select ACL file...", QDir::currentPath(), filter);
+	if (!file_name.isNull()) {
+		char fname[PATH_MAX];
+		strcpy(fname, file_name.toStdString().c_str());
+		char message[PATH_MAX];
+		if (indigo_load_device_tokens_from_file(fname)) {
+			snprintf(message, PATH_MAX, "ACL loaded from '%s'", fname);
+		} else {
+			snprintf(message, PATH_MAX, "Failed to load ACL from '%s'", fname);
+		}
+		on_window_log(NULL, message);
+	}
+	indigo_debug("%s\n", __FUNCTION__);
+}
+
+void BrowserWindow::on_acl_clear_act() {
+	indigo_clear_device_tokens();
+	on_window_log(NULL, "Access control list cleared.");
+	indigo_debug("%s\n", __FUNCTION__);
 }
 
 
