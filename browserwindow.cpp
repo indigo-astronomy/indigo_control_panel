@@ -78,10 +78,10 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QMenu *menu = new QMenu("&File");
 	QAction *act;
 
-	act = menu->addAction(tr("&Load ACL from file..."));
+	act = menu->addAction(tr("&Load device ACL from file..."));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_acl_load_act);
 
-	act = menu->addAction(tr("&Clear ACL"));
+	act = menu->addAction(tr("&Clear device ACL"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_acl_clear_act);
 
 	menu->addSeparator();
@@ -643,16 +643,16 @@ void BrowserWindow::on_log_trace() {
 
 
 void BrowserWindow::on_acl_load_act() {
-	QString filter = "INDIGO Access Control List (*.iacl);; All files (*)";
-	QString file_name = QFileDialog::getOpenFileName(this, "Select ACL file...", QDir::currentPath(), filter);
+	QString filter = "INDIGO Device Access Control (*.idac);; All files (*)";
+	QString file_name = QFileDialog::getOpenFileName(this, "Select device ACL file...", QDir::currentPath(), filter);
 	if (!file_name.isNull()) {
 		char fname[PATH_MAX];
 		strcpy(fname, file_name.toStdString().c_str());
 		char message[PATH_MAX];
 		if (indigo_load_device_tokens_from_file(fname)) {
-			snprintf(message, PATH_MAX, "ACL loaded from '%s'", fname);
+			snprintf(message, PATH_MAX, "Device ACL loaded from '%s'", fname);
 		} else {
-			snprintf(message, PATH_MAX, "Failed to load ACL from '%s'", fname);
+			snprintf(message, PATH_MAX, "Failed to load device ACL from '%s'", fname);
 		}
 		on_window_log(NULL, message);
 	}
