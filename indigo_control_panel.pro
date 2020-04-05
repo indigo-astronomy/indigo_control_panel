@@ -150,7 +150,8 @@ win32 {
             indigo/indigo_libs/indigo_client_xml.c \
             indigo/indigo_libs/indigo_version.c \
             indigo/indigo_libs/indigo_io.c \
-            indigo/indigo_libs/indigo_xml.c
+            indigo/indigo_libs/indigo_xml.c \
+            indigo/indigo_libs/indigo_token.c
 
         HEADERS += \
             indigo/indigo_libs/indigo/indigo_base64.h \
@@ -162,5 +163,6 @@ win32 {
             indigo/indigo_libs/indigo/indigo_io.h \
             indigo/indigo_libs/indigo/indigo_version.h \
             indigo/indigo_libs/indigo/indigo_xml.h \
-            indigo/indigo_libs/indigo/indigo_names.h
+            indigo/indigo_libs/indigo/indigo_names.h \
+            indigo/indigo_libs/indigo/indigo_token.h
 }
