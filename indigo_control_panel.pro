@@ -68,6 +68,8 @@ RESOURCES += \
 	resource/guider-green.png \
 	resource/dome-grey.png \
 	resource/dome-green.png \
+	resource/rotator-grey.png \
+	resource/rotator-green.png \
 	resource/weather-grey.png \
 	resource/weather-green.png \
 	resource/powerbox-grey.png \
@@ -81,7 +83,9 @@ RESOURCES += \
 	resource/sqm-grey.png \
 	resource/sqm-green.png \
 	resource/dustcap-grey.png \
-	resource/dustcap-green.png
+	resource/dustcap-green.png \
+	resource/gpio-grey.png \
+	resource/gpio-green.png
 
 
 # Additional import path used to resolve QML modules in Qt Creator\'s code model
@@ -128,7 +132,8 @@ INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
 
 unix {
 	INCLUDEPATH += "$${PWD}/libjpeg"
-	LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg
+	# LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -Wl,-Bstatic -lindigo -ljpeg -Wl,-Bdynamic -ldl
+	LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg -ldl
 }
 
 DISTFILES += \
@@ -145,7 +150,8 @@ win32 {
             indigo/indigo_libs/indigo_client_xml.c \
             indigo/indigo_libs/indigo_version.c \
             indigo/indigo_libs/indigo_io.c \
-            indigo/indigo_libs/indigo_xml.c
+            indigo/indigo_libs/indigo_xml.c \
+            indigo/indigo_libs/indigo_token.c
 
         HEADERS += \
             indigo/indigo_libs/indigo/indigo_base64.h \
@@ -157,5 +163,6 @@ win32 {
             indigo/indigo_libs/indigo/indigo_io.h \
             indigo/indigo_libs/indigo/indigo_version.h \
             indigo/indigo_libs/indigo/indigo_xml.h \
-            indigo/indigo_libs/indigo/indigo_names.h
+            indigo/indigo_libs/indigo/indigo_names.h \
+            indigo/indigo_libs/indigo/indigo_token.h
 }
