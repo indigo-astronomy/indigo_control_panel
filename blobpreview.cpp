@@ -318,7 +318,6 @@ QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_si
 	QImage *img = create_preview(header->width, header->height,
 	        pix_format, raw_data, hist, preview_stretch_lut[preview_stretch_level]);
 
-	free(raw_data);
 	free(hist);
 	return img;
 }
