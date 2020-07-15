@@ -268,9 +268,9 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::obsolete_preview, this, &BrowserWindow::on_obsolete_preview);
 	connect(&IndigoClient::instance(), &IndigoClient::remove_preview, this, &BrowserWindow::on_remove_preview);
 
-	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property);
-	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property);
-	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property);
+	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property, Qt::BlockingQueuedConnection);
+	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property, Qt::BlockingQueuedConnection);
+	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property, Qt::BlockingQueuedConnection);
 
 	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define);
 	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_delete);
