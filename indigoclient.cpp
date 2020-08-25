@@ -104,8 +104,8 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
-					emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 				}
+				emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 			}
 		} else if(property->state == INDIGO_BUSY_STATE) {
 			for (int row = 0; row < property->count; row++) {
