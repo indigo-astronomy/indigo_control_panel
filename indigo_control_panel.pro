@@ -52,6 +52,7 @@ RESOURCES += \
 	resource/led-grey-dev.png \
 	resource/led-green-dev.png \
 	resource/server.png \
+	resource/agent.png \
 	resource/ccd-grey.png \
 	resource/ccd-green.png \
 	resource/mount-grey.png \
