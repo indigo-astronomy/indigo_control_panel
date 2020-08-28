@@ -743,6 +743,7 @@ typedef int ssize_t;
 //	 Standard Types
 //===========================================================================================================================
 
+/*
 #if ( !defined( INT8_MIN ) )
 
     #define INT8_MIN                    SCHAR_MIN
@@ -791,6 +792,7 @@ typedef unsigned long int uintptr_t;
     #endif
 
 #endif
+*/
 
 // Macros for minimum-width integer constants
 
