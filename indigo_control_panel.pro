@@ -154,6 +154,11 @@ win32 {
             indigo/indigo_libs/indigo_xml.c \
             indigo/indigo_libs/indigo_token.c
 
+	# If you want to use indigo_client.dll place int he current folder
+	# indigo_client.dll indigo_client.lib and pthreadVC3.dll
+	# then uncoment the line below (LIBS) and comment SOURCES above.
+	#LIBS +=$${PWD}/indigo_client.dll
+
         HEADERS += \
             indigo/indigo_libs/indigo/indigo_base64.h \
             indigo/indigo_libs/indigo/indigo_base64_luts.h \
