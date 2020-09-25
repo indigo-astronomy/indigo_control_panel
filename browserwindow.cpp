@@ -78,6 +78,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QMenu *menu = new QMenu("&File");
 	QAction *act;
 
+	act = menu->addAction(tr("&Manage services"));
+	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
+
+	menu->addSeparator();
+
 	act = menu->addAction(tr("&Load Device ACL..."));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_acl_load_act);
 
@@ -89,11 +94,6 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	act = menu->addAction(tr("&Clear Device ACL"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_acl_clear_act);
-
-	menu->addSeparator();
-
-	act = menu->addAction(tr("&Manage services"));
-	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
 
 	menu->addSeparator();
 
@@ -109,7 +109,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	menu = new QMenu("&Settings");
 
-	act = menu->addAction(tr("Ebable &BLOBs"));
+	act = menu->addAction(tr("Enable &BLOBs"));
 	act->setCheckable(true);
 	act->setChecked(conf.blobs_enabled);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
