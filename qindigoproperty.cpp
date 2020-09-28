@@ -23,7 +23,6 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QThread>
 #include <QtConcurrentRun>
 #include "qindigoproperty.h"
 #include "qindigotext.h"

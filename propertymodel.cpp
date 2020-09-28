@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
+#include <QtConcurrentRun>
 #include <unistd.h>
 #include "blobpreview.h"
 #include "propertymodel.h"
@@ -557,11 +558,13 @@ void PropertyModel::enable_blobs(bool on) {
 				indigo_property *property = prop_node->property;
 				if (property == nullptr) continue;
 				if (property->type == INDIGO_BLOB_VECTOR) {
-					if (on) { // Enagle blob and let adapter decide URL or ALSO
-						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB);
-					} else {
-						indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_NEVER);
-					}
+					QtConcurrent::run([=]() {
+						if (on) { // Enagle blob and let adapter decide URL or ALSO
+							indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB);
+						} else {
+							indigo_enable_blob(&client, property, INDIGO_ENABLE_BLOB_NEVER);
+						}
+					});
 					indigo_debug("BLOB %s.%s -> mode = %d\n", property->device, property->name, on);
 				}
 			}
