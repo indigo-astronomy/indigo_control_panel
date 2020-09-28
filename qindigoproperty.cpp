@@ -23,6 +23,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QThread>
+#include <QtConcurrentRun>
 #include "qindigoproperty.h"
 #include "qindigotext.h"
 #include "qindigonumber.h"
@@ -119,8 +121,10 @@ void QIndigoProperty::update() {
 	update_property_view();
 
 	//  Update the property on the bus
-	m_property->access_token = indigo_get_device_or_master_token(m_property->device);
-	indigo_change_property(nullptr, m_property);
+	QtConcurrent::run([=]() {
+		m_property->access_token = indigo_get_device_or_master_token(m_property->device);
+		indigo_change_property(nullptr, m_property);
+	});
 }
 
 
@@ -140,7 +144,9 @@ void QIndigoProperty::set_clicked() {
 		m_controls[i]->apply();
 
 	//  Update property on indigo bus
-	indigo_change_property(nullptr, m_property);
+	QtConcurrent::run([=]() {
+		indigo_change_property(nullptr, m_property);
+	});
 }
 
 
