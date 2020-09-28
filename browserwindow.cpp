@@ -722,7 +722,7 @@ void BrowserWindow::on_about_act() {
 		"Rumen G.Bogdanovski<br>"
 		"David Hulse<br><br>"
 		"You can use this software under the terms of <b>INDIGO Astronomy open-source license</b><br><br>"
-		"Copyright ©2019, The INDIGO Initiative.<br>"
+		"Copyright ©2019-2020, The INDIGO Initiative.<br>"
 		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
 	);
 	msgBox.exec();
