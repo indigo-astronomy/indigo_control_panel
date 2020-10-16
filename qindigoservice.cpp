@@ -26,6 +26,19 @@ QIndigoService::QIndigoService(const QZeroConfService& _service) :
 	m_service(_service),
 	m_server_entry(nullptr),
 	isQZeroConfService(true),
+	autoConnect(true),
+	prevSocket(0) {
+}
+
+
+QIndigoService::QIndigoService(const QZeroConfService& _service, bool connect) :
+	m_name(_service->name().toUtf8().constData()),
+	m_host(_service->host().toUtf8().constData()),
+	m_port(_service->port()),
+	m_service(_service),
+	m_server_entry(nullptr),
+	isQZeroConfService(true),
+	autoConnect(connect),
 	prevSocket(0) {
 }
 
@@ -40,6 +53,18 @@ QIndigoService::QIndigoService(QByteArray name, QByteArray host, int port) :
 	m_port(port),
 	m_server_entry(nullptr),
 	isQZeroConfService(false),
+	autoConnect(true),
+	prevSocket(0) {
+}
+
+
+QIndigoService::QIndigoService(QByteArray name, QByteArray host, int port, bool connect) :
+	m_name(name),
+	m_host(host),
+	m_port(port),
+	m_server_entry(nullptr),
+	isQZeroConfService(false),
+	autoConnect(connect),
 	prevSocket(0) {
 }
 
