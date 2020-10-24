@@ -56,7 +56,7 @@ void QServiceModel::saveManualServices() {
 			} else {
 				service_type = 'M';
 			}
-			indigo_debug("Saved: %s@%s:%d, %c, %d\n", (*i)->name().constData(), (*i)->host().constData(), (*i)->port(), service_type, (*i)->auto_connect);
+			indigo_debug("Saved service: %s@%s:%d, %c, %d\n", (*i)->name().constData(), (*i)->host().constData(), (*i)->port(), service_type, (*i)->auto_connect);
 			fprintf(file, "%s@%s:%d, %c, %d\n", (*i)->name().constData(), (*i)->host().constData(), (*i)->port(), service_type, (*i)->auto_connect);
 		}
 		fclose(file);

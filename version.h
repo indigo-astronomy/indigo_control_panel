@@ -20,6 +20,6 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define PANEL_VERSION "0.7-5"
+#define PANEL_VERSION "0.8-1"
 
 #endif // VERSION_H
