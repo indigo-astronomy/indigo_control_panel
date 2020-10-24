@@ -9,7 +9,7 @@ Vcs-Git: git://github.com/indigo-astronomy/control-panel.git
 
 Package: indigo-control-panel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, indigo (>= 2.0-122)
+Depends: ${shlibs:Depends}, ${misc:Depends}, qt5-image-formats-plugins, indigo (>= 2.0-122)
 Description: INDIGO Control Panel
  INDIGO Control Panel is a program for browsing and
  and modifying INDIGO properties.

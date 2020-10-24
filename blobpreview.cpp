@@ -323,9 +323,10 @@ QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_si
 
 
 QImage* create_tiff_preview(unsigned char *tiff_image_buffer, unsigned long tiff_size) {
-	indigo_error("PREVIEW: %s(): not implemented!", __FUNCTION__);
+	indigo_error("PREVIEW: %s(): not implemented, just basic support!", __FUNCTION__);
 	QImage* img = new QImage();
 	/* not supported yet */
+	img->loadFromData((const uchar*)tiff_image_buffer, tiff_size, "TIFF");
 	return img;
 }
 
