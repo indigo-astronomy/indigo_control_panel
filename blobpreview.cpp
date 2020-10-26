@@ -327,6 +327,10 @@ QImage* create_tiff_preview(unsigned char *tiff_image_buffer, unsigned long tiff
 	QImage* img = new QImage();
 	/* not supported yet */
 	img->loadFromData((const uchar*)tiff_image_buffer, tiff_size, "TIFF");
+	if(img->isNull()) {
+		delete img;
+		img = nullptr;
+	}
 	return img;
 }
 
@@ -335,6 +339,10 @@ QImage* create_qtsupported_preview(unsigned char *image_buffer, unsigned long si
 	indigo_debug("PREVIEW: %s(): called", __FUNCTION__);
 	QImage* img = new QImage();
 	img->loadFromData((const uchar*)image_buffer, size);
+	if(img->isNull()) {
+		delete img;
+		img = nullptr;
+	}
 	return img;
 }
 
@@ -525,7 +533,8 @@ QImage* create_preview(int width, int height, int pix_format, char *image_data, 
 		free(rgb_data);
 	} else {
 		indigo_error("PREVIEW: Unsupported pixel format (%d)", pix_format);
-		return nullptr;
+		delete img;
+		img = nullptr;
 	}
 	return img;
 }
