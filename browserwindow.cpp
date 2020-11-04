@@ -114,7 +114,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act->setChecked(conf.blobs_enabled);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
 
-	act = menu->addAction(tr("Enable auto &connect"));
+	act = menu->addAction(tr("Auto &connect new services"));
 	act->setCheckable(true);
 	act->setChecked(conf.auto_connect);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
