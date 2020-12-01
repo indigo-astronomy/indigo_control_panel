@@ -94,6 +94,15 @@ int main(int argc, char *argv[]) {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication app(argc, argv);
 
+#if defined(INDIGO_WINDOWS)
+	QFont font("Helvetica", 10, QFont::Medium);
+	font.setStyleHint(QFont::Helvetica, QFont::PreferAntialias);
+#else
+	QFont font("Sans", 10, QFont::Medium);
+	font.setStyleHint(QFont::SansSerif);
+#endif
+	app.setFont(font);
+
 	QFile f(":qdarkstyle/style.qss");
 	f.open(QFile::ReadOnly | QFile::Text);
 	QTextStream ts(&f);
