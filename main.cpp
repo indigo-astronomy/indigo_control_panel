@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	memset(&conf,0,sizeof(conf_t));
-	conf.blobs_enabled = true;
+	conf.blobs_enabled = false;
 	conf.auto_connect = true;
 	conf.indigo_use_host_suffix = true;
 	conf.use_state_icons = false;
@@ -94,13 +94,8 @@ int main(int argc, char *argv[]) {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication app(argc, argv);
 
-#if defined(INDIGO_WINDOWS)
-	QFont font("Helvetica", 10, QFont::Medium);
-	font.setStyleHint(QFont::Helvetica, QFont::PreferAntialias);
-#else
-	QFont font("Sans", 10, QFont::Medium);
+	QFont font("SansSerif", 10, QFont::Medium);
 	font.setStyleHint(QFont::SansSerif);
-#endif
 	app.setFont(font);
 
 	QFile f(":qdarkstyle/style.qss");
