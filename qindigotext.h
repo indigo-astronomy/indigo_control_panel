@@ -22,6 +22,7 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QWidget>
 #include "qindigoswitch.h"
 
@@ -45,6 +46,7 @@ public slots:
 private:
 	QLabel* label;
 	QLineEdit* text;
+	QPlainTextEdit* text_edit;
 	bool m_dirty;
 };
 

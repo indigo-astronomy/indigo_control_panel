@@ -26,29 +26,51 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
-	text = new QLineEdit();
-	char tooltip[1600];
-	text->setObjectName("INDIGO_property");
-	if (m_property->perm == INDIGO_RO_PERM) {
-		snprintf(tooltip, sizeof(tooltip), "%s: read only", m_item->label);
-		text->setToolTip(tooltip);
-		text->setReadOnly(true);
+
+	if (strncmp(m_item->name, "SCRIPT", INDIGO_NAME_SIZE)) {
+		text = new QLineEdit();
+		char tooltip[1600];
+		text->setObjectName("INDIGO_property");
+		if (m_property->perm == INDIGO_RO_PERM) {
+			snprintf(tooltip, sizeof(tooltip), "%s: read only", m_item->label);
+			text->setToolTip(tooltip);
+			text->setReadOnly(true);
+		} else {
+			snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
+			text->setToolTip(tooltip);
+		}
+		QHBoxLayout* hbox = new QHBoxLayout();
+		setLayout(hbox);
+		hbox->setAlignment(Qt::AlignLeft);
+		hbox->setMargin(0);
+		hbox->setSpacing(0);
+		hbox->addWidget(label, 35);
+		hbox->addWidget(text, 65);
+		connect(text, &QLineEdit::textEdited, this, &QIndigoText::dirty);
 	} else {
-		snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
-		text->setToolTip(tooltip);
+		text_edit = new QPlainTextEdit();
+		text = NULL;
+		char tooltip[1600];
+		//text_edit->setObjectName("INDIGO_property");
+		if (m_property->perm == INDIGO_RO_PERM) {
+			snprintf(tooltip, sizeof(tooltip), "%s: read only", m_item->label);
+			text_edit->setToolTip(tooltip);
+			text_edit->setReadOnly(true);
+		} else {
+			snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
+			text_edit->setToolTip(tooltip);
+		}
+		QHBoxLayout* hbox = new QHBoxLayout();
+		setLayout(hbox);
+		hbox->setAlignment(Qt::AlignLeft);
+		hbox->setMargin(0);
+		hbox->setSpacing(0);
+		hbox->addWidget(label, 15);
+		hbox->addWidget(text_edit, 85);
+		text_edit->setFixedHeight(350);
+		connect(text_edit, &QPlainTextEdit::textChanged, this, &QIndigoText::dirty);
 	}
 	update();
-
-	//  Lay the labels out somehow in the widget
-	QHBoxLayout* hbox = new QHBoxLayout();
-	setLayout(hbox);
-	hbox->setAlignment(Qt::AlignLeft);
-	hbox->setMargin(0);
-	hbox->setSpacing(0);
-	hbox->addWidget(label, 35);
-	hbox->addWidget(text, 65);
-
-	connect(text, &QLineEdit::textEdited, this, &QIndigoText::dirty);
 }
 
 QIndigoText::~QIndigoText() {
@@ -58,21 +80,35 @@ QIndigoText::~QIndigoText() {
 
 void QIndigoText::update() {
 	//  Apply update from indigo bus only if not being edited
-	if (!m_dirty) text->setText(m_item->text.value);
+	if (!m_dirty) {
+		if (text)
+			text->setText(m_item->text.value);
+		else
+			text_edit->setPlainText(m_item->text.value);
+	}
 }
 
 void QIndigoText::reset() {
 	if (m_dirty) {
 		m_dirty = false;
 		update();
-		text->setStyleSheet("color: #FFFFFF");
-		text->clearFocus();
+		if (text) {
+			text->setStyleSheet("color: #FFFFFF");
+			text->clearFocus();
+		} else {
+			text_edit->setStyleSheet("color: #FFFFFF");
+			text_edit->clearFocus();
+		}
 	}
 }
 
 void QIndigoText::apply() {
 	if (m_dirty) {
-		strncpy(m_item->text.value, text->text().trimmed().toUtf8().constData(), sizeof(m_item->text.value));
+		if (text) {
+			strncpy(m_item->text.value, text->text().trimmed().toUtf8().constData(), sizeof(m_item->text.value));
+		} else {
+			strncpy(m_item->text.value, text_edit->toPlainText().trimmed().toUtf8().constData(), sizeof(m_item->text.value));
+		}
 		reset();
 	}
 }
@@ -81,5 +117,9 @@ void QIndigoText::dirty() {
 	//  Set dirty flag
 	m_dirty = true;
 	//  Colour text orange
-	text->setStyleSheet("color: #CCCC00");
+	if (text) {
+		text->setStyleSheet("color: #CCCC00");
+	} else {
+		text_edit->setStyleSheet("color: #CCCC00");
+	}
 }
