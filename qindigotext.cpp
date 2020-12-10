@@ -27,6 +27,12 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 
+	QHBoxLayout* hbox = new QHBoxLayout();
+	hbox->setAlignment(Qt::AlignLeft);
+	hbox->setMargin(0);
+	hbox->setSpacing(0);
+	setLayout(hbox);
+
 	if (strncmp(m_item->name, "SCRIPT", INDIGO_NAME_SIZE)) {
 		text = new QLineEdit();
 		char tooltip[1600];
@@ -39,11 +45,6 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 			snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
 			text->setToolTip(tooltip);
 		}
-		QHBoxLayout* hbox = new QHBoxLayout();
-		setLayout(hbox);
-		hbox->setAlignment(Qt::AlignLeft);
-		hbox->setMargin(0);
-		hbox->setSpacing(0);
 		hbox->addWidget(label, 35);
 		hbox->addWidget(text, 65);
 		connect(text, &QLineEdit::textEdited, this, &QIndigoText::dirty);
@@ -60,14 +61,10 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 			snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
 			text_edit->setToolTip(tooltip);
 		}
-		QHBoxLayout* hbox = new QHBoxLayout();
-		setLayout(hbox);
-		hbox->setAlignment(Qt::AlignLeft);
-		hbox->setMargin(0);
-		hbox->setSpacing(0);
 		hbox->addWidget(label, 15);
 		hbox->addWidget(text_edit, 85);
-		text_edit->setFixedHeight(350);
+		text_edit->setMinimumHeight(350);
+		text_edit->setWordWrapMode(QTextOption::ManualWrap);
 		connect(text_edit, &QPlainTextEdit::textChanged, this, &QIndigoText::dirty);
 	}
 	update();
