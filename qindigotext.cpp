@@ -16,8 +16,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <QLayout>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include "qindigotext.h"
 
 
@@ -27,13 +28,12 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 
-	QHBoxLayout* hbox = new QHBoxLayout();
-	hbox->setAlignment(Qt::AlignLeft);
-	hbox->setMargin(0);
-	hbox->setSpacing(0);
-	setLayout(hbox);
-
-	if (strncmp(m_item->name, "SCRIPT", INDIGO_NAME_SIZE)) {
+	if (strncmp(property->name, "AGENT_SCRIPTING_SCRIPT", INDIGO_NAME_SIZE)) {
+		QHBoxLayout* hbox = new QHBoxLayout();
+		hbox->setAlignment(Qt::AlignLeft);
+		hbox->setMargin(0);
+		hbox->setSpacing(0);
+		setLayout(hbox);
 		text = new QLineEdit();
 		char tooltip[1600];
 		text->setObjectName("INDIGO_property");
@@ -49,6 +49,11 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 		hbox->addWidget(text, 65);
 		connect(text, &QLineEdit::textEdited, this, &QIndigoText::dirty);
 	} else {
+		QVBoxLayout* vbox = new QVBoxLayout();
+		vbox->setAlignment(Qt::AlignLeft);
+		vbox->setMargin(0);
+		vbox->setSpacing(0);
+		setLayout(vbox);
 		text_edit = new QPlainTextEdit();
 		text = NULL;
 		char tooltip[1600];
@@ -61,8 +66,8 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 			snprintf(tooltip, sizeof(tooltip), "%s: editable", m_item->label);
 			text_edit->setToolTip(tooltip);
 		}
-		hbox->addWidget(label, 15);
-		hbox->addWidget(text_edit, 85);
+		vbox->addWidget(label, 15);
+		vbox->addWidget(text_edit, 85);
 		text_edit->setMinimumHeight(350);
 		text_edit->setWordWrapMode(QTextOption::ManualWrap);
 		connect(text_edit, &QPlainTextEdit::textChanged, this, &QIndigoText::dirty);
