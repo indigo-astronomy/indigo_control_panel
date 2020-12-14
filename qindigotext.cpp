@@ -81,14 +81,15 @@ QIndigoText::~QIndigoText() {
 void QIndigoText::update() {
 	//  Apply update from indigo bus only if not being edited
 	if (!m_dirty) {
-		char *value = m_item->text.value;
-		if (m_item->text.long_value) {
-			value = m_item->text.long_value;
-		}
-		if (text)
+		char *value = indigo_get_text_item_value(m_item);
+
+		if (text) {
 			text->setText(value);
-		else
+		} else {
+			text_edit->blockSignals(true);
 			text_edit->setPlainText(value);
+			text_edit->blockSignals(false);
+		}
 	}
 }
 
