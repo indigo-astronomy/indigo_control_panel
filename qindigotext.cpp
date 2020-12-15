@@ -110,9 +110,9 @@ void QIndigoText::reset() {
 void QIndigoText::apply() {
 	if (m_dirty) {
 		if (text) {
-			strncpy(m_item->text.value, text->text().trimmed().toUtf8().constData(), sizeof(m_item->text.value));
+			indigo_set_text_item_value(m_item, text->text().trimmed().toUtf8().constData());
 		} else {
-			strncpy(m_item->text.value, text_edit->toPlainText().trimmed().toUtf8().constData(), sizeof(m_item->text.value));
+			indigo_set_text_item_value(m_item, text_edit->toPlainText().trimmed().toUtf8().constData());
 		}
 		reset();
 	}
