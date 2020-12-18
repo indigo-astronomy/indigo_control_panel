@@ -114,7 +114,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act->setChecked(conf.blobs_enabled);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
 
-	act = menu->addAction(tr("Auto &connect new services"));
+	act = menu->addAction(tr("&Auto connect new services"));
 	act->setCheckable(true);
 	act->setChecked(conf.auto_connect);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
@@ -129,7 +129,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act->setChecked(conf.use_state_icons);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_state_icons_changed);
 
-	act = menu->addAction(tr("Use locale specific &decimal separator"));
+	act = menu->addAction(tr("Use &locale specific decimal separator"));
 	act->setCheckable(true);
 	act->setChecked(conf.use_system_locale);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_use_system_locale_changed);
