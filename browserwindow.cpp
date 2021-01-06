@@ -710,6 +710,7 @@ void BrowserWindow::on_acl_clear_act() {
 
 void BrowserWindow::on_about_act() {
 	QMessageBox msgBox(this);
+	int platform_bits = sizeof(void*) * 8;
 	QPixmap pixmap(":resource/indigo_logo.png");
 	msgBox.setWindowTitle("About INDIGO Panel");
 	msgBox.setTextFormat(Qt::RichText);
@@ -718,12 +719,13 @@ void BrowserWindow::on_about_act() {
 		"<b>INDIGO Control Panel</b><br>"
 		"Version "
 		PANEL_VERSION
-		"</b><br><br>"
+		" (" + QString::number(platform_bits) + "bit) <br>"
+		"<br>"
 		"Authors:<br>"
 		"Rumen G.Bogdanovski<br>"
 		"David Hulse<br><br>"
 		"You can use this software under the terms of <b>INDIGO Astronomy open-source license</b><br><br>"
-		"Copyright ©2019-2020, The INDIGO Initiative.<br>"
+		"Copyright ©2019-2021, The INDIGO Initiative.<br>"
 		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
 	);
 	msgBox.exec();
