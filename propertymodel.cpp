@@ -382,6 +382,9 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 				}
 			} else if (node->node_type == TREE_NODE_DEVICE) {
 				DeviceNode* d = reinterpret_cast<DeviceNode*>(node);
+				if (d->m_interface & INDIGO_INTERFACE_AGENT) {
+					return QPixmap(":resource/agent.png");
+				}
 				if (d->m_interface & INDIGO_INTERFACE_CCD) {
 					switch (d->state) {
 					case INDIGO_OK_STATE:
@@ -520,9 +523,6 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 				}
 				if (d->m_interface == 0) { // server
 					return QPixmap(":resource/server.png");
-				}
-				if (d->m_interface == INDIGO_INTERFACE_AGENT) {
-					return QPixmap(":resource/agent.png");
 				}
 				switch (d->state) {
 				case INDIGO_IDLE_STATE:
