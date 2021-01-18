@@ -2,10 +2,13 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #ifndef Arch
-#define Arch "64"
+# Arch "64"
 #endif
 
-#define MyAppVersion "0.9-1"
+#ifndef MyAppVersion
+#define MyAppVersion "0.0-0"
+#endif
+
 #define MyAppName "INDIGO Control Panel"
 #define MyAppPublisher "INDIGO Initiative"
 #define MyAppURL "http://www.indigo-astronomy.org"
