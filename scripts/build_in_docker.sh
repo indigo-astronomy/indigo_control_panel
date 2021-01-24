@@ -28,8 +28,10 @@ RUN apt-get -y remove systemd
 RUN echo 'deb [trusted=yes] https://indigo-astronomy.github.io/indigo_ppa/ppa indigo main' >>/etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y install indigo
-RUN git clone https://github.com/indigo-astronomy/indigo_control_panel.git
-WORKDIR indigo_control_panel
+COPY indigo-control-panel-$2.tar.gz .
+RUN tar -zxf indigo-control-panel-$2.tar.gz
+RUN rm indigo-control-panel-$2.tar.gz
+WORKDIR indigo-control-panel-$2
 RUN qmake
 RUN scripts/builddeb.sh $2
 EOF
