@@ -27,7 +27,7 @@ RUN apt-get -y remove systemd
 #RUN rm -f /usr/bin/systemctl
 RUN echo 'deb [trusted=yes] https://indigo-astronomy.github.io/indigo_ppa/ppa indigo main' >>/etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install indigo
+RUN apt-get -y install indigo
 RUN git clone https://github.com/indigo-astronomy/indigo_control_panel.git
 WORKDIR indigo_control_panel
 RUN qmake
