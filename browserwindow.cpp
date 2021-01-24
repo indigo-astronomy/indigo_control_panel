@@ -23,7 +23,6 @@
 #include <QTreeView>
 #include <QMenuBar>
 #include <QIcon>
-#include <QPlainTextEdit>
 #include <QScrollArea>
 #include <QMessageBox>
 #include <QActionGroup>
@@ -70,7 +69,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	central->setLayout(rootLayout);
 
 	//  Create log viewer
-	mLog = new QPlainTextEdit;
+	mLog = new QTextEdit;
 	mLog->setReadOnly(true);
 
 	// Create menubar
@@ -104,7 +103,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	menu = new QMenu("&Edit");
 	act = menu->addAction(tr("Clear &messages"));
-	connect(act, &QAction::triggered, mLog, &QPlainTextEdit::clear);
+	connect(act, &QAction::triggered, mLog, &QTextEdit::clear);
 	menu_bar->addMenu(menu);
 
 	menu = new QMenu("&Settings");
@@ -326,7 +325,6 @@ void BrowserWindow::on_message_sent(indigo_property* property, char *message) {
 void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 	char timestamp[16];
 	char log_line[512];
-	char message_line[512];
 	struct timeval tmnow;
 
 	if (!message) return;
@@ -351,24 +349,25 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 	snprintf(timestamp + 8, sizeof(timestamp) - 8, ".%03ld", tmnow.tv_usec/1000);
 
 	if (property) {
-		snprintf(message_line, 512, "%s.%s: %s", property->device, property->name, message);
 		switch (property->state) {
 		case INDIGO_ALERT_STATE:
-			snprintf(log_line, 512, "<font color = \"#E00000\">%s %s<\font>", timestamp, message_line);
+			mLog->setTextColor(QColor::fromRgb(224, 0, 0));
 			break;
 		case INDIGO_BUSY_STATE:
-			snprintf(log_line, 512, "<font color = \"orange\">%s %s<\font>", timestamp, message_line);
+			mLog->setTextColor(QColor::fromRgb(255, 165, 0));
 			break;
 		default:
-			snprintf(log_line, 512, "%s %s", timestamp, message_line);
+			mLog->setTextColor(Qt::white);
 			break;
 		}
-		indigo_debug("[message] %s\n", message_line);
+		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
 	} else {
+		mLog->setTextColor(Qt::white);
 		snprintf(log_line, 512, "%s %s", timestamp, message);
-		indigo_debug("[message] %s\n", message);
 	}
-	mLog->appendHtml(log_line); // Adds the message to the widget
+	indigo_log("[message] %s\n", log_line);
+	mLog->append(log_line);
+	mLog->verticalScrollBar()->setValue(mLog->verticalScrollBar()->maximum());
 }
 
 void BrowserWindow::on_property_define(indigo_property* property, char *message) {

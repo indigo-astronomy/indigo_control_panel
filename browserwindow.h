@@ -22,10 +22,11 @@
 
 #include <QApplication>
 #include <QMainWindow>
+#include <QTextEdit>
+#include <QScrollBar>
 #include <indigo/indigo_bus.h>
 #include <propertymodel.h>
 
-class QPlainTextEdit;
 class QTreeView;
 class QServiceModel;
 class QItemSelection;
@@ -125,7 +126,7 @@ public slots:
 	void on_remove_preview(indigo_property *property, indigo_item *item);
 
 private:
-	QPlainTextEdit* mLog;
+	QTextEdit* mLog;
 	QTreeView* mProperties;
 	QScrollArea* mScrollArea;
 	QLabel* mSelectionLine;
