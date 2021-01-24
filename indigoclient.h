@@ -64,6 +64,7 @@ signals:
 	void create_preview(indigo_property* property, indigo_item *item);
 	void obsolete_preview(indigo_property* property, indigo_item *item);
 	void remove_preview(indigo_property* property, indigo_item *item);
+	void no_preview(indigo_property* property, indigo_item *item);
 };
 
 inline IndigoClient& IndigoClient::instance() {

@@ -62,7 +62,7 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 			}
 		} else {
 			for (int row = 0; row < property->count; row++) {
-				emit(IndigoClient::instance().remove_preview(property, &property->items[row]));
+				emit(IndigoClient::instance().no_preview(property, &property->items[row]));
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
@@ -113,7 +113,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 			}
 		} else {
 			for (int row = 0; row < property->count; row++) {
-				emit(IndigoClient::instance().remove_preview(property, &property->items[row]));
+				emit(IndigoClient::instance().no_preview(property, &property->items[row]));
 			}
 		}
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);

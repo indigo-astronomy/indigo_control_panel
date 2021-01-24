@@ -268,6 +268,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::create_preview, this, &BrowserWindow::on_create_preview, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::obsolete_preview, this, &BrowserWindow::on_obsolete_preview, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::remove_preview, this, &BrowserWindow::on_remove_preview, Qt::BlockingQueuedConnection);
+	connect(&IndigoClient::instance(), &IndigoClient::no_preview, this, &BrowserWindow::on_remove_preview, Qt::BlockingQueuedConnection);
 
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property, Qt::BlockingQueuedConnection);
@@ -331,7 +332,7 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 	if (!message) return;
 
 	char *str = message;
-	while(*str && *str != '\r') str++;
+	while(*str && *str != '\r' && *str != '\n') str++;
 	*str = 0;
 
 	gettimeofday(&tmnow, NULL);
