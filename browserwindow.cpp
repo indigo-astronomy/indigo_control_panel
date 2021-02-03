@@ -329,10 +329,6 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 
 	if (!message) return;
 
-	char *str = message;
-	while(*str && *str != '\r' && *str != '\n') str++;
-	*str = 0;
-
 	gettimeofday(&tmnow, NULL);
 #if defined(INDIGO_WINDOWS)
 	struct tm *lt;
