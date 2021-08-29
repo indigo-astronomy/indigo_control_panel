@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
 #include <QUrl>
 #include <QDir>
 #include <QDesktopServices>
@@ -187,7 +188,7 @@ bool QIndigoBLOB::save_blob_item_with_prefix(const char *prefix, char *file_name
 
 #if defined(INDIGO_WINDOWS)
 		sprintf(file_name, "%s\\blob_%03d%s", prefix, file_no++, m_item->blob.format);
-		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, 0);
+		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, S_IRUSR | S_IWUSR);
 #else
 		sprintf(file_name, "%s/blob_%03d%s", prefix, file_no++, m_item->blob.format);
 		fd = open(file_name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
