@@ -10,16 +10,16 @@
 #define DEFAULT_C (-2.8)
 
 struct StretchParams1Channel {
- 	// Stretch algorithm parameters
- 	float shadows;;
- 	float highlights;
- 	float midtones;
- 	// The extension parameters are not used.
- 	float shadows_expansion;
- 	float highlights_expansion;
+	// Stretch algorithm parameters
+	float shadows;;
+	float highlights;
+	float midtones;
+	// The extension parameters are not used.
+	float shadows_expansion;
+	float highlights_expansion;
 
- 	// The default parameters result in no stretch at all.
- 	StretchParams1Channel() {
+	// The default parameters result in no stretch at all.
+	StretchParams1Channel() {
 		shadows = 0.0;
 		highlights = 1.0;
 		midtones = 0.5;
@@ -30,9 +30,9 @@ struct StretchParams1Channel {
 
 struct StretchParams {
 	StretchParams1Channel *refChannel;
- 	StretchParams1Channel grey_red;
- 	StretchParams1Channel green;
- 	StretchParams1Channel blue;
+	StretchParams1Channel grey_red;
+	StretchParams1Channel green;
+	StretchParams1Channel blue;
 
 	StretchParams() {
 		refChannel = nullptr;
@@ -50,10 +50,10 @@ public:
 	void stretch(uint8_t const *input, QImage *output_image, int sampling=1);
 
  private:
-	 int m_image_width;
-	 int m_image_height;
-	 int m_input_range;
-	 uint32_t m_pix_fmt;
+	int m_image_width;
+	int m_image_height;
+	int m_input_range;
+	uint32_t m_pix_fmt;
 
-	 StretchParams m_params;
+	StretchParams m_params;
 };
