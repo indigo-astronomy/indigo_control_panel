@@ -22,29 +22,15 @@
 #include <QImage>
 #include <QHash>
 #include <indigo/indigo_client.h>
-
-#if !defined(INDIGO_WINDOWS)
-#define USE_LIBJPEG
-#endif
-#if defined(USE_LIBJPEG)
-#include <jpeglib.h>
-#endif
-
-typedef enum {
-	STRETCH_NONE = 0,
-	STRETCH_NORMAL = 1,
-	STRETCH_HARD = 2,
-} preview_stretch;
-
-QImage* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size);
-QImage* create_fits_preview(unsigned char *fits_buffer, unsigned long fits_size);
-QImage* create_raw_preview(unsigned char *raw_image_buffer, unsigned long raw_size);
-QImage* create_preview(int width, int height, int pixel_format, char *image_data, int *hist, double white_threshold);
-QImage* create_preview(indigo_property *property, indigo_item *item);
+#include <imagepreview.h>
 
 class blob_preview_cache: QHash<QString, QImage*> {
 public:
 	blob_preview_cache(): preview_mutex(PTHREAD_MUTEX_INITIALIZER) {
+		pthread_mutexattr_t attr;
+		pthread_mutexattr_init(&attr);
+		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init(&preview_mutex, &attr);
 	};
 
 	~blob_preview_cache() {

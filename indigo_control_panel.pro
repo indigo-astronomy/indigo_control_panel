@@ -1,5 +1,7 @@
 QT += core gui widgets network concurrent
-CONFIG += c++11 debug
+CONFIG += c++11 release
+QMAKE_CXXFLAGS += -O3
+QMAKE_CXXFLAGS_RELEASE += -O3
 
 OBJECTS_DIR=object
 MOC_DIR=moc
@@ -32,6 +34,8 @@ SOURCES += \
 	blobpreview.cpp \
 	fits/fits.c \
 	debayer/debayer.c \
+	imagepreview.cpp \
+	stretcher.cpp \
 
 
 RESOURCES += \
@@ -119,6 +123,9 @@ HEADERS += \
 	fits/fits.h \
 	debayer/debayer.h \
 	debayer/pixelformat.h \
+	imagepreview.h \
+	image_preview_lut.h \
+	stretcher.h \
 	conf.h
 
 
