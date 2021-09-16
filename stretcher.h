@@ -25,7 +25,7 @@ struct StretchParams1Channel {
 		midtones = 0.5;
 		shadows_expansion = 0.0;
 		highlights_expansion = 1.0;
- 	}
+	}
 };
 
 struct StretchParams {
@@ -49,7 +49,7 @@ public:
 	StretchParams computeParams(const uint8_t *input, const float B = DEFAULT_B, const float C = DEFAULT_C);
 	void stretch(uint8_t const *input, QImage *output_image, int sampling=1);
 
- private:
+private:
 	int m_image_width;
 	int m_image_height;
 	int m_input_range;
