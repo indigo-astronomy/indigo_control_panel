@@ -77,7 +77,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	QMenu *menu = new QMenu("&File");
 	QAction *act;
 
-	act = menu->addAction(tr("&Manage services"));
+	act = menu->addAction(tr("&Manage servers"));
 	connect(act, &QAction::triggered, this, &BrowserWindow::on_servers_act);
 
 	menu->addSeparator();
@@ -113,7 +113,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	act->setChecked(conf.blobs_enabled);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_blobs_changed);
 
-	act = menu->addAction(tr("&Auto connect new services"));
+	act = menu->addAction(tr("&Auto connect new servers"));
 	act->setCheckable(true);
 	act->setChecked(conf.auto_connect);
 	connect(act, &QAction::toggled, this, &BrowserWindow::on_bonjour_changed);
