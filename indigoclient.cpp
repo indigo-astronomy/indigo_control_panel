@@ -65,7 +65,7 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 				emit(IndigoClient::instance().no_preview(property, &property->items[row]));
 			}
 		}
-		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
+		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	}
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
@@ -116,7 +116,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 				emit(IndigoClient::instance().no_preview(property, &property->items[row]));
 			}
 		}
-		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state,property->count);
+		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	}
 
