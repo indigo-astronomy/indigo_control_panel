@@ -50,13 +50,13 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 		if (IndigoClient::instance().blobs_enabled()) { // Enagle blob and let adapter decide URL or ALSO
 			indigo_enable_blob(client, property, INDIGO_ENABLE_BLOB);
 		}
-		if (property->state == INDIGO_OK_STATE) {
+		if (property->state == INDIGO_OK_STATE && property->perm != INDIGO_WO_PERM) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 				}
 				emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 			}
-		} else if(property->state == INDIGO_BUSY_STATE) {
+		} else if(property->state == INDIGO_BUSY_STATE && property->perm != INDIGO_WO_PERM) {
 			for (int row = 0; row < property->count; row++) {
 				emit(IndigoClient::instance().obsolete_preview(property, &property->items[row]));
 			}
@@ -100,14 +100,14 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	case INDIGO_BLOB_VECTOR:
-		if (property->state == INDIGO_OK_STATE) {
+		if (property->state == INDIGO_OK_STATE && property->perm != INDIGO_WO_PERM) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
 					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
 				}
 				emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 			}
-		} else if(property->state == INDIGO_BUSY_STATE) {
+		} else if(property->state == INDIGO_BUSY_STATE && property->perm != INDIGO_WO_PERM) {
 			for (int row = 0; row < property->count; row++) {
 				emit(IndigoClient::instance().obsolete_preview(property, &property->items[row]));
 			}
