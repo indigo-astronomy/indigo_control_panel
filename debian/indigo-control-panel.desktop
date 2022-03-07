@@ -7,5 +7,6 @@ Exec=indigo_control_panel
 Icon=indigo-control-panel.png
 Terminal=false
 Type=Application
-Categories=Education;Science;Astronomy;
+StartupWMClass=indigo_control_panel
+Categories=Astronomy
 Keywords=astronomy
