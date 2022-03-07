@@ -8,5 +8,5 @@ Icon=indigo-control-panel.png
 Terminal=false
 Type=Application
 StartupWMClass=indigo_control_panel
-Categories=Astronomy
+Categories=Astronomy;Education;Science
 Keywords=astronomy
