@@ -358,7 +358,12 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 		}
 		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
 	} else {
-		mLog->setTextColor(Qt::white);
+		QString msg(message);
+		if (msg.contains("failed", Qt::CaseInsensitive) || msg.contains("error", Qt::CaseInsensitive)) {
+			mLog->setTextColor(QColor::fromRgb(224, 0, 0));
+		} else {
+			mLog->setTextColor(Qt::white);
+		}
 		snprintf(log_line, 512, "%s %s", timestamp, message);
 	}
 	indigo_log("[message] %s\n", log_line);
