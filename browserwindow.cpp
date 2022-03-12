@@ -359,8 +359,10 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
 	} else {
 		QString msg(message);
-		if (msg.contains("failed", Qt::CaseInsensitive) || msg.contains("error", Qt::CaseInsensitive)) {
+		if (msg.contains("fail", Qt::CaseInsensitive) || msg.contains("error", Qt::CaseInsensitive)) {
 			mLog->setTextColor(QColor::fromRgb(224, 0, 0));
+		} else if (msg.contains("warn", Qt::CaseInsensitive)) {
+			mLog->setTextColor(QColor::fromRgb(255, 165, 0));
 		} else {
 			mLog->setTextColor(Qt::white);
 		}
