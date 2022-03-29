@@ -21,5 +21,6 @@
 #define VERSION_H
 
 #define PANEL_VERSION "0.10-3"
+#define YEAR_NOW (__DATE__ + 7)
 
 #endif // VERSION_H

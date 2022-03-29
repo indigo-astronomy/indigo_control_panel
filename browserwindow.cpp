@@ -359,7 +359,15 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
 	} else {
 		QString msg(message);
-		if (msg.contains("fail", Qt::CaseInsensitive) || msg.contains("error", Qt::CaseInsensitive)) {
+		if (
+			(
+				msg.contains("fail", Qt::CaseInsensitive)
+			) || ( /* match "error" but not polar alignment error messages */
+				msg.contains("error", Qt::CaseInsensitive) &&
+				!msg.contains("Polar error:") &&
+				!msg.contains("adjustment knob", Qt::CaseInsensitive)
+			)
+		) {
 			mLog->setTextColor(QColor::fromRgb(224, 0, 0));
 		} else if (msg.contains("warn", Qt::CaseInsensitive)) {
 			mLog->setTextColor(QColor::fromRgb(255, 165, 0));
@@ -732,7 +740,7 @@ void BrowserWindow::on_about_act() {
 		"Rumen G.Bogdanovski<br>"
 		"David Hulse<br><br>"
 		"You can use this software under the terms of <b>INDIGO Astronomy open-source license</b><br><br>"
-		"Copyright ©2019-2021, The INDIGO Initiative.<br>"
+		"Copyright ©2019-" + YEAR_NOW + ", The INDIGO Initiative.<br>"
 		"<a href='http://www.indigo-astronomy.org'>http://www.indigo-astronomy.org</a>"
 	);
 	msgBox.exec();
