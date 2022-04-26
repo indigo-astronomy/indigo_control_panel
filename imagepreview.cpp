@@ -186,7 +186,8 @@ preview_image* create_fits_preview(unsigned char *raw_fits_buffer, unsigned long
 	}
 
 	if (header.naxis == 2) {
-		pix_format = bayer_to_pix_format(header.bayerpat, header.bitpix);
+		int bayer_pix_fmt = bayer_to_pix_format(header.bayerpat, header.bitpix);
+		if (bayer_pix_fmt != 0) pix_format = bayer_pix_fmt;
 	}
 
 	preview_image *img = create_preview(header.naxisn[0], header.naxisn[1],
