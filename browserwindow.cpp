@@ -724,6 +724,11 @@ void BrowserWindow::on_acl_clear_act() {
 
 
 void BrowserWindow::on_about_act() {
+	int major, minor, build;
+	indigo_get_version(&major, &minor, &build);
+	char indigo_version[50];
+	sprintf(indigo_version, "%d.%d-%3d", major, minor, build);
+
 	QMessageBox msgBox(this);
 	int platform_bits = sizeof(void*) * 8;
 	QPixmap pixmap(":resource/indigo_logo.png");
@@ -735,6 +740,7 @@ void BrowserWindow::on_about_act() {
 		"Version "
 		PANEL_VERSION
 		" (" + QString::number(platform_bits) + "bit) <br>"
+		"<br>INDIGO framework version " + QString(indigo_version) + "<br>"
 		"<br>"
 		"Authors:<br>"
 		"Rumen G.Bogdanovski<br>"
