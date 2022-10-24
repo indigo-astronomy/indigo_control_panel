@@ -93,16 +93,17 @@ QIndigoNumber::~QIndigoNumber() {
 
 void QIndigoNumber::update() {
 	char buffer[50];
+	const char m_format[] = "%d:%02d:%06.3f";
 
 	if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm') {
-		strncpy(buffer, indigo_dtos(m_item->number.value, NULL), sizeof(buffer));
+		strncpy(buffer, indigo_dtos(m_item->number.value, (char*)m_format), sizeof(buffer));
 	} else {
 		snprintf(buffer, sizeof(buffer), m_item->number.format, m_item->number.value);
 	}
 	text_value->setText(buffer);
 	if (text_target && !m_dirty && !text_target->hasFocus()) {
 		if (m_item->number.format[strlen(m_item->number.format) - 1] == 'm')
-			strncpy(buffer, indigo_dtos(m_item->number.target, NULL), sizeof(buffer));
+			strncpy(buffer, indigo_dtos(m_item->number.target, (char*)m_format), sizeof(buffer));
 		else
 			snprintf(buffer, sizeof(buffer), m_item->number.format, m_item->number.target);
 		text_target->setText(buffer);
