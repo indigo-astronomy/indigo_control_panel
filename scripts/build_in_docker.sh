@@ -22,9 +22,8 @@
 echo FROM $1 >Dockerfile
 cat >>Dockerfile <<EOF
 LABEL maintainer="rumenastro@gmail.com"
-RUN apt-get -y update && apt-get -y install wget unzip build-essential autoconf autotools-dev libtool cmake libudev-dev libavahi-compat-libdnssd-dev libusb-1.0-0-dev libgtk-3-0 libcurl4-gnutls-dev libgphoto2-dev libz-dev git curl bsdmainutils qt5-default devscripts cdbs apt-transport-https
-RUN apt-get -y remove systemd
-#RUN rm -f /usr/bin/systemctl
+RUN apt-get -y update && apt-get -y install wget unzip build-essential autoconf autotools-dev libtool cmake libudev-dev libavahi-compat-libdnssd-dev libusb-1.0-0-dev libcurl4-gnutls-dev libgphoto2-dev libz-dev git curl bsdmainutils qt5-default devscripts cdbs apt-transport-https
+RUN apt-get -y remove systemd; exit 0
 RUN echo 'deb [trusted=yes] https://indigo-astronomy.github.io/indigo_ppa/ppa indigo main' >>/etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y install indigo
