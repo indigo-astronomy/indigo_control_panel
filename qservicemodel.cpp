@@ -24,7 +24,7 @@
 #include <indigo/indigo_service_discovery.h>
 #include "conf.h"
 
-#define SERVICE_FILENAME "indigo_imager.services"
+#define SERVICE_FILENAME "indigo_control_panel.services"
 
 void resolve_callback(const char *service_name, uint32_t interface_index, const char *host, int port) {
 	QServiceModel *model = NULL;
