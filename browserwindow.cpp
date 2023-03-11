@@ -241,7 +241,7 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	propertyLayout->addWidget(mLog, 15);
 
-	mServiceModel = new QServiceModel("_indigo._tcp");
+	mServiceModel = &QServiceModel::instance();
 	mServiceModel->enable_auto_connect(conf.auto_connect);
 
 	mPropertyModel = new PropertyModel();

@@ -129,8 +129,6 @@ HEADERS += \
 	conf.h
 
 
-include(qtzeroconf/qtzeroconf.pri)
-
 #unix:!mac {
 #    CONFIG += link_pkgconfig
 #    PKGCONFIG += indigo
