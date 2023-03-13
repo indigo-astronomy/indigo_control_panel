@@ -30,8 +30,8 @@ libjpeg/missing
 libjpeg/rdjpgcom
 libjpeg/wrjpgcom
 
-indigo
-indigo/*
+/indigo
+/indigo/*
 
 debian/.debhelper/*
 debian/files
