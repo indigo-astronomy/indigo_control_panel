@@ -147,33 +147,7 @@ DISTFILES += \
 	LICENCE.md \
 
 win32 {
-        DEFINES += INDIGO_WINDOWS
-
-        SOURCES += \
-            indigo/indigo_libs/indigo_base64.c \
-            indigo/indigo_libs/indigo_bus.c \
-            indigo/indigo_libs/indigo_client.c \
-            indigo/indigo_libs/indigo_client_xml.c \
-            indigo/indigo_libs/indigo_version.c \
-            indigo/indigo_libs/indigo_io.c \
-            indigo/indigo_libs/indigo_xml.c \
-            indigo/indigo_libs/indigo_token.c
-
-	# If you want to use indigo_client.dll place int he current folder
-	# indigo_client.dll indigo_client.lib and pthreadVC3.dll
-	# then uncoment the line below (LIBS) and comment SOURCES above.
-	#LIBS +=$${PWD}/indigo_client.dll
-
-        HEADERS += \
-            indigo/indigo_libs/indigo/indigo_base64.h \
-            indigo/indigo_libs/indigo/indigo_base64_luts.h \
-            indigo/indigo_libs/indigo/indigo_bus.h \
-            indigo/indigo_libs/indigo/indigo_client.h \
-            indigo/indigo_libs/indigo/indigo_client_xml.h \
-            indigo/indigo_libs/indigo/indigo_config.h \
-            indigo/indigo_libs/indigo/indigo_io.h \
-            indigo/indigo_libs/indigo/indigo_version.h \
-            indigo/indigo_libs/indigo/indigo_xml.h \
-            indigo/indigo_libs/indigo/indigo_names.h \
-            indigo/indigo_libs/indigo/indigo_token.h
+	DEFINES += INDIGO_WINDOWS
+	INCLUDEPATH += ../../external/indigo_sdk/include
+	LIBS += ../../external/indigo_sdk/lib/libindigo_client.lib -lws2_32
 }
