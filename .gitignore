@@ -49,6 +49,13 @@ qmake_qmake_immediate.qrc
 qrc_qmake_qmake_immediate.cpp
 qrc_style.cpp
 
+external/indigo_sdk/lib
+indigo_control_panel.pro.user
+windows/Output
+windows/indigo_control_panel_32
+windows/indigo_control_panel_64
+
+
 
 *.deb
 
