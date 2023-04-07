@@ -23,6 +23,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QMessageBox>
 #include <QtConcurrentRun>
 #include "qindigoproperty.h"
 #include "qindigotext.h"
@@ -138,15 +139,28 @@ void QIndigoProperty::property_update(indigo_property* property) {
 
 
 void QIndigoProperty::set_clicked() {
-	//  Apply all dirty controls
-	for (int i = 0; i < m_property->count; i++)
-		m_controls[i]->apply();
+	bool update = true;
+	char message[INDIGO_VALUE_SIZE];
 
-	//  Update property on indigo bus
-	QtConcurrent::run([=]() {
-		m_property->access_token = indigo_get_device_or_master_token(m_property->device);
-		indigo_change_property(nullptr, m_property);
-	});
+	// Ask user to confirm change if hints are defined
+	if ((indigo_get_property_hint(m_property, "warn_on_change", message))) {
+		update = false;
+		if (QMessageBox::Yes == QMessageBox::question(this, "Property update", message, QMessageBox::Yes|QMessageBox::No)) {
+			update = true;
+		}
+	}
+
+	if (update) {
+		//  Apply all dirty controls
+		for (int i = 0; i < m_property->count; i++)
+			m_controls[i]->apply();
+
+		//  Update property on indigo bus
+		QtConcurrent::run([=]() {
+			m_property->access_token = indigo_get_device_or_master_token(m_property->device);
+			indigo_change_property(nullptr, m_property);
+		});
+	}
 }
 
 

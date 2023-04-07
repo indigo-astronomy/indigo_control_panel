@@ -18,6 +18,7 @@
 
 
 #include <QObject>
+#include <QMessageBox>
 #include "qindigoproperty.h"
 #include "qindigoswitch.h"
 
@@ -45,9 +46,29 @@ void QIndigoSwitch::update() {
 }
 
 void QIndigoSwitch::switch_clicked(bool checked) {
-	//  Update the switch item
-	indigo_set_switch(m_property, m_item, checked);
+	bool update = true;
+	char message[INDIGO_VALUE_SIZE];
 
-	//  Make the GUI controls consistent with the switches
+	// Ask user to confirm change if hints are defined
+	if (
+		(indigo_get_item_hint(m_item, "warn_on_clear", message) && !checked) ||
+		(indigo_get_item_hint(m_item, "warn_on_set", message) && checked) ||
+		(indigo_get_item_hint(m_item, "warn_on_change", message)) ||
+		(indigo_get_property_hint(m_property, "warn_on_clear", message) && !checked) ||
+		(indigo_get_property_hint(m_property, "warn_on_set", message) && checked) ||
+		(indigo_get_property_hint(m_property, "warn_on_change", message))
+	) {
+		update = false;
+		if (QMessageBox::Yes == QMessageBox::question(this, "Property update", message, QMessageBox::Yes|QMessageBox::No)) {
+			update = true;
+		}
+	}
+
+	if (update) {
+		// Update the switch item
+		indigo_set_switch(m_property, m_item, checked);
+	}
+
+	// Make the GUI controls consistent with the switches
 	emit(item_changed());
 }
