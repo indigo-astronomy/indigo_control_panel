@@ -68,7 +68,16 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
 		break;
 	}
+
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
+	if(property->type == INDIGO_TEXT_VECTOR) {
+		for (int i = 0; i < property->count; i++) {
+			if (property->items[i].text.long_value) {
+				p->items[i].text.long_value = (char*)indigo_safe_malloc(property->items[i].text.length);
+				memcpy(p->items[i].text.long_value, property->items[i].text.long_value, property->items[i].text.length);
+			}
+		}
+	}
 
 	if (message) {
 		static char *msg;
@@ -121,6 +130,15 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 	}
 
 	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
+	if(property->type == INDIGO_TEXT_VECTOR) {
+		for (int i = 0; i < property->count; i++) {
+			if (property->items[i].text.long_value) {
+				p->items[i].text.long_value = (char*)indigo_safe_malloc(property->items[i].text.length);
+				memcpy(p->items[i].text.long_value, property->items[i].text.long_value, property->items[i].text.length);
+			}
+		}
+	}
+
 	if (message) {
 		static char *msg;
 		msg = (char*)malloc(INDIGO_VALUE_SIZE);

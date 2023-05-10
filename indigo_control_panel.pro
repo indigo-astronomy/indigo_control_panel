@@ -1,5 +1,5 @@
 QT += core gui widgets network concurrent
-CONFIG += c++11 release
+CONFIG += c++11 debug
 QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS_RELEASE += -O3
 
