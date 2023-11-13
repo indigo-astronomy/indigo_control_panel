@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 Rumen G.Bogdanovski
+// Copyright (c) 2020 Rumen G.Bogdanovski
 // All rights reserved.
 //
 // You can use this software under the terms of 'INDIGO Astronomy
@@ -16,11 +16,33 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <time.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-#ifndef VERSION_H
-#define VERSION_H
+#include <QDir>
+#include <QString>
+#include <QObject>
 
-#define PANEL_VERSION "0.14-0"
-#define YEAR_NOW (__DATE__ + 7)
+#include <utils.h>
+#include <conf.h>
 
-#endif // VERSION_H
+#ifdef INDIGO_WINDOWS
+#include <windows.h>
+#endif
+
+int get_number_of_cores() {
+#ifdef INDIGO_WINDOWS
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo(&sysinfo);
+	//indigo_error("NUMCPU = %d", sysinfo.dwNumberOfProcessors);
+	return sysinfo.dwNumberOfProcessors;
+#else
+	//indigo_error("NUMCPU = %d", sysconf(_SC_NPROCESSORS_ONLN));
+	return sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+}
+

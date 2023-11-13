@@ -33,9 +33,9 @@ SOURCES += \
 	qindigoservers.cpp \
 	blobpreview.cpp \
 	fits/fits.c \
-	debayer/debayer.c \
 	imagepreview.cpp \
 	stretcher.cpp \
+	utils.cpp
 
 
 RESOURCES += \
@@ -121,11 +121,11 @@ HEADERS += \
 	qindigoservers.h \
 	logger.h \
 	fits/fits.h \
-	debayer/debayer.h \
-	debayer/pixelformat.h \
+	pixelformat.h \
 	imagepreview.h \
 	image_preview_lut.h \
 	stretcher.h \
+	utils.h \
 	conf.h
 
 

@@ -18,8 +18,7 @@
 
 #include <math.h>
 #include <fits/fits.h>
-#include <debayer/debayer.h>
-#include <debayer/pixelformat.h>
+#include <pixelformat.h>
 #include "blobpreview.h"
 #include <QPainter>
 

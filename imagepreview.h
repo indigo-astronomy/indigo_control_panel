@@ -22,7 +22,7 @@
 #include <QImage>
 #include <QHash>
 #include <indigo/indigo_client.h>
-#include <debayer/pixelformat.h>
+#include <pixelformat.h>
 #include <image_preview_lut.h>
 #include <stretcher.h>
 
@@ -211,6 +211,9 @@ public:
 	int m_pix_format;
 	StretchParams m_strech_params;
 };
+
+int get_bayer_offsets(uint32_t pix_format);
+template <typename T> void parallel_debayer(T *input_buffer, int width, int height, int offsets, T *output_buffer);
 
 preview_image* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_size);
 preview_image* create_fits_preview(unsigned char *fits_buffer, unsigned long fits_size, const stretch_config_t sconfig);

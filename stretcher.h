@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <QImage>
-#include <debayer/pixelformat.h>
+#include <pixelformat.h>
 
 #define DEFAULT_B (0.25)
 #define DEFAULT_C (-2.8)

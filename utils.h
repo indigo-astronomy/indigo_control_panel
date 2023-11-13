@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Rumen G.Bogdanovski
+// Copyright (c) 2020 Rumen G.Bogdanovski
 // All rights reserved.
 //
 // You can use this software under the terms of 'INDIGO Astronomy
@@ -16,29 +16,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef _DEBAYER_H
-#define _DEBAYER_H
+#ifndef _UTILS_H
+#define _UTILS_H
 
-#include <inttypes.h>
+#define AIN_DEFAULT_THREADS 4
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int get_number_of_cores();
 
-void bayer_to_rgb24(const unsigned char *bayer,
-  unsigned char *rgb, int width, int height, unsigned int pixfmt);
+void get_timestamp(char *timestamp_str);
+void get_date(char *date_str);
+void get_date_jd(char *date_str);
+void get_time(char *time_str);
 
-void bayer_to_bgr24(const unsigned char *bayer,
-  unsigned char *rgb, int width, int height, unsigned int pixfmt);
+void get_current_output_dir(char *output_dir, char *prefix = nullptr);
 
-void bayer_to_rgb48(const uint16_t *bayer,
-  uint16_t *rgb, int width, int height, unsigned int pixfmt);
+void get_indigo_device_domain(char *device_domain, const char *device_name);
+void remove_indigo_device_domain(char *device_name, int levels);
+void add_indigo_device_domain(char *device_name, const char *domain_name);
 
-void bayer_to_bgr48(const uint16_t *bayer,
-  uint16_t *rgb, int width, int height, unsigned int pixfmt);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _DEBAYER_H */
+#endif /* _UTILS_H */
