@@ -1,12 +1,13 @@
 // based on https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html
 
 #include "stretcher.h"
+//#include <indigo/indigo_bus.h>
+//#include <indigo/indigo_raw_utils.h>
 
 #include <math.h>
 #include <QCoreApplication>
 #include <QtConcurrent>
-
-#define MAX_THREADS 4
+#include <utils.h>
 
 // Returns the median value of the vector.
 // The values is modified
@@ -34,14 +35,14 @@ void stretchOneChannel(
 	T *input_buffer,
 	QImage *output_image,
 	const StretchParams &stretch_params,
-	int input_range,
+	double input_range,
 	int image_height,
 	int image_width,
 	int sampling
 ) {
 	constexpr int maxOutput = 255;
 
-	const float maxInput = input_range > 1 ? input_range - 1 : input_range;
+	const double maxInput = input_range > 1 ? input_range - 1 : input_range;
 
 	const float midtones   = stretch_params.grey_red.midtones;
 	const float highlights = stretch_params.grey_red.highlights;
@@ -56,12 +57,15 @@ void stretchOneChannel(
 	const float k2 = ((2 * midtones) - 1) * hsRangeFactor / maxInput;
 
 	QVector<QFuture<void>> futures;
-	for (int rank = 0; rank < MAX_THREADS; rank++) {
-		const int chunk = image_height / MAX_THREADS;
+	int num_threads = get_number_of_cores();
+	num_threads = (num_threads > 0) ? num_threads : ICP_DEFAULT_THREADS;
+	for (int rank = 0; rank < num_threads; rank++) {
+		const int chunk = ceil(image_height / (double)num_threads);
 		futures.append(QtConcurrent::run([ = ]() {
 			int start_row = chunk * rank;
 			int end_row = start_row + chunk;
 			end_row = (end_row > image_height) ? image_height : end_row;
+			//indigo_debug("stretchOneChannel(): %d - start_row %d, end_row %d, rows %d", rank, start_row, end_row, end_row-start_row);
 			for (int j = start_row, jout = start_row; j < end_row; j += sampling, jout++) {
 				T * inputLine  = input_buffer + j * image_width;
 				auto * scanLine = reinterpret_cast<QRgb*>(output_image->scanLine(jout));
@@ -86,14 +90,14 @@ template <typename T>
 void stretchThreeChannels(
 	T *inputBuffer, QImage *outputImage,
 	const StretchParams &stretchParams,
-	int inputRange,
+	double inputRange,
 	int imageHeight,
 	int imageWidth,
 	int sampling
 ) {
 	constexpr int maxOutput = 255;
 
-	const float maxInput = inputRange > 1 ? inputRange - 1 : inputRange;
+	const double maxInput = inputRange > 1 ? inputRange - 1 : inputRange;
 
 	float midtonesR   = stretchParams.grey_red.midtones;
 	float highlightsR = stretchParams.grey_red.highlights;
@@ -139,12 +143,15 @@ void stretchThreeChannels(
 	const int imageWidth3 = imageWidth * 3;
 
 	QVector<QFuture<void>> futures;
-	for (int rank = 0; rank < MAX_THREADS; rank++) {
-		const int chunk = imageHeight / MAX_THREADS;
+	int num_threads = get_number_of_cores();
+	num_threads = (num_threads > 0) ?  num_threads : ICP_DEFAULT_THREADS;
+	for (int rank = 0; rank < num_threads; rank++) {
+		const int chunk = ceil(imageHeight / (double)num_threads);
 		futures.append(QtConcurrent::run([ = ]() {
 			int start_row = chunk * rank;
 			int end_row = start_row + chunk;
 			end_row = (end_row > imageHeight) ? imageHeight : end_row;
+			//indigo_error("stretchThreeChannels(): %d - start_row %d, end_row %d, rows %d", rank, start_row, end_row, end_row-start_row);
 			int index = start_row * imageWidth3;
 			for (int j = start_row, jout = start_row; j < end_row; j += sampling, jout++) {
 				QCoreApplication::processEvents();
@@ -188,7 +195,7 @@ template <typename T>
 void computeParamsOneChannel(
 	T const *buffer,
 	StretchParams1Channel *params,
-	int inputRange,
+	double inputRange,
 	int height,
 	int width,
 	const float B = 0.25,
@@ -210,8 +217,8 @@ void computeParamsOneChannel(
 
 	// scale to 0 -> 1.0.
 	const float medDev = median(deviations);
-	const float normalizedMedian = medianSample / static_cast<float>(inputRange);
-	const float MADN = 1.4826 * medDev / static_cast<float>(inputRange);
+	const float normalizedMedian = medianSample / inputRange;
+	const float MADN = 1.4826 * medDev / inputRange;
 
 	const bool upperHalf = normalizedMedian > 0.5;
 
@@ -244,7 +251,7 @@ template <typename T>
 void computeParamsThreeChannels(
 	T const *buffer,
 	StretchParams *params,
-	int inputRange,
+	double inputRange,
 	int height,
 	int width,
 	const float B = 0.25,
@@ -286,8 +293,8 @@ void computeParamsThreeChannels(
 
 	// scale to 0 -> 1.0.
 	float medDev = median(deviationsR);
-	float normalizedMedian = medianSampleR / static_cast<float>(inputRange);
-	float MADN = 1.4826 * medDev / static_cast<float>(inputRange);
+	float normalizedMedian = medianSampleR / inputRange;
+	float MADN = 1.4826 * medDev / inputRange;
 
 	bool upperHalf = normalizedMedian > 0.5;
 
@@ -311,8 +318,8 @@ void computeParamsThreeChannels(
 
 	// Green
 	medDev = median(deviationsG);
-	normalizedMedian = medianSampleG / static_cast<float>(inputRange);
-	MADN = 1.4826 * medDev / static_cast<float>(inputRange);
+	normalizedMedian = medianSampleG / inputRange;
+	MADN = 1.4826 * medDev / inputRange;
 
 	upperHalf = normalizedMedian > 0.5;
 
@@ -335,8 +342,8 @@ void computeParamsThreeChannels(
 
 	// Blue
 	medDev = median(deviationsB);
-	normalizedMedian = medianSampleB / static_cast<float>(inputRange);
-	MADN = 1.4826 * medDev / static_cast<float>(inputRange);
+	normalizedMedian = medianSampleB / inputRange;
+	MADN = 1.4826 * medDev / inputRange;
 
 	upperHalf = normalizedMedian > 0.5;
 
@@ -374,13 +381,16 @@ void computeParamsThreeChannels(
 	params->blue.highlights_expansion = 1.0;
 }
 
-int getRange(int data_type) {
+double getRange(int data_type) {
 	switch (data_type) {
 		case PIX_FMT_Y8:
 		case PIX_FMT_RGB24:
-			return 256;
+			return (double)0xFF;
+		case PIX_FMT_Y16:
+		case PIX_FMT_RGB48:
+			return (double)0xFFFF;
 		default:
-			return 64 * 1024;
+			return 1.0;
 	}
 }
 

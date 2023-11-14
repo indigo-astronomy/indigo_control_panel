@@ -19,19 +19,8 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
-#define AIN_DEFAULT_THREADS 4
+#define ICP_DEFAULT_THREADS 4
 
 int get_number_of_cores();
-
-void get_timestamp(char *timestamp_str);
-void get_date(char *date_str);
-void get_date_jd(char *date_str);
-void get_time(char *time_str);
-
-void get_current_output_dir(char *output_dir, char *prefix = nullptr);
-
-void get_indigo_device_domain(char *device_domain, const char *device_name);
-void remove_indigo_device_domain(char *device_name, int levels);
-void add_indigo_device_domain(char *device_name, const char *domain_name);
 
 #endif /* _UTILS_H */
