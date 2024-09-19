@@ -59,13 +59,13 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	base->setObjectName("INDIGO_property");
 	base->setLayout(hbox);
 	hbox->setAlignment(Qt::AlignLeft);
-	hbox->setMargin(0);
+	hbox->setContentsMargins(0, 0, 0, 0);
 	hbox->setSpacing(0);
 	hbox->addWidget(label, 20);
 	hbox->addWidget(text, 80);
 
 	vbox->setAlignment(Qt::AlignHCenter);
-	vbox->setMargin(0);
+	vbox->setContentsMargins(0, 0, 0, 0);
 	vbox->setSpacing(10);
 	vbox->addWidget(image);
 	vbox->setAlignment(image, Qt::AlignHCenter);

@@ -193,7 +193,7 @@ void QIndigoProperty::build_property_form(QVBoxLayout* layout) {
 	head->setLayout(head_layout);
 
 	head_layout->setAlignment(Qt::AlignLeft);
-	head_layout->setMargin(3);
+	head_layout->setContentsMargins(3,3,3,3);
 	head_layout->setSpacing(5);
 
 	char device_string[1025];
@@ -314,7 +314,7 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 		layout->addLayout(hbox);
 		hbox->setAlignment(Qt::AlignRight);
 		hbox->setSpacing(10);
-		hbox->setMargin(0);
+		hbox->setContentsMargins(0,0,0,0);
 
 		//  Add Display button
 		QPushButton *displayb = new QPushButton("&View...");
@@ -357,7 +357,7 @@ void QIndigoProperty::build_buttons(QVBoxLayout* layout) {
 	layout->addLayout(hbox);
 	hbox->setAlignment(Qt::AlignRight);
 	hbox->setSpacing(10);
-	hbox->setMargin(0);
+	hbox->setContentsMargins(0,0,0,0);
 
 	//  Add buttons
 	QPushButton* set = new QPushButton("&Set");

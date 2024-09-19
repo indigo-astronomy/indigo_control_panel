@@ -73,7 +73,7 @@ QIndigoNumber::QIndigoNumber(QIndigoProperty* p, indigo_property* property, indi
 	QHBoxLayout* hbox = new QHBoxLayout();
 	setLayout(hbox);
 	hbox->setAlignment(Qt::AlignLeft);
-	hbox->setMargin(0);
+	hbox->setContentsMargins(0, 0, 0, 0);
 	hbox->setSpacing(0);
 	hbox->addWidget(label, 35);
 	if (m_property->perm == INDIGO_RO_PERM)

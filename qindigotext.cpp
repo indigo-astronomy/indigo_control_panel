@@ -30,7 +30,7 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 		label->setObjectName("INDIGO_property");
 		QHBoxLayout* hbox = new QHBoxLayout();
 		hbox->setAlignment(Qt::AlignLeft);
-		hbox->setMargin(0);
+		hbox->setContentsMargins(0, 0, 0, 0);
 		hbox->setSpacing(0);
 		setLayout(hbox);
 		text = new QLineEdit();
@@ -50,7 +50,7 @@ QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_i
 	} else {
 		QVBoxLayout* vbox = new QVBoxLayout();
 		vbox->setAlignment(Qt::AlignLeft);
-		vbox->setMargin(0);
+		vbox->setContentsMargins(0, 0, 0, 0);
 		vbox->setSpacing(0);
 		setLayout(vbox);
 		text_edit = new QPlainTextEdit();
