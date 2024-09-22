@@ -3,6 +3,11 @@ CONFIG += c++11 debug
 QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS_RELEASE += -O3
 
+unix:mac {
+	CONFIG += app_bundle
+	ICON=$$PWD/resource/appicon.icns
+}
+
 OBJECTS_DIR=object
 MOC_DIR=moc
 
