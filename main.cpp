@@ -21,6 +21,10 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QTextStream>
+
+#include <signal.h>
+#include <unistd.h>
+
 #include "browserwindow.h"
 #include <conf.h>
 
@@ -106,6 +110,8 @@ int main(int argc, char *argv[]) {
 
 	BrowserWindow browser_window;
 	browser_window.show();
+
+	signal(SIGPIPE, SIG_IGN);
 
 	return app.exec();
 }
