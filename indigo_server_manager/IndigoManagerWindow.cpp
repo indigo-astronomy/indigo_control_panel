@@ -714,21 +714,102 @@ void IndigoManagerWindow::populateDriversMenu() {
 
 	if (driverDefinitions.isEmpty()) {
 		QMessageBox::information(this, tr("Driver Files"),
-						  tr("No driver definitions available.\n"
-							 "Please make sure INDIGO is properly installed."));
+						tr("No driver definitions available.\n"
+							"Please make sure INDIGO is properly installed."));
 		return;
 	}
 
 	QMenu driversMenu;
+	
+	QMap<QString, QMap<QString, QPair<QString, QString>>> driversByType;
+	QStringList otherDrivers;
+	
+	// Sort drivers into type categories
 	QMapIterator<QString, QPair<QString, QString>> i(driverDefinitions);
 	while (i.hasNext()) {
 		i.next();
+		QString driverName = i.key();
 		QString displayText = i.value().first;
-		QAction *action = driversMenu.addAction(displayText);
-		action->setData(i.key());
+		
+		QRegExp namePattern("indigo_([^_]+)_(.+)");
+		if (namePattern.indexIn(driverName) != -1) {
+			QString deviceType = namePattern.cap(1);
+
+			QString deviceTypeTitle = deviceType;
+			if (!deviceTypeTitle.isEmpty()) {
+				if (deviceTypeTitle.toLower() == "ccd" ||
+					deviceTypeTitle.toLower() == "ao" ||
+					deviceTypeTitle.toLower() == "aux" ||
+					deviceTypeTitle.toLower() == "gps") {
+					deviceTypeTitle = deviceTypeTitle.toUpper();
+				} else {
+					deviceTypeTitle[0] = deviceTypeTitle[0].toUpper();
+				}
+			}
+
+			driversByType[deviceTypeTitle][driverName] = i.value();
+		} else {
+			otherDrivers << driverName;
+		}
 	}
 
-	// Adjust the position to show menu next to the button
+	QMapIterator<QString, QMap<QString, QPair<QString, QString>>> typeIter(driversByType);
+	while (typeIter.hasNext()) {
+		typeIter.next();
+		QString deviceType = typeIter.key();
+
+		QString menuTitle;
+		if (deviceType.toLower() == "agent") {
+			menuTitle = "Agents";  // For agents, just use "Agents" without "Drivers"
+		} else {
+			menuTitle = deviceType + " Drivers";  // For others, append "Drivers"
+		}
+
+		QMenu *subMenu = driversMenu.addMenu(menuTitle);
+
+
+		QList<QPair<QString, QString>> sortedDrivers;
+		QMapIterator<QString, QPair<QString, QString>> driverIter(typeIter.value());
+		
+		while (driverIter.hasNext()) {
+			driverIter.next();
+			QString driverName = driverIter.key();
+			QString displayText = driverIter.value().first;
+			sortedDrivers.append(qMakePair(displayText, driverName));
+		}
+
+		std::sort(sortedDrivers.begin(), sortedDrivers.end(), 
+			[](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
+				return a.first.toLower() < b.first.toLower();
+			});
+
+		for (const auto &driver : sortedDrivers) {
+			QAction *action = subMenu->addAction(driver.first);
+			action->setData(driver.second);
+		}
+	}
+
+	if (!otherDrivers.isEmpty()) {
+		QMenu *otherMenu = driversMenu.addMenu("Other Drivers");
+		
+		QList<QPair<QString, QString>> sortedOtherDrivers;
+		
+		for (const QString &driverName : otherDrivers) {
+			QString displayText = driverDefinitions[driverName].first;
+			sortedOtherDrivers.append(qMakePair(displayText, driverName));
+		}
+		
+		std::sort(sortedOtherDrivers.begin(), sortedOtherDrivers.end(),
+			[](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
+				return a.first.toLower() < b.first.toLower();
+			});
+			
+		for (const auto &driver : sortedOtherDrivers) {
+			QAction *action = otherMenu->addAction(driver.first);
+			action->setData(driver.second);
+		}
+	}
+
 	QPoint pos = driversMenuButton->mapToGlobal(QPoint(0, driversMenuButton->height()));
 	QAction *selectedAction = driversMenu.exec(pos);
 
