@@ -8,6 +8,7 @@
 #include <QComboBox>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QToolButton>
 #include <QSpinBox>
 #include <QGroupBox>
 #include <QStatusBar>
@@ -17,6 +18,7 @@
 #include <QTextStream>
 #include <QSettings>
 #include <QLabel>
+#include <QMap>
 
 class IndigoManagerWindow : public QMainWindow {
 	Q_OBJECT
@@ -32,13 +34,17 @@ private slots:
 	void handleProcessError();
 	void handleProcessStateChanged(QProcess::ProcessState newState);
 	void showServerHelp();
+	void populateDriversMenu();
 
 private:
 	void setupUi();
+	void initializeServerAndDrivers();
 	QStringList buildCommandArguments();
 	void processAndDisplayText(const QString &text);
 	void appendToLog(const QString &text, bool isError = false);
-	QString findServerExecutable();
+	QPair<QString, QString> findServerExecutable();
+	QStringList findDriverFiles();
+	QMap<QString, QPair<QString, QString>> parseDriverFiles(const QStringList &files);
 
 	void saveConfig();
 	void loadConfig();
@@ -48,6 +54,12 @@ private:
 	QProcess *indigoServer;
 	bool serverRunning;
 	bool autoScroll;
+
+	QString serverExecutablePath;
+	QString installationPrefix;
+	QStringList driverFilePaths;
+	QMap<QString, QPair<QString, QString>> driverDefinitions;
+	bool serverAndDriversInitialized;
 
 	QSpinBox *portSpinBox;
 	QLineEdit *bonjourNameEdit;
@@ -60,6 +72,7 @@ private:
 	QPushButton *startStopButton;
 	QPushButton *saveLogButton;
 	QPushButton *helpButton;
+	QToolButton *driversMenuButton;
 	QTextEdit *logTextEdit;
 
 	QTemporaryFile *logFile;

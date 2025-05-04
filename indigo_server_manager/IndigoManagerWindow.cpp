@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QTemporaryFile>
 #include <QSettings>
+#include <QMenu>
 
 // Constants for configuration paths
 const QString CONFIG_DIR = QDir::homePath() + "/.config";
@@ -20,13 +21,17 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 	, indigoServer(new QProcess(this))
 	, serverRunning(false)
 	, autoScroll(true)
-	, logFile(new QTemporaryFile(this)) {
+	, logFile(new QTemporaryFile(this))
+	, serverAndDriversInitialized(false) {
 
 	logFile->open();
 	logStream.setDevice(logFile);
 
 	setupUi();
 	loadConfig();
+
+	// Initialize server and drivers once at startup
+	initializeServerAndDrivers();
 
 	// Configure process to prevent blocking
 	indigoServer->setProcessChannelMode(QProcess::SeparateChannels);
@@ -119,6 +124,13 @@ void IndigoManagerWindow::setupUi() {
 	driversLayout->addWidget(driversLabel);
 	driversLayout->addWidget(additionalParamsEdit);
 
+	// Replace button with tool button for driver selection
+	driversMenuButton = new QToolButton(configGroup);
+	driversMenuButton->setText("…");  // Unicode ellipsis (U+2026)
+	driversMenuButton->setToolTip("Click to select drivers from the installed INDIGO drivers");
+	connect(driversMenuButton, &QToolButton::clicked, this, &IndigoManagerWindow::populateDriversMenu);
+	driversLayout->addWidget(driversMenuButton);
+
 	configMainLayout->addLayout(driversLayout);
 
 	QHBoxLayout *checkboxesAndLogoLayout = new QHBoxLayout();
@@ -196,8 +208,8 @@ void IndigoManagerWindow::setupUi() {
 	// Status bar with icon
 	statusIconLabel = new QLabel(this);
 	statusIconLabel->setPixmap(QPixmap(":resource/led-grey.png"));
-	statusIconLabel->setMargin(3);  // Reduced from 5
-	statusIconLabel->setIndent(2);  // Reduced from 5
+	statusIconLabel->setMargin(3);
+	statusIconLabel->setIndent(2);
 
 	// Create a label for the status message with less padding
 	statusMessageLabel = new QLabel("Ready", this);
@@ -220,7 +232,12 @@ void IndigoManagerWindow::startStopServer() {
 		logTextEdit->clear();
 		logFile->resize(0);
 
-		QString program = findServerExecutable();
+		QString program = serverExecutablePath;
+		if (program.isEmpty()) {
+			initializeServerAndDrivers();
+			program = serverExecutablePath;
+		}
+
 		if (program.isEmpty()) {
 			statusIconLabel->setPixmap(QPixmap(":resource/led-red.png"));
 			appendToLog("Cannot start server: indigo_server executable not found!", true);
@@ -234,8 +251,8 @@ void IndigoManagerWindow::startStopServer() {
 
 		// Set process environment to prevent output blocking
 		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-		env.insert("PYTHONUNBUFFERED", "1");  // Works for many programs, not just Python
-		env.insert("UNBUFFERED", "1");        // Some programs check this
+		env.insert("PYTHONUNBUFFERED", "1");
+		env.insert("UNBUFFERED", "1");
 		indigoServer->setProcessEnvironment(env);
 
 		indigoServer->setProgram(program);
@@ -467,13 +484,43 @@ QString IndigoManagerWindow::formatServiceAddress() {
 	return QString("<b>%1.local:%2</b>").arg(hostname).arg(portSpinBox->value());
 }
 
-QString IndigoManagerWindow::findServerExecutable() {
-	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	QString serverPath = env.value("INDIGO_SERVER");
+void IndigoManagerWindow::initializeServerAndDrivers() {
+	QPair<QString, QString> serverInfo = findServerExecutable();
+	serverExecutablePath = serverInfo.first;
+	installationPrefix = serverInfo.second;
 
-	if (!serverPath.isEmpty() && QFile::exists(serverPath)) {
-		appendToLog("Using indigo_server from environment variable: " + serverPath, false);
-		return serverPath;
+	if (!serverExecutablePath.isEmpty()) {
+		driverFilePaths = findDriverFiles();
+
+		if (!driverFilePaths.isEmpty()) {
+			driverDefinitions = parseDriverFiles(driverFilePaths);
+			if (!driverDefinitions.isEmpty()) {
+				serverAndDriversInitialized = true;
+				appendToLog("INDIGO server and driver definitions successfully initialized", false);
+				return;
+			}
+		}
+	}
+
+	appendToLog("Warning: INDIGO server or driver definitions could not be fully initialized", true);
+}
+
+QPair<QString, QString> IndigoManagerWindow::findServerExecutable() {
+	if (serverAndDriversInitialized) {
+		return qMakePair(serverExecutablePath, installationPrefix);
+	}
+
+	QString serverPath;
+	QString prefix;
+
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	if (!env.value("INDIGO_INSTALL_PREFIX").isEmpty()) {
+		prefix = env.value("INDIGO_INSTALL_PREFIX");
+		serverPath = prefix + "/bin/indigo_server";
+		if (QFile::exists(serverPath)) {
+			appendToLog("Using indigo_server from environment variable: " + serverPath, false);
+			return qMakePair(serverPath, prefix);
+		}
 	}
 
 	QStringList searchPaths = {
@@ -485,15 +532,56 @@ QString IndigoManagerWindow::findServerExecutable() {
 
 	for (const QString &path : searchPaths) {
 		if (QFile::exists(path)) {
-			appendToLog("Found indigo_server at: " + path, false);
-			return path;
+			// Derive prefix from path by removing "/bin/indigo_server"
+			int binIndex = path.lastIndexOf("/bin/indigo_server");
+			if (binIndex > 0) {
+				prefix = path.left(binIndex);
+				appendToLog("Found indigo_server at: " + path, false);
+				appendToLog("Derived installation prefix: " + prefix, false);
+				return qMakePair(path, prefix);
+			}
 		}
 	}
 
 	appendToLog("indigo_server executable not found in search paths", true);
-	return QString();
+	return qMakePair(QString(), QString());
 }
 
+QStringList IndigoManagerWindow::findDriverFiles() {
+	if (serverAndDriversInitialized && !driverFilePaths.isEmpty()) {
+		return driverFilePaths;
+	}
+
+	QStringList result;
+
+	QString prefix = installationPrefix;
+	if (prefix.isEmpty()) {
+		QPair<QString, QString> serverInfo = findServerExecutable();
+		prefix = serverInfo.second;
+	}
+
+	if (prefix.isEmpty()) {
+		appendToLog("Cannot locate driver files: No valid installation prefix found", true);
+		return result;
+	}
+
+	QString driverPath = prefix + "/share/indigo/";
+
+	if (QFile::exists(driverPath + "indigo_drivers")) {
+		result << driverPath + "indigo_drivers";
+	}
+	if (QFile::exists(driverPath + "indigo_linux_drivers")) {
+		result << driverPath + "indigo_linux_drivers";
+	}
+
+	if (!result.isEmpty() && !serverAndDriversInitialized) {
+		appendToLog("Found driver definition files: " + result.join(", "), false);
+	} else if (result.isEmpty() && !serverAndDriversInitialized) {
+		appendToLog("No driver definition files found under prefix: " + prefix, true);
+	}
+
+	return result;
+}
 
 void IndigoManagerWindow::saveConfig() {
 	QDir configDir(CONFIG_DIR);
@@ -549,7 +637,12 @@ void IndigoManagerWindow::showServerHelp() {
 
 	logTextEdit->clear();
 
-	QString program = findServerExecutable();
+	QString program = serverExecutablePath;
+	if (program.isEmpty()) {
+		initializeServerAndDrivers();
+		program = serverExecutablePath;
+	}
+
 	if (program.isEmpty()) {
 		statusIconLabel->setPixmap(QPixmap(":resource/led-red.png"));
 		appendToLog("Cannot show help: indigo_server executable not found!", true);
@@ -583,4 +676,68 @@ void IndigoManagerWindow::showServerHelp() {
 	appendToLog("--- End of Help ---", false);
 
 	statusMessageLabel->setText("Server help displayed");
+}
+
+QMap<QString, QPair<QString, QString>> IndigoManagerWindow::parseDriverFiles(const QStringList &files) {
+	QMap<QString, QPair<QString, QString>> driversMap; // Map of name -> (description, version)
+
+	for (const QString &file : files) {
+		QFile driverFile(file);
+		if (driverFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			QTextStream in(&driverFile);
+			while (!in.atEnd()) {
+				QString line = in.readLine().trimmed();
+				if (line.isEmpty() || line.startsWith("#")) {
+					continue;
+				}
+
+				// Parse the line which should be in format: "name", "description", version
+				QRegExp rx("\"([^\"]+)\",\\s*\"([^\"]+)\",\\s*(\\w+)");
+				if (rx.indexIn(line) != -1) {
+					QString name = rx.cap(1);
+					QString description = rx.cap(2);
+					QString version = rx.cap(3);
+					driversMap[name] = qMakePair(description, version);
+				}
+			}
+			driverFile.close();
+		}
+	}
+
+	return driversMap;
+}
+
+void IndigoManagerWindow::populateDriversMenu() {
+	if (!serverAndDriversInitialized) {
+		initializeServerAndDrivers();
+	}
+
+	if (driverDefinitions.isEmpty()) {
+		QMessageBox::information(this, tr("Driver Files"),
+						  tr("No driver definitions available.\n"
+							 "Please make sure INDIGO is properly installed."));
+		return;
+	}
+
+	QMenu driversMenu;
+	QMapIterator<QString, QPair<QString, QString>> i(driverDefinitions);
+	while (i.hasNext()) {
+		i.next();
+		QString displayText = i.value().first;
+		QAction *action = driversMenu.addAction(displayText);
+		action->setData(i.key());
+	}
+
+	// Adjust the position to show menu next to the button
+	QPoint pos = driversMenuButton->mapToGlobal(QPoint(0, driversMenuButton->height()));
+	QAction *selectedAction = driversMenu.exec(pos);
+
+	if (selectedAction) {
+		QString driverName = selectedAction->data().toString();
+		QString currentText = additionalParamsEdit->text().trimmed();
+		if (!currentText.isEmpty() && !currentText.endsWith(" ")) {
+			currentText += " ";
+		}
+		additionalParamsEdit->setText(currentText + driverName);
+	}
 }
