@@ -42,9 +42,6 @@ private:
 	QStringList buildCommandArguments();
 	void processAndDisplayText(const QString &text);
 	void appendToLog(const QString &text, bool isError = false);
-	QPair<QString, QString> findServerExecutable();
-	QStringList findDriverFiles();
-	QMap<QString, QPair<QString, QString>> parseDriverFiles(const QStringList &files);
 
 	void saveConfig();
 	void loadConfig();
