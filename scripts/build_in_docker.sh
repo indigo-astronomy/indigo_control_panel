@@ -31,7 +31,7 @@ COPY indigo-control-panel-$2.tar.gz .
 RUN tar -zxf indigo-control-panel-$2.tar.gz
 RUN rm indigo-control-panel-$2.tar.gz
 WORKDIR indigo-control-panel-$2
-RUN qmake
+RUN qmake indigo_tools.pro
 RUN scripts/builddeb.sh $2
 EOF
 docker build -t icp .

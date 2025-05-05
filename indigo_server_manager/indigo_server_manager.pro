@@ -6,6 +6,7 @@ TEMPLATE = app
 
 RESOURCES += \
 	../qdarkstyle/style.qrc \
+	../resource/server_manager.png \
 	../resource/led-red.png \
 	../resource/led-grey.png \
 	../resource/led-green.png \

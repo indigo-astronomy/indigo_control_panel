@@ -7,6 +7,8 @@ int main(int argc, char *argv[]) {
 	app.setApplicationName("INDIGO Server Manager");
 	app.setOrganizationName("INDIGO");
 
+	app.setWindowIcon(QIcon(":/resource/server_manager.png"));
+
 	QFont font("SansSerif", 10, QFont::Medium);
 	font.setStyleHint(QFont::SansSerif);
 	app.setFont(font);
