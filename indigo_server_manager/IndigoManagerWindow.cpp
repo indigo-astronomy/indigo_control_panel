@@ -38,7 +38,8 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 
 	connect(startStopButton, &QPushButton::clicked, this, &IndigoManagerWindow::startStopServer);
 	connect(saveLogButton, &QPushButton::clicked, this, &IndigoManagerWindow::saveLog);
-	connect(helpButton, &QPushButton::clicked, this, &IndigoManagerWindow::showServerHelp);  // Connect help button
+	connect(helpButton, &QPushButton::clicked, this, &IndigoManagerWindow::showServerHelp);
+	connect(resetButton, &QPushButton::clicked, this, &IndigoManagerWindow::resetToDefaults);
 
 	connect(indigoServer, &QProcess::readyReadStandardOutput, this, &IndigoManagerWindow::handleProcessOutput);
 	connect(indigoServer, &QProcess::readyReadStandardError, this, &IndigoManagerWindow::handleProcessError);
@@ -180,9 +181,11 @@ void IndigoManagerWindow::setupUi() {
 	startStopButton = new QPushButton("Start Server", centralWidget);
 	saveLogButton = new QPushButton("Save Log", centralWidget);
 	helpButton = new QPushButton("Server Help", centralWidget);
+	resetButton = new QPushButton("Reset to Defaults", centralWidget);
 	buttonLayout->addWidget(startStopButton);
 	buttonLayout->addWidget(saveLogButton);
 	buttonLayout->addWidget(helpButton);
+	buttonLayout->addWidget(resetButton);
 	mainLayout->addLayout(buttonLayout);
 
 	// Log area
@@ -595,7 +598,7 @@ void IndigoManagerWindow::loadConfig() {
 	disableBonjourCheck->setChecked(settings.value("DisableBonjour", false).toBool());
 	disableBlobBufferingCheck->setChecked(settings.value("DisableBlobBuffering", false).toBool());
 	enableBlobCompressionCheck->setChecked(settings.value("EnableBlobCompression", false).toBool());
-	verbosityComboBox->setCurrentIndex(settings.value("VerbosityIndex", 0).toInt());
+	verbosityComboBox->setCurrentIndex(settings.value("VerbosityIndex", 1).toInt());
 	additionalParamsEdit->setText(settings.value("AdditionalParameters", "").toString());
 	settings.endGroup();
 
@@ -605,6 +608,30 @@ void IndigoManagerWindow::loadConfig() {
 	resize(savedSize);
 	move(savedPos);
 	settings.endGroup();
+}
+
+void IndigoManagerWindow::resetToDefaults() {
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, "Reset to Defaults",
+								"Are you sure you want to reset all settings to default values?",
+								QMessageBox::Yes|QMessageBox::No);
+
+	if (reply != QMessageBox::Yes) {
+		return;
+	}
+
+	portSpinBox->setValue(7624);
+	bonjourNameEdit->setText(QHostInfo::localHostName());
+	disableBonjourCheck->setChecked(false);
+	disableBlobBufferingCheck->setChecked(false);
+	enableBlobCompressionCheck->setChecked(false);
+	verbosityComboBox->setCurrentIndex(1);
+	additionalParamsEdit->clear();
+
+	statusMessageLabel->setText("Settings reset to defaults");
+	appendToLog("Settings were reset to default values", false);
+
+	saveConfig();
 }
 
 void IndigoManagerWindow::showServerHelp() {

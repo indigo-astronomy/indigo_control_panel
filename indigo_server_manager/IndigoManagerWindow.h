@@ -35,6 +35,7 @@ private slots:
 	void handleProcessStateChanged(QProcess::ProcessState newState);
 	void showServerHelp();
 	void populateDriversMenu();
+	void resetToDefaults(); // New slot for reset button
 
 private:
 	void setupUi();
@@ -69,6 +70,7 @@ private:
 	QPushButton *startStopButton;
 	QPushButton *saveLogButton;
 	QPushButton *helpButton;
+	QPushButton *resetButton; // New reset button
 	QToolButton *driversMenuButton;
 	QTextEdit *logTextEdit;
 
