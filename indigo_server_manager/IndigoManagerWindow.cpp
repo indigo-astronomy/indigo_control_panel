@@ -1,4 +1,5 @@
 #include "IndigoManagerWindow.h"
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
@@ -51,7 +52,6 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 		autoScroll = (value == sb->maximum());
 	});
 
-	// Configure log text edit for better performance
 	logTextEdit->document()->setMaximumBlockCount(1000);
 
 	updateControlsState();
@@ -243,7 +243,7 @@ void IndigoManagerWindow::startStopServer() {
 
 		if (program.isEmpty()) {
 			statusIconLabel->setPixmap(QPixmap(":resource/led-red.png"));
-			appendToLog("Cannot start server: indigo_server executable not found!", true);
+			appendToLog("* Cannot start server: indigo_server executable not found!", true);
 			statusMessageLabel->setText("Error: Server executable not found");
 			return;
 		}
@@ -264,7 +264,7 @@ void IndigoManagerWindow::startStopServer() {
 
 		if (!indigoServer->waitForStarted(1000)) {
 			statusIconLabel->setPixmap(QPixmap(":resource/led-red.png"));
-			appendToLog("Failed to start indigo_server process!", true);
+			appendToLog("* Failed to start indigo_server process!", true);
 			statusMessageLabel->setText("Error: Failed to start server");
 			return;
 		}
@@ -276,13 +276,16 @@ void IndigoManagerWindow::startStopServer() {
 		statusMessageLabel->setText("Server started on " + formatServiceAddress());
 	} else {
 		// Stop the server
-		appendToLog("> Stopping indigo_server...", false);
+		appendToLog("* Stopping indigo_server...", false);
 		statusIconLabel->setPixmap(QPixmap(":resource/led-orange.png"));
 		statusMessageLabel->setText("Stopping server...");
 
+		// Force UI update to make the orange LED visible immediately
+		QApplication::processEvents();
+
 		indigoServer->terminate();
 		if (!indigoServer->waitForFinished(3000)) {
-			appendToLog("Server not responding, forcing termination!", true);
+			appendToLog("* Server not responding, forcing termination!", true);
 			indigoServer->kill();
 		}
 
@@ -446,7 +449,7 @@ void IndigoManagerWindow::handleProcessStateChanged(QProcess::ProcessState newSt
 	case QProcess::NotRunning:
 		if (serverRunning) {
 			int exitCode = indigoServer->exitCode();
-			appendToLog(QString("Server process exited with code %1").arg(exitCode), false);
+			appendToLog(QString("* Server process exited with code %1").arg(exitCode), false);
 			startStopButton->setText("Start Server");
 			serverRunning = false;
 			updateControlsState();
@@ -461,13 +464,12 @@ void IndigoManagerWindow::handleProcessStateChanged(QProcess::ProcessState newSt
 		}
 		break;
 	case QProcess::Starting:
-		appendToLog("Server process starting...", false);
+		appendToLog("* Server process starting...", false);
 		statusIconLabel->setPixmap(QPixmap(":resource/led-orange.png"));
 		statusMessageLabel->setText("Starting server...");
 		helpButton->setEnabled(false);
 		break;
 	case QProcess::Running:
-		appendToLog("Server process running...", false);
 		statusIconLabel->setPixmap(QPixmap(":resource/led-green.png"));
 		statusMessageLabel->setText("Server running on " + formatServiceAddress());
 		helpButton->setEnabled(false);
@@ -512,7 +514,7 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 		installationPrefix = env.value("INDIGO_INSTALL_PREFIX");
 		serverExecutablePath = installationPrefix + "/bin/indigo_server";
 		if (QFile::exists(serverExecutablePath)) {
-			appendToLog("Using indigo_server from environment variable: " + serverExecutablePath, false);
+			appendToLog("INDIGO Server found at: " + serverExecutablePath, false);
 		} else {
 			serverExecutablePath = "";
 		}
@@ -532,7 +534,7 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 				int binIndex = path.lastIndexOf("/bin/indigo_server");
 				if (binIndex > 0) {
 					installationPrefix = path.left(binIndex);
-					appendToLog("Using indigo_server at: " + path, false);
+					appendToLog("INDIGO Server found at: " + path, false);
 					break;
 				}
 			}
@@ -572,14 +574,14 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 				}
 			}
 		} else {
-			appendToLog("No driver definition files found under prefix: " + installationPrefix, true);
+			appendToLog("* Error: No driver definition files found under prefix: " + installationPrefix, true);
 		}
 	}
 
 	if (!serverExecutablePath.isEmpty() && !driverDefinitions.isEmpty()) {
 		serverAndDriversInitialized = true;
 	} else {
-		appendToLog("Warning: INDIGO server or driver definitions could not be fully initialized", true);
+		appendToLog("* Warning: INDIGO server or driver definitions could not be fully initialized", true);
 	}
 }
 
@@ -649,7 +651,7 @@ void IndigoManagerWindow::resetToDefaults() {
 	additionalParamsEdit->clear();
 
 	statusMessageLabel->setText("Settings reset to defaults");
-	appendToLog("Settings were reset to default values", false);
+	appendToLog("* Settings were reset to default values", false);
 
 	saveConfig();
 }
@@ -663,7 +665,7 @@ void IndigoManagerWindow::showServerHelp() {
 
 	if (serverExecutablePath.isEmpty()) {
 		statusIconLabel->setPixmap(QPixmap(":resource/led-red.png"));
-		appendToLog("Cannot show help: indigo_server executable not found!", true);
+		appendToLog("* Cannot show help: indigo_server executable not found!", true);
 		statusMessageLabel->setText("Error: Server executable not found");
 		return;
 	}
