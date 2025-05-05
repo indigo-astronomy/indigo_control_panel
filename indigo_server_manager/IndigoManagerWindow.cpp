@@ -823,6 +823,14 @@ void IndigoManagerWindow::populateDriversMenu() {
 	if (selectedAction) {
 		QString driverName = selectedAction->data().toString();
 		QString currentText = additionalParamsEdit->text().trimmed();
+
+		// Check if the driver is already selected
+		QRegExp wordBoundary("\\b" + QRegExp::escape(driverName) + "\\b");
+		if (wordBoundary.indexIn(currentText) != -1) {
+			appendToLog("* Driver \"" + selectedAction->text() + "\" is already selected", false);
+			return;
+		}
+
 		if (!currentText.isEmpty() && !currentText.endsWith(" ")) {
 			currentText += " ";
 		}
