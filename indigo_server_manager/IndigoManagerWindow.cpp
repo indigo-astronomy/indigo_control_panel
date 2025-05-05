@@ -466,7 +466,7 @@ void IndigoManagerWindow::processAndDisplayText(const QString &text) {
 			logTextEdit->append(
 				"NOTE: Output truncated, " +
 				QString::number(lines.size() - maxLinesToProcess) +
-				" lines skipped to maintain performance. Complete output will be sved to log."
+				" lines skipped to maintain performance. Complete output will be saved to log."
 			);
 		}
 	} else {
