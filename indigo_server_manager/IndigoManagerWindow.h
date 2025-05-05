@@ -35,7 +35,8 @@ private slots:
 	void handleProcessStateChanged(QProcess::ProcessState newState);
 	void showServerHelp();
 	void populateDriversMenu();
-	void resetToDefaults(); // New slot for reset button
+	void resetToDefaults();
+	void showAboutDialog();
 
 private:
 	void setupUi();
@@ -71,7 +72,7 @@ private:
 	QPushButton *startStopButton;
 	QPushButton *saveLogButton;
 	QPushButton *helpButton;
-	QPushButton *resetButton; // New reset button
+	QPushButton *resetButton;
 	QToolButton *driversMenuButton;
 	QTextEdit *logTextEdit;
 
@@ -80,6 +81,7 @@ private:
 
 	QLabel *statusIconLabel;
 	QLabel *statusMessageLabel;
+	QPushButton *logoButton;
 };
 
 #endif // __INDIGOMANAGERWINDOW_H

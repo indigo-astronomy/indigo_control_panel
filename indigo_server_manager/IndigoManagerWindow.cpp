@@ -134,6 +134,11 @@ void IndigoManagerWindow::setupUi() {
 
 	configMainLayout->addLayout(driversLayout);
 
+	// Add vertical spacing here
+	QSpacerItem* verticalSpacer = new QSpacerItem(0, 5, QSizePolicy::Minimum, QSizePolicy::Fixed);
+	configMainLayout->addItem(verticalSpacer);
+
+	// Then the checkboxes and logo layout
 	QHBoxLayout *checkboxesAndLogoLayout = new QHBoxLayout();
 
 	QVBoxLayout *checkboxesLayout = new QVBoxLayout();
@@ -167,12 +172,33 @@ void IndigoManagerWindow::setupUi() {
 
 	checkboxesAndLogoLayout->addLayout(checkboxesLayout);
 
-	QLabel *logoLabel = new QLabel(configGroup);
+	// Create logo button with no decorations
+	logoButton = new QPushButton(configGroup);
+	logoButton->setFlat(true);
+	logoButton->setCursor(Qt::PointingHandCursor);
+	logoButton->setToolTip("Click for information about INDIGO Server Controller");
+
 	QPixmap logoPixmap(":/resource/indigo_logo.png");
 	logoPixmap = logoPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-	logoLabel->setPixmap(logoPixmap);
-	logoLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	checkboxesAndLogoLayout->addWidget(logoLabel);
+
+	logoButton->setStyleSheet(
+		"QPushButton {"
+		"   border: none;"
+		"   margin: 0px;"
+		"   padding: 0px;"
+		"   min-width: 0px;" // This prevents minimum width constraints
+		"   min-height: 0px;" // This prevents minimum height constraints
+		"}"
+	);
+	logoButton->setIcon(QIcon(logoPixmap));
+	logoButton->setIconSize(logoPixmap.size());
+	logoButton->setFixedSize(logoPixmap.size());
+	logoButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	connect(logoButton, &QPushButton::clicked, this, &IndigoManagerWindow::showAboutDialog);
+
+	// Add to layout with right alignment
+	checkboxesAndLogoLayout->addWidget(logoButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 
 	configMainLayout->addLayout(checkboxesAndLogoLayout);
 
@@ -802,4 +828,25 @@ void IndigoManagerWindow::populateDriversMenu() {
 		}
 		additionalParamsEdit->setText(currentText + driverName);
 	}
+}
+
+void IndigoManagerWindow::showAboutDialog() {
+		QString aboutText = QString(
+			"<b>INDIGO Server Controller</b><br>"
+			"Version 1.0<br><br>"
+			"A graphical interface to control the INDIGO astronomy server.<br>"
+			"<br>"
+			"Author:<br>"
+			"Rumen G.Bogdanovski<br>"
+			"You can use this software under the terms of <b>INDIGO Astronomy open-source license</b><br><br>"
+			"Copyright © 2025 The INDIGO Initiative<br>"
+			"<a href='https://www.indigo-astronomy.org/'>www.indigo-astronomy.org</a><br>"
+		);
+
+		QMessageBox aboutBox(this);
+		aboutBox.setWindowTitle("About INDIGO Server Controller");
+		aboutBox.setTextFormat(Qt::RichText);
+		aboutBox.setText(aboutText);
+		aboutBox.setIconPixmap(QPixmap(":/resource/indigo_logo.png").scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		aboutBox.exec();
 }
