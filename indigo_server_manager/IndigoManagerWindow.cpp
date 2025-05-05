@@ -181,6 +181,9 @@ void IndigoManagerWindow::setupUi() {
 	// Buttons
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	startStopButton = new QPushButton("Start Server", centralWidget);
+	QFont boldFont = startStopButton->font();
+	boldFont.setBold(true);
+	startStopButton->setFont(boldFont);
 	saveLogButton = new QPushButton("Save Log", centralWidget);
 	helpButton = new QPushButton("Server Help", centralWidget);
 	resetButton = new QPushButton("Reset to Defaults", centralWidget);
