@@ -54,6 +54,8 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 	// Configure log text edit for better performance
 	logTextEdit->document()->setMaximumBlockCount(1000);
 
+	updateControlsState();
+
 	helpButton->setEnabled(!serverRunning);
 }
 
@@ -270,7 +272,7 @@ void IndigoManagerWindow::startStopServer() {
 		statusIconLabel->setPixmap(QPixmap(":resource/led-green.png"));
 		startStopButton->setText("Stop Server");
 		serverRunning = true;
-		helpButton->setEnabled(false);
+		updateControlsState();
 		statusMessageLabel->setText("Server started on " + formatServiceAddress());
 	} else {
 		// Stop the server
@@ -287,7 +289,7 @@ void IndigoManagerWindow::startStopServer() {
 		statusIconLabel->setPixmap(QPixmap(":resource/led-grey.png"));
 		startStopButton->setText("Start Server");
 		serverRunning = false;
-		helpButton->setEnabled(true);
+		updateControlsState();
 		statusMessageLabel->setText("Server stopped");
 	}
 }
@@ -447,7 +449,7 @@ void IndigoManagerWindow::handleProcessStateChanged(QProcess::ProcessState newSt
 			appendToLog(QString("Server process exited with code %1").arg(exitCode), false);
 			startStopButton->setText("Start Server");
 			serverRunning = false;
-			helpButton->setEnabled(true);
+			updateControlsState();
 
 			if (exitCode == 0) {
 				statusIconLabel->setPixmap(QPixmap(":resource/led-grey.png"));
@@ -483,6 +485,24 @@ QString IndigoManagerWindow::formatServiceAddress() {
 	}
 
 	return QString("<b>%1.local:%2</b>").arg(hostname).arg(portSpinBox->value());
+}
+
+void IndigoManagerWindow::updateControlsState() {
+	bool controlsEnabled = !serverRunning;
+
+	bonjourNameEdit->setEnabled(controlsEnabled);
+	portSpinBox->setEnabled(controlsEnabled);
+	verbosityComboBox->setEnabled(controlsEnabled);
+
+	additionalParamsEdit->setEnabled(controlsEnabled);
+	driversMenuButton->setEnabled(controlsEnabled);
+
+	disableBonjourCheck->setEnabled(controlsEnabled);
+	disableBlobBufferingCheck->setEnabled(controlsEnabled);
+	enableBlobCompressionCheck->setEnabled(controlsEnabled);
+
+	helpButton->setEnabled(controlsEnabled);
+	resetButton->setEnabled(controlsEnabled);
 }
 
 void IndigoManagerWindow::initializeServerAndDrivers() {

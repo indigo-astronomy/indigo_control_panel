@@ -43,6 +43,7 @@ private:
 	QStringList buildCommandArguments();
 	void processAndDisplayText(const QString &text);
 	void appendToLog(const QString &text, bool isError = false);
+	void updateControlsState();
 
 	void saveConfig();
 	void loadConfig();
