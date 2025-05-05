@@ -50,6 +50,7 @@ private:
 	void loadConfig();
 
 	QString formatServiceAddress();
+	bool isOptionInAdditionalParams(const QString &option);
 
 	QProcess *indigoServer;
 	bool serverRunning;

@@ -328,41 +328,64 @@ void IndigoManagerWindow::startStopServer() {
 
 QStringList IndigoManagerWindow::buildCommandArguments() {
 	QStringList args;
-
+	QString additionalParams = additionalParamsEdit->text().trimmed();
 	// Port
-	args << "-p" << QString::number(portSpinBox->value());
+	if (!isOptionInAdditionalParams("-p")) {
+		args << "-p" << QString::number(portSpinBox->value());
+	} else {
+		appendToLog("* NOTE: Using listening port from command line parameters", false);
+	}
 
 	// Bonjour
 	if (disableBonjourCheck->isChecked()) {
-		args << "-b-";
-	} else {
-		// Use hostname as default if service name is empty
-		QString serviceName = bonjourNameEdit->text().trimmed();
-		if (serviceName.isEmpty()) {
-			serviceName = QHostInfo::localHostName();
-			bonjourNameEdit->setText(serviceName);
+		if (!isOptionInAdditionalParams("-b-")) {
+			args << "-b-";
+		} else {
+			appendToLog("* NOTE: Using disable bonjour option from command line parameters", false);
 		}
-		args << "-b" << serviceName;
+	} else {
+		if (!isOptionInAdditionalParams("-b")) {
+			// Use hostname as default if service name is empty
+			QString serviceName = bonjourNameEdit->text().trimmed();
+			if (serviceName.isEmpty()) {
+				serviceName = QHostInfo::localHostName();
+				bonjourNameEdit->setText(serviceName);
+			}
+			args << "-b" << serviceName;
+		} else {
+			appendToLog("* NOTE: Using bonjour service name from command line parameters", false);
+		}
 	}
 
 	// BLOB Buffering
 	if (disableBlobBufferingCheck->isChecked()) {
-		args << "-d-";
+		if (!isOptionInAdditionalParams("-d-")) {
+			args << "-d-";
+		} else {
+			appendToLog("* NOTE: Using BLOB buffering setting from command line parameters", false);
+		}
 	}
 
 	// BLOB Compression
 	if (enableBlobCompressionCheck->isChecked()) {
-		args << "-C";
+		if (!isOptionInAdditionalParams("-C")) {
+			args << "-C";
+		} else {
+			appendToLog("* NOTE: Using BLOB compression setting from command line parameters", false);
+		}
 	}
 
 	// Verbosity
 	QString verbosityFlag = verbosityComboBox->currentData().toString();
 	if (!verbosityFlag.isEmpty()) {
-		args << verbosityFlag;
+		if (!isOptionInAdditionalParams(verbosityFlag)) {
+			args << verbosityFlag;
+		} else {
+			appendToLog("* NOTE: Using verbosity setting from command line parameters", false);
+		}
 	}
 
 	// Additional parameters (typically drivers to load)
-	QString additionalParams = additionalParamsEdit->text().trimmed();
 	if (!additionalParams.isEmpty()) {
 		foreach (const QString &param, additionalParams.split(QRegExp("\\s+"), QString::SkipEmptyParts)) {
 			args << param;
@@ -441,9 +464,9 @@ void IndigoManagerWindow::processAndDisplayText(const QString &text) {
 		// If there are more lines, log a message and skip them to prevent UI freezing
 		if (lines.size() > maxLinesToProcess) {
 			logTextEdit->append(
-				"NOTICE: Output truncated, " +
+				"NOTE: Output truncated, " +
 				QString::number(lines.size() - maxLinesToProcess) +
-				" lines skipped to maintain performance"
+				" lines skipped to maintain performance. Complete output will be sved to log."
 			);
 		}
 	} else {
@@ -516,6 +539,15 @@ QString IndigoManagerWindow::formatServiceAddress() {
 	}
 
 	return QString("<b>%1.local:%2</b>").arg(hostname).arg(portSpinBox->value());
+}
+
+bool IndigoManagerWindow::isOptionInAdditionalParams(const QString &option) {
+	QString currentText = additionalParamsEdit->text().trimmed();
+	if (currentText.isEmpty()) {
+		return false;
+	}
+	QStringList tokens = currentText.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+	return tokens.contains(option);
 }
 
 void IndigoManagerWindow::updateControlsState() {
@@ -824,9 +856,8 @@ void IndigoManagerWindow::populateDriversMenu() {
 		QString driverName = selectedAction->data().toString();
 		QString currentText = additionalParamsEdit->text().trimmed();
 
-		// Check if the driver is already selected
-		QRegExp wordBoundary("\\b" + QRegExp::escape(driverName) + "\\b");
-		if (wordBoundary.indexIn(currentText) != -1) {
+		// Check if the driver is already selected using our helper function
+		if (isOptionInAdditionalParams(driverName)) {
 			appendToLog("* Driver \"" + selectedAction->text() + "\" is already selected", false);
 			return;
 		}
