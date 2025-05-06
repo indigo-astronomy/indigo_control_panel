@@ -20,7 +20,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define PANEL_VERSION ""
+#define PANEL_VERSION "0.15-1"
 #define YEAR_NOW (__DATE__ + 7)
 
 #endif // VERSION_H
