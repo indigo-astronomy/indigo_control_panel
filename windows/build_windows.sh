@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 APP=indigo_control_panel
 QT_VER=5.15.2
 MINGW_VER=81
@@ -40,7 +42,7 @@ popd
 pushd .
 [ ! -d "${APP}_64" ] && mkdir ${APP}_64
 cd ${APP}_64
-qmake ../../${APP}.pro
+qmake ../../${APP}_src/${APP}.pro
 mingw32-make -f Makefile.release
 
 [ ! -d "${APP}" ] && mkdir ${APP}
@@ -50,7 +52,7 @@ cp ../../../external/indigo_sdk/lib/libindigo_client.dll .
 windeployqt ${APP}.exe
 popd
 
-APP_VERSION=`grep "VERSION " ../version.h | sed 's/"//g' |awk '{ print $3 }'`
+APP_VERSION=`grep "VERSION " ../indigo_control_panel_src/version.h | sed 's/"//g' |awk '{ print $3 }'`
 
 #iscc -DArch=32 -DMyAppVersion=$APP_VERSION ${APP}.iss
 iscc -DArch=64 -DMyAppVersion=$APP_VERSION ${APP}.iss

@@ -149,6 +149,6 @@ unix {
 
 win32 {
 	DEFINES += INDIGO_WINDOWS
-	INCLUDEPATH += $${PWD}/../../external/indigo_sdk/include
-	LIBS += $${PWD}/../../external/indigo_sdk/lib/libindigo_client.lib -lws2_32
+	INCLUDEPATH += $${PWD}/../external/indigo_sdk/include
+	LIBS += $${PWD}/../external/indigo_sdk/lib/libindigo_client.lib -lws2_32
 }
