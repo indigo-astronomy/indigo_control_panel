@@ -1,2 +1,5 @@
 debian/indigo-control-panel.desktop usr/share/applications
 debian/indigo-control-panel.png usr/share/icons/hicolor/48x48/apps
+
+debian/indigo-server-manager.desktop usr/share/applications
+debian/indigo-server-manager.png usr/share/icons/hicolor/48x48/apps

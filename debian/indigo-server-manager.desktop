@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=INDIGO Server Manager
+Comment=INDIGO Server Manager
+Exec=indigo_server_manager
+Icon=indigo-server-manager.png
+Terminal=false
+Type=Application
+StartupWMClass=indigo_server_manager
+Categories=Astronomy;Education;Science
+Keywords=astronomy
