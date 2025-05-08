@@ -5,7 +5,7 @@ QMAKE_CXXFLAGS_RELEASE += -O3
 
 unix:mac {
 	CONFIG += app_bundle
-	ICON=$$PWD/resource/appicon.icns
+	ICON=$$PWD/../resource/appicon.icns
 }
 
 OBJECTS_DIR=object
@@ -44,58 +44,58 @@ SOURCES += \
 
 
 RESOURCES += \
-	qdarkstyle/style.qrc \
-	resource/control_panel.qss \
-	resource/appicon.png \
-	resource/indigo_logo.png \
-	resource/bonjour_service.png \
-	resource/manual_service.png \
-	resource/no-preview.png \
-	resource/led-red.png \
-	resource/led-grey.png \
-	resource/led-green.png \
-	resource/led-orange.png \
-	resource/led-red-cb.png \
-	resource/led-green-cb.png \
-	resource/led-orange-cb.png \
-	resource/led-grey-dev.png \
-	resource/led-green-dev.png \
-	resource/server.png \
-	resource/agent.png \
-	resource/ccd-grey.png \
-	resource/ccd-green.png \
-	resource/mount-grey.png \
-	resource/mount-green.png \
-	resource/wheel-grey.png \
-	resource/wheel-green.png \
-	resource/ao-grey.png \
-	resource/ao-green.png \
-	resource/focuser-grey.png \
-	resource/focuser-green.png \
-	resource/gps-grey.png \
-	resource/gps-green.png \
-	resource/guider-grey.png \
-	resource/guider-green.png \
-	resource/dome-grey.png \
-	resource/dome-green.png \
-	resource/rotator-grey.png \
-	resource/rotator-green.png \
-	resource/weather-grey.png \
-	resource/weather-green.png \
-	resource/powerbox-grey.png \
-	resource/powerbox-green.png \
-	resource/flatbox-grey.png \
-	resource/flatbox-green.png \
-	resource/joystick-grey.png \
-	resource/joystick-green.png \
-	resource/shutter-grey.png \
-	resource/shutter-green.png \
-	resource/sqm-grey.png \
-	resource/sqm-green.png \
-	resource/dustcap-grey.png \
-	resource/dustcap-green.png \
-	resource/gpio-grey.png \
-	resource/gpio-green.png
+	../qdarkstyle/style.qrc \
+	../resource/control_panel.qss \
+	../resource/appicon.png \
+	../resource/indigo_logo.png \
+	../resource/bonjour_service.png \
+	../resource/manual_service.png \
+	../resource/no-preview.png \
+	../resource/led-red.png \
+	../resource/led-grey.png \
+	../resource/led-green.png \
+	../resource/led-orange.png \
+	../resource/led-red-cb.png \
+	../resource/led-green-cb.png \
+	../resource/led-orange-cb.png \
+	../resource/led-grey-dev.png \
+	../resource/led-green-dev.png \
+	../resource/server.png \
+	../resource/agent.png \
+	../resource/ccd-grey.png \
+	../resource/ccd-green.png \
+	../resource/mount-grey.png \
+	../resource/mount-green.png \
+	../resource/wheel-grey.png \
+	../resource/wheel-green.png \
+	../resource/ao-grey.png \
+	../resource/ao-green.png \
+	../resource/focuser-grey.png \
+	../resource/focuser-green.png \
+	../resource/gps-grey.png \
+	../resource/gps-green.png \
+	../resource/guider-grey.png \
+	../resource/guider-green.png \
+	../resource/dome-grey.png \
+	../resource/dome-green.png \
+	../resource/rotator-grey.png \
+	../resource/rotator-green.png \
+	../resource/weather-grey.png \
+	../resource/weather-green.png \
+	../resource/powerbox-grey.png \
+	../resource/powerbox-green.png \
+	../resource/flatbox-grey.png \
+	../resource/flatbox-green.png \
+	../resource/joystick-grey.png \
+	../resource/joystick-green.png \
+	../resource/shutter-grey.png \
+	../resource/shutter-green.png \
+	../resource/sqm-grey.png \
+	../resource/sqm-green.png \
+	../resource/dustcap-grey.png \
+	../resource/dustcap-green.png \
+	../resource/gpio-grey.png \
+	../resource/gpio-green.png
 
 
 # Additional import path used to resolve QML modules in Qt Creator\'s code model
@@ -139,20 +139,16 @@ HEADERS += \
 #    PKGCONFIG += indigo
 #}
 
-INCLUDEPATH += "$${PWD}/indigo/indigo_libs"
+INCLUDEPATH += "$${PWD}/../indigo/indigo_libs"
 
 unix {
-	INCLUDEPATH += "$${PWD}/libjpeg"
-	# LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -Wl,-Bstatic -lindigo -ljpeg -Wl,-Bdynamic -ldl
-	LIBS += -L"$${PWD}/libjpeg/.libs" -L"$${PWD}/indigo/build/lib" -lindigo -ljpeg -ldl
+	INCLUDEPATH += "$${PWD}/../libjpeg"
+	# LIBS += -L"$${PWD}/../libjpeg/.libs" -L"$${PWD}/../indigo/build/lib" -Wl,-Bstatic -lindigo -ljpeg -Wl,-Bdynamic -ldl
+	LIBS += -L"$${PWD}/../libjpeg/.libs" -L"$${PWD}/../indigo/build/lib" -lindigo -ljpeg -ldl
 }
-
-DISTFILES += \
-	README.md \
-	LICENCE.md \
 
 win32 {
 	DEFINES += INDIGO_WINDOWS
-	INCLUDEPATH += ../../external/indigo_sdk/include
-	LIBS += ../../external/indigo_sdk/lib/libindigo_client.lib -lws2_32
+	INCLUDEPATH += $${PWD}/../../external/indigo_sdk/include
+	LIBS += $${PWD}/../../external/indigo_sdk/lib/libindigo_client.lib -lws2_32
 }

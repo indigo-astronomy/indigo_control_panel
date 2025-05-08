@@ -1,6 +1,7 @@
 #!/bin/sh
 
 VERSION=${1}
+VERSION_HEADER="indigo_control_panel_src/version.h"
 
 DEBFULLNAME="Rumen Bogdanovski"
 EMAIL="rumenastro@gmail.com"
@@ -10,7 +11,7 @@ __check_file_exits() {
 }
 
 # Check for files where version number shall be replaced.
-__check_file_exits "version.h"
+__check_file_exits ${VERSION_FILE}
 
 # Make sure debian/changelog does not exists because we will genrate it.
 rm -f debian/changelog
@@ -27,7 +28,7 @@ rm -f debian/changelog
 dch --create --package "indigo-control-panel" --newversion ${VERSION} --distribution unstable --nomultimaint -t "Build from official upstream."
 
 # Update version.h.
-sed -i "s/\(PANEL_VERSION \).*/\1\"${VERSION}\"/g" version.h
+sed -i "s/\(PANEL_VERSION \).*/\1\"${VERSION}\"/g" ${VERSION_FILE}
 
 # Finally build the package.
 dpkg-buildpackage \-us \-uc \-I.git \-I\*.out[0-9]\* \-I\*.swp
