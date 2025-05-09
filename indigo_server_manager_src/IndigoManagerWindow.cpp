@@ -147,7 +147,7 @@ void IndigoManagerWindow::setupUi() {
 	QLabel *bonjourSpacerLabel = new QLabel("", configGroup);
 	bonjourSpacerLabel->setFixedWidth(serviceNameLabel->sizeHint().width());
 	bonjourLayout->addWidget(bonjourSpacerLabel);
-	disableBonjourCheck = new QCheckBox("Disable Bonjour", configGroup);
+	disableBonjourCheck = new QCheckBox("Disable Service Discovery", configGroup);
 	bonjourLayout->addWidget(disableBonjourCheck);
 	bonjourLayout->addStretch(1);
 	checkboxesLayout->addLayout(bonjourLayout);
@@ -464,7 +464,7 @@ void IndigoManagerWindow::processAndDisplayText(const QString &text) {
 		// If there are more lines, log a message and skip them to prevent UI freezing
 		if (lines.size() > maxLinesToProcess) {
 			logTextEdit->append(
-				"NOTE: Output truncated, " +
+				"* NOTE: Output truncated, " +
 				QString::number(lines.size() - maxLinesToProcess) +
 				" lines skipped to maintain performance. Complete output will be saved to log."
 			);
