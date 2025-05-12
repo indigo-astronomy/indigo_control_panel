@@ -19,6 +19,7 @@
 #include <QSettings>
 #include <QLabel>
 #include <QMap>
+#include <QCloseEvent>
 
 class IndigoManagerWindow : public QMainWindow {
 	Q_OBJECT
@@ -26,6 +27,9 @@ class IndigoManagerWindow : public QMainWindow {
 public:
 	explicit IndigoManagerWindow(QWidget *parent = nullptr);
 	~IndigoManagerWindow();
+
+protected:
+	void closeEvent(QCloseEvent *event) override;
 
 private slots:
 	void startStopServer();

@@ -13,6 +13,7 @@
 #include <QTemporaryFile>
 #include <QSettings>
 #include <QMenu>
+#include <QCloseEvent>
 
 // Constants for configuration paths
 const QString CONFIG_DIR = QDir::homePath() + "/.config";
@@ -60,24 +61,59 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 }
 
 IndigoManagerWindow::~IndigoManagerWindow() {
-	saveConfig();
-
-	logStream.flush();
-	logFile->close();
-	logFile->setAutoRemove(true);
-
-	// Process termination
+	// Process termination (only needed if closeEvent didn't handle it)
 	if (indigoServer->state() != QProcess::NotRunning) {
 		indigoServer->terminate();
-		indigoServer->waitForFinished(3000);
+		indigoServer->waitForFinished(2000);
 		if (indigoServer->state() != QProcess::NotRunning) {
 			indigoServer->kill();
 		}
 	}
+
+	logStream.flush();
+	logFile->close();
+	logFile->setAutoRemove(true);
+}
+
+void IndigoManagerWindow::closeEvent(QCloseEvent *event) {
+	if (serverRunning) {
+		QMessageBox::StandardButton reply = QMessageBox::question(this,
+			"Exit Application",
+			"INDIGO Server is still running.\nDo you want to terminate it and exit?",
+			QMessageBox::Ok | QMessageBox::Cancel,
+			QMessageBox::Cancel);
+
+		if (reply == QMessageBox::Cancel) {
+			event->ignore();
+			return;
+		}
+
+		appendToLog("* Stopping INDIGO server before exit...", false);
+		statusIconLabel->setPixmap(QPixmap(":resource/led-orange.png"));
+		statusMessageLabel->setText("Stopping server before exit...");
+
+		// Process events to ensure the UI is responsive
+		QApplication::processEvents();
+
+		indigoServer->terminate();
+		if (!indigoServer->waitForFinished(3000)) {
+			appendToLog("* Server not responding, forcing termination!", true);
+			indigoServer->kill();
+			if (!indigoServer->waitForFinished(1000)) {
+				appendToLog("* Warning: Failed to terminate server process!", true);
+			}
+		}
+
+		serverRunning = false;
+		appendToLog("* Server stopped, application will exit now", false);
+	}
+
+	saveConfig();
+	event->accept();
 }
 
 void IndigoManagerWindow::setupUi() {
-	setWindowTitle("INDIGO Server Controller");
+	setWindowTitle("INDIGO Server Manager");
 	resize(800, 600);
 
 	QWidget *centralWidget = new QWidget(this);
