@@ -20,6 +20,7 @@ SOURCES += \
 
 # Header files
 HEADERS += \
+	version.h \
 	IndigoManagerWindow.h
 
 # Default rules for deployment.

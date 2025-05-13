@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 Rumen G.Bogdanovski
+// Copyright (c) 2025 Rumen G.Bogdanovski
 // All rights reserved.
 //
 // You can use this software under the terms of 'INDIGO Astronomy
@@ -20,7 +20,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define PANEL_VERSION "1.0-0"
+#define MANAGER_VERSION "1.0-0"
 #define YEAR_NOW (__DATE__ + 7)
 
 #endif // VERSION_H
