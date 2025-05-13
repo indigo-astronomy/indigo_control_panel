@@ -14,8 +14,10 @@
 #include <QSettings>
 #include <QMenu>
 #include <QCloseEvent>
+#include <QThread>
 
 // Constants for configuration paths
+const QString INDIGO_INSTALL_PREFIX = "INDIGO_INSTALL_PREFIX";
 const QString CONFIG_DIR = QDir::homePath() + "/.config";
 const QString CONFIG_FILE = CONFIG_DIR + "/indigo_server_manager.conf";
 
@@ -64,7 +66,7 @@ IndigoManagerWindow::~IndigoManagerWindow() {
 	// Process termination (only needed if closeEvent didn't handle it)
 	if (indigoServer->state() != QProcess::NotRunning) {
 		indigoServer->terminate();
-		indigoServer->waitForFinished(2000);
+		indigoServer->waitForFinished(5000);
 		if (indigoServer->state() != QProcess::NotRunning) {
 			indigoServer->kill();
 		}
@@ -96,7 +98,7 @@ void IndigoManagerWindow::closeEvent(QCloseEvent *event) {
 		QApplication::processEvents();
 
 		indigoServer->terminate();
-		if (!indigoServer->waitForFinished(3000)) {
+		if (!indigoServer->waitForFinished(5000)) {
 			appendToLog("* Server not responding, forcing termination!", true);
 			indigoServer->kill();
 			if (!indigoServer->waitForFinished(1000)) {
@@ -106,6 +108,9 @@ void IndigoManagerWindow::closeEvent(QCloseEvent *event) {
 
 		serverRunning = false;
 		appendToLog("* Server stopped, application will exit now", false);
+		QApplication::processEvents();
+		// Force a short delay to ensure the log is visible
+		QThread::msleep(500);
 	}
 
 	saveConfig();
@@ -607,8 +612,8 @@ void IndigoManagerWindow::updateControlsState() {
 void IndigoManagerWindow::initializeServerAndDrivers() {
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
-	if (!env.value("INDIGO_INSTALL_PREFIX").isEmpty()) {
-		installationPrefix = env.value("INDIGO_INSTALL_PREFIX");
+	if (!env.value(INDIGO_INSTALL_PREFIX).isEmpty()) {
+		installationPrefix = env.value(INDIGO_INSTALL_PREFIX);
 		serverExecutablePath = installationPrefix + "/bin/indigo_server";
 		if (QFile::exists(serverExecutablePath)) {
 			appendToLog("INDIGO Server found at: " + serverExecutablePath, false);
@@ -679,6 +684,9 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 		serverAndDriversInitialized = true;
 	} else {
 		appendToLog("* Warning: INDIGO server or driver definitions could not be fully initialized", true);
+		appendToLog("\n* INDIGO Server not found in standard locations.", true);
+		appendToLog("* If installed in a custom location, please set the " + INDIGO_INSTALL_PREFIX + " environment variable.", true);
+		appendToLog("* The server executable should be located at $" + INDIGO_INSTALL_PREFIX + "/bin/indigo_server", true);
 	}
 }
 
