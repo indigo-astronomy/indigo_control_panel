@@ -208,6 +208,7 @@ void IndigoManagerWindow::setupUi() {
 	bonjourSpacerLabel->setFixedWidth(serviceNameLabel->sizeHint().width());
 	bonjourLayout->addWidget(bonjourSpacerLabel);
 	disableBonjourCheck = new QCheckBox("Disable Service Discovery", configGroup);
+	disableBonjourCheck->setToolTip("If enabled, indigo_server will not announce its services on the network.\nThis disables automatic discovery of the server by clients.");
 	bonjourLayout->addWidget(disableBonjourCheck);
 	bonjourLayout->addStretch(1);
 	checkboxesLayout->addLayout(bonjourLayout);
@@ -217,6 +218,7 @@ void IndigoManagerWindow::setupUi() {
 	blobSpacerLabel->setFixedWidth(serviceNameLabel->sizeHint().width());
 	blobLayout->addWidget(blobSpacerLabel);
 	disableBlobBufferingCheck = new QCheckBox("Disable BLOB Buffering", configGroup);
+	disableBlobBufferingCheck->setToolTip("If enabled, indigo_server will not buffer BLOB data (image data).");
 	blobLayout->addWidget(disableBlobBufferingCheck);
 	blobLayout->addStretch(1);
 	checkboxesLayout->addLayout(blobLayout);
@@ -226,9 +228,21 @@ void IndigoManagerWindow::setupUi() {
 	compressionSpacerLabel->setFixedWidth(serviceNameLabel->sizeHint().width());
 	compressionLayout->addWidget(compressionSpacerLabel);
 	enableBlobCompressionCheck = new QCheckBox("Enable BLOB Compression", configGroup);
+	enableBlobCompressionCheck->setToolTip("If enabled, indigo_server will compress BLOB data (image data) to reduce network usage.\nThis willq increase CPU usage.");
 	compressionLayout->addWidget(enableBlobCompressionCheck);
 	compressionLayout->addStretch(1);
 	checkboxesLayout->addLayout(compressionLayout);
+
+	// Add the new checkbox for disabling forking
+	QHBoxLayout *forkingLayout = new QHBoxLayout();
+	QLabel *forkingSpacerLabel = new QLabel("", configGroup);
+	forkingSpacerLabel->setFixedWidth(serviceNameLabel->sizeHint().width());
+	forkingLayout->addWidget(forkingSpacerLabel);
+	disableForkingCheck = new QCheckBox("Run in a single process", configGroup);
+	disableForkingCheck->setToolTip("If enabled, indigo_server will run in a single process without forking.\nThis disables automatic recovery if the server or a driver crashes.");
+	forkingLayout->addWidget(disableForkingCheck);
+	forkingLayout->addStretch(1);
+	checkboxesLayout->addLayout(forkingLayout);
 
 	checkboxesAndLogoLayout->addLayout(checkboxesLayout);
 
@@ -435,6 +449,15 @@ QStringList IndigoManagerWindow::buildCommandArguments() {
 		}
 	}
 
+	// Forking
+	if (disableForkingCheck->isChecked()) {
+		if (!isOptionInAdditionalParams("--")) {
+			args << "--";
+		} else {
+			appendToLog("* NOTE: Using forking setting from command line parameters", false);
+		}
+	}
+
 	// Verbosity
 	QString verbosityFlag = verbosityComboBox->currentData().toString();
 	if (!verbosityFlag.isEmpty()) {
@@ -623,6 +646,7 @@ void IndigoManagerWindow::updateControlsState() {
 	disableBonjourCheck->setEnabled(controlsEnabled);
 	disableBlobBufferingCheck->setEnabled(controlsEnabled);
 	enableBlobCompressionCheck->setEnabled(controlsEnabled);
+	disableForkingCheck->setEnabled(controlsEnabled);
 
 	helpButton->setEnabled(controlsEnabled);
 	resetButton->setEnabled(controlsEnabled);
@@ -723,6 +747,7 @@ void IndigoManagerWindow::saveConfig() {
 	settings.setValue("DisableBonjour", disableBonjourCheck->isChecked());
 	settings.setValue("DisableBlobBuffering", disableBlobBufferingCheck->isChecked());
 	settings.setValue("EnableBlobCompression", enableBlobCompressionCheck->isChecked());
+	settings.setValue("DisableForking", disableForkingCheck->isChecked());
 	settings.setValue("VerbosityIndex", verbosityComboBox->currentIndex());
 	settings.setValue("AdditionalParameters", additionalParamsEdit->text());
 	settings.endGroup();
@@ -744,6 +769,7 @@ void IndigoManagerWindow::loadConfig() {
 	disableBonjourCheck->setChecked(settings.value("DisableBonjour", false).toBool());
 	disableBlobBufferingCheck->setChecked(settings.value("DisableBlobBuffering", false).toBool());
 	enableBlobCompressionCheck->setChecked(settings.value("EnableBlobCompression", false).toBool());
+	disableForkingCheck->setChecked(settings.value("DisableForking", false).toBool());
 	verbosityComboBox->setCurrentIndex(settings.value("VerbosityIndex", 1).toInt());
 	additionalParamsEdit->setText(settings.value("AdditionalParameters", "").toString());
 	settings.endGroup();
@@ -771,6 +797,7 @@ void IndigoManagerWindow::resetToDefaults() {
 	disableBonjourCheck->setChecked(false);
 	disableBlobBufferingCheck->setChecked(false);
 	enableBlobCompressionCheck->setChecked(false);
+	disableForkingCheck->setChecked(false);
 	verbosityComboBox->setCurrentIndex(1);
 	additionalParamsEdit->clear();
 

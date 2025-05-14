@@ -89,6 +89,7 @@ private:
 	QCheckBox *disableBonjourCheck;
 	QCheckBox *disableBlobBufferingCheck;
 	QCheckBox *enableBlobCompressionCheck;
+	QCheckBox *disableForkingCheck;
 	QComboBox *verbosityComboBox;
 	QLineEdit *additionalParamsEdit;
 
