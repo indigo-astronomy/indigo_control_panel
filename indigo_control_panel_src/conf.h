@@ -34,6 +34,8 @@
 
 #define CONFIG_FILENAME "indigo_control_panel.conf"
 
+#define SERVICE_FILENAME "indigo_control_panel.services"
+
 typedef struct {
 	bool blobs_enabled;
 	bool auto_connect;
