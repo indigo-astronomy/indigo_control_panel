@@ -5,6 +5,7 @@ TARGET = indigo_server_manager
 TEMPLATE = app
 
 RESOURCES += \
+	../resource/fonts.qrc \
 	../qdarkstyle/style.qrc \
 	../resource/server_manager.png \
 	../resource/led-red.png \

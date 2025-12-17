@@ -22,6 +22,8 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QSocketNotifier>
+#include <QFontDatabase>
+#include <QFont>
 #include <signal.h>
 #ifdef INDIGO_WINDOWS
 #include <QTimer>
@@ -132,9 +134,26 @@ int main(int argc, char *argv[]) {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication app(argc, argv);
 
-	QFont font("SansSerif", 10, QFont::Medium);
-	font.setStyleHint(QFont::SansSerif);
-	app.setFont(font);
+	int id = QFontDatabase::addApplicationFont(":/fonts/Hack-Regular.ttf");
+	if (id != -1) {
+		QStringList families = QFontDatabase::applicationFontFamilies(id);
+		if (!families.isEmpty()) {
+			QString monoFamily = families.at(0);
+			QFont::insertSubstitution("monospace", monoFamily);
+		}
+	} else {
+		indigo_error("Failed to load embedded Hack Mono font, using system default.");
+	}
+	id = QFontDatabase::addApplicationFont(":/fonts/Ubuntu-Regular.ttf");
+	if (id != -1) {
+		QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+		app.setFont(QFont(family, 10, QFont::Medium));
+	} else {
+		indigo_error("Failed to load embedded Ubuntu font, using system default.");
+		QFont font("SansSerif", 10, QFont::Medium);
+		font.setStyleHint(QFont::SansSerif);
+		app.setFont(font);
+	}
 
 	QFile f(":qdarkstyle/style.qss");
 	f.open(QFile::ReadOnly | QFile::Text);

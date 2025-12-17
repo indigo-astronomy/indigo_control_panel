@@ -44,6 +44,7 @@ SOURCES += \
 
 
 RESOURCES += \
+	../resource/fonts.qrc \
 	../qdarkstyle/style.qrc \
 	../resource/control_panel.qss \
 	../resource/appicon.png \
