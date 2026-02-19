@@ -241,6 +241,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 	propertyLayout->addWidget(mLog, 15);
 
+
+	//  Start up the client
+	IndigoClient::instance().enable_blobs(conf.blobs_enabled);
+	IndigoClient::instance().start("INDIGO Control Panel");
+
 	mServiceModel = &QServiceModel::instance();
 	mServiceModel->enable_auto_connect(conf.auto_connect);
 
@@ -267,11 +272,11 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::create_preview, this, &BrowserWindow::on_create_preview, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::obsolete_preview, this, &BrowserWindow::on_obsolete_preview, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::remove_preview, this, &BrowserWindow::on_remove_preview, Qt::BlockingQueuedConnection);
-	connect(&IndigoClient::instance(), &IndigoClient::no_preview, this, &BrowserWindow::on_remove_preview, Qt::BlockingQueuedConnection);
+	connect(&IndigoClient::instance(), &IndigoClient::no_preview, this, &BrowserWindow::on_remove_preview, Qt::QueuedConnection);
 
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, mPropertyModel, &PropertyModel::define_property, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, mPropertyModel, &PropertyModel::update_property, Qt::BlockingQueuedConnection);
-	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property, Qt::BlockingQueuedConnection);
+	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, mPropertyModel, &PropertyModel::delete_property, Qt::QueuedConnection);
 
 	connect(mPropertyModel, &PropertyModel::property_defined, this, &BrowserWindow::on_property_define);
 	connect(mPropertyModel, &PropertyModel::property_deleted, this, &BrowserWindow::on_property_delete);
@@ -283,10 +288,6 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, &BrowserWindow::rebuild_blob_previews, mPropertyModel, &PropertyModel::rebuild_blob_previews);
 
 	preview_cache.set_stretch_level(conf.preview_stretch_level);
-
-	//  Start up the client
-	IndigoClient::instance().enable_blobs(conf.blobs_enabled);
-	IndigoClient::instance().start("INDIGO Control Panel");
 
 	// load manually configured services
 	mServiceModel->loadManualServices();
