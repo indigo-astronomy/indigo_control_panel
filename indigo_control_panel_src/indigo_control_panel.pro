@@ -142,11 +142,45 @@ HEADERS += \
 
 INCLUDEPATH += "$${PWD}/../indigo/indigo_libs"
 
-unix {
+INDIGO_LIB_DIR = $$PWD/../indigo/build/lib
+
+unix:mac {
 	INCLUDEPATH += "$${PWD}/../libjpeg"
-	# LIBS += -L"$${PWD}/../libjpeg/.libs" -L"$${PWD}/../indigo/build/lib" -Wl,-Bstatic -lindigo -ljpeg -Wl,-Bdynamic -ldl
-	LIBS += -L"$${PWD}/../libjpeg/.libs" -L"$${PWD}/../indigo/build/lib" -lindigo -ljpeg -ldl
+	LIBS += -L"$$PWD/../external/libraw/lib"
+	LIBS += -L"$$PWD/../external/libjpeg/.libs" -L"$$INDIGO_LIB_DIR"
+	exists($$INDIGO_LIB_DIR/libindigo_client.dylib) | exists($$INDIGO_LIB_DIR/libindigo_client.a) {
+		LIBS += -lindigo_client
+	} else {
+		INDIGO_SYS = $$system(ls /usr/local/lib /usr/lib /opt/homebrew/lib 2>/dev/null | grep -q libindigo_client && echo yes || echo no)
+		contains(INDIGO_SYS, yes) {
+			LIBS += -lindigo_client
+		} else {
+			LIBS += -lindigo
+		}
+	}
+	LIBS += -ljpeg -ldl
 }
+
+unix:!mac {
+	INCLUDEPATH += "$${PWD}/../libjpeg"
+	LIBS += -L"$$PWD/../external/libjpeg/.libs" -L"$$INDIGO_LIB_DIR"
+	exists($$INDIGO_LIB_DIR/libindigo_client.so) | exists($$INDIGO_LIB_DIR/libindigo_client.a) {
+		LIBS += -lindigo_client -ljpeg -ldl
+	} else {
+		INDIGO_SYS = $$system(ls /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/x86_64-linux-gnu 2>/dev/null | grep -q libindigo_client && echo yes || echo no)
+		contains(INDIGO_SYS, yes) {
+			LIBS += -lindigo_client -ljpeg -ldl
+		} else {
+			LIBS += -lindigo -ljpeg -ldl
+		}
+	}
+}
+
+#unix {
+#	INCLUDEPATH += "$${PWD}/../libjpeg"
+#	# LIBS += -L"$${PWD}/../libjpeg/.libs" -L"$${PWD}/../indigo/build/lib" -Wl,-Bstatic -lindigo -ljpeg -Wl,-Bdynamic -ldl
+#	LIBS += -L"$${PWD}/../libjpeg/.libs" -L"$${PWD}/../indigo/build/lib" -lindigo -ljpeg -ldl
+#}
 
 win32 {
 	DEFINES += INDIGO_WINDOWS
