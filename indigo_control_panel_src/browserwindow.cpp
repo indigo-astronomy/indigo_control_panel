@@ -381,7 +381,11 @@ void BrowserWindow::on_window_log(indigo_property* property, char *message) {
 			mLog->setTextColor(Qt::white);
 			break;
 		}
-		snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
+		if (property->name[0] != '\0') {
+			snprintf(log_line, 512, "%s %s.%s: %s", timestamp, property->device, property->name, message);
+		} else {
+			snprintf(log_line, 512, "%s %s: %s", timestamp, property->device, message);
+		}
 	} else {
 		QString msg(message);
 		if (
