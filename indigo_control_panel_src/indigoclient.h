@@ -56,7 +56,8 @@ signals:
 	void property_defined(indigo_property* property, char *message);
 	void property_changed(indigo_property* property, char *message);
 	void property_deleted(indigo_property* property, char *message);
-	void message_sent(indigo_property* property, char *message);
+	void message_received_v2(indigo_property* property, char *message_copy);
+	void message_received_v3(char* device_name_copy, char *property_name_copy, int property_state, char *message_copy);
 
 	/* No copy of the property will be made with this signals.
 	   Do not free().

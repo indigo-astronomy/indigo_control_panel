@@ -267,7 +267,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(&IndigoClient::instance(), &IndigoClient::property_defined, this, &BrowserWindow::on_message_sent);
 	connect(&IndigoClient::instance(), &IndigoClient::property_changed, this, &BrowserWindow::on_message_sent);
 	connect(&IndigoClient::instance(), &IndigoClient::property_deleted, this, &BrowserWindow::on_message_sent);
-	connect(&IndigoClient::instance(), &IndigoClient::message_sent, this, &BrowserWindow::on_message_sent);
+	connect(&IndigoClient::instance(), &IndigoClient::message_received_v2, this, &BrowserWindow::on_message_sent);
+	connect(&IndigoClient::instance(), &IndigoClient::message_received_v3, this, &BrowserWindow::on_message_received);
 
 	connect(&IndigoClient::instance(), &IndigoClient::create_preview, this, &BrowserWindow::on_create_preview, Qt::BlockingQueuedConnection);
 	connect(&IndigoClient::instance(), &IndigoClient::obsolete_preview, this, &BrowserWindow::on_obsolete_preview, Qt::BlockingQueuedConnection);
@@ -320,6 +321,29 @@ void BrowserWindow::on_remove_preview(indigo_property *property, indigo_item *it
 
 void BrowserWindow::on_message_sent(indigo_property* property, char *message) {
 	on_window_log(property, message);
+	free(message);
+}
+
+void BrowserWindow::on_message_received(char *device_name, char *property_name, int property_state, char *message) {
+	indigo_property *property = (indigo_property*)malloc(sizeof(indigo_property));
+	if (property) {
+		property->count = 0;
+		snprintf(property->device, INDIGO_NAME_SIZE, "%s", device_name ? device_name : "");
+		snprintf(property->name, INDIGO_NAME_SIZE, "%s", property_name ? property_name : "");
+		property->state = (indigo_property_state)property_state;
+	}
+
+	on_window_log(property, message);
+
+	if (property) {
+		free(property);
+	}
+	if (device_name) {
+		free(device_name);
+	}
+	if (property_name) {
+		free(property_name);
+	}
 	free(message);
 }
 

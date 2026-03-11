@@ -102,6 +102,7 @@ public slots:
 	void on_property_define(indigo_property* property, char *message);
 	void on_property_delete(indigo_property* property, char *message);
 	void on_message_sent(indigo_property* property, char *message);
+	void on_message_received(char *device_name, char *property_name, int property_state, char *message);
 	void on_blobs_changed(bool status);
 	void on_bonjour_changed(bool status);
 	void on_use_suffix_changed(bool status);
