@@ -4,7 +4,7 @@ TEMPLATE = subdirs
 SUBDIRS += indigo_control_panel_src
 
 # Build server manager on Linux only
-unix:!macx {
+unix: {
 	SUBDIRS += indigo_server_manager_src
 }
 

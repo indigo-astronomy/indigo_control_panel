@@ -6,13 +6,8 @@ TEMPLATE = app
 
 RESOURCES += \
 	../resource/fonts.qrc \
-	../qdarkstyle/style.qrc \
-	../resource/server_manager.png \
-	../resource/led-red.png \
-	../resource/led-grey.png \
-	../resource/led-green.png \
-	../resource/led-orange.png \
-	../resource/indigo_logo.png
+	../resource/images.qrc \
+	../qdarkstyle/style.qrc
 
 # Source files
 SOURCES += \

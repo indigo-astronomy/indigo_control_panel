@@ -34,6 +34,14 @@
 #include <QMenu>
 #include <QCloseEvent>
 #include <QThread>
+#include <QRegularExpression>
+
+// Qt5/Qt6 compatibility: Qt::SkipEmptyParts was introduced in Qt 5.14
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#  define QT_SKIP_EMPTY_PARTS QString::SkipEmptyParts
+#else
+#  define QT_SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+#endif
 
 // Constants for configuration paths
 const QString INDIGO_INSTALL_PREFIX = "INDIGO_INSTALL_PREFIX";
@@ -44,8 +52,8 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 	, indigoServer(new QProcess(this))
 	, serverRunning(false)
 	, autoScroll(true)
-	, logFile(new QTemporaryFile(this))
-	, serverAndDriversInitialized(false) {
+	, serverAndDriversInitialized(false)
+	, logFile(new QTemporaryFile(this)) {
 
 	logFile->open();
 	logStream.setDevice(logFile);
@@ -470,7 +478,7 @@ QStringList IndigoManagerWindow::buildCommandArguments() {
 
 	// Additional parameters (typically drivers to load)
 	if (!additionalParams.isEmpty()) {
-		foreach (const QString &param, additionalParams.split(QRegExp("\\s+"), QString::SkipEmptyParts)) {
+		foreach (const QString &param, additionalParams.split(QRegularExpression("\\s+"), QT_SKIP_EMPTY_PARTS)) {
 			args << param;
 		}
 	}
@@ -523,9 +531,9 @@ void IndigoManagerWindow::handleProcessError() {
 }
 
 void IndigoManagerWindow::processAndDisplayText(const QString &text) {
-	static QRegExp newlineRegex("[\r\n]");
+	static QRegularExpression newlineRegex("[\r\n]");
 
-	QStringList lines = text.split(newlineRegex, QString::SkipEmptyParts);
+	QStringList lines = text.split(newlineRegex, QT_SKIP_EMPTY_PARTS);
 
 	if (lines.isEmpty()) return;
 
@@ -629,7 +637,7 @@ bool IndigoManagerWindow::isOptionInAdditionalParams(const QString &option) {
 	if (currentText.isEmpty()) {
 		return false;
 	}
-	QStringList tokens = currentText.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+	QStringList tokens = currentText.split(QRegularExpression("\\s+"), QT_SKIP_EMPTY_PARTS);
 	return tokens.contains(option);
 }
 
@@ -707,11 +715,12 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 							continue;
 						}
 
-						QRegExp rx("\"([^\"]+)\",\\s*\"([^\"]+)\",\\s*(\\w+)");
-						if (rx.indexIn(line) != -1) {
-							QString name = rx.cap(1);
-							QString description = rx.cap(2);
-							QString version = rx.cap(3);
+					QRegularExpression rx("\"([^\"]+)\",\\s*\"([^\"]+)\",\\s*(\\w+)");
+					QRegularExpressionMatch rxMatch = rx.match(line);
+					if (rxMatch.hasMatch()) {
+						QString name = rxMatch.captured(1);
+						QString description = rxMatch.captured(2);
+						QString version = rxMatch.captured(3);
 							driverDefinitions[name] = qMakePair(description, version);
 						}
 					}
@@ -860,9 +869,10 @@ void IndigoManagerWindow::populateDriversMenu() {
 		QString driverName = i.key();
 		QString displayText = i.value().first;
 
-		QRegExp namePattern("indigo_([^_]+)_(.+)");
-		if (namePattern.indexIn(driverName) != -1) {
-			QString deviceType = namePattern.cap(1);
+		QRegularExpression namePattern("indigo_([^_]+)_(.+)");
+		QRegularExpressionMatch nameMatch = namePattern.match(driverName);
+		if (nameMatch.hasMatch()) {
+			QString deviceType = nameMatch.captured(1);
 
 			QString deviceTypeTitle = deviceType;
 			if (!deviceTypeTitle.isEmpty()) {
