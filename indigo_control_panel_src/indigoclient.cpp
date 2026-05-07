@@ -113,7 +113,7 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 		if (property->state == INDIGO_OK_STATE && property->perm != INDIGO_WO_PERM) {
 			for (int row = 0; row < property->count; row++) {
 				if (*property->items[row].blob.url && indigo_populate_http_blob_item(&property->items[row])) {
-					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[0].blob.url, property->items[0].blob.size);
+					indigo_log("Image URL received (%s, %ld bytes)...\n", property->items[row].blob.url, property->items[row].blob.size);
 				}
 				emit(IndigoClient::instance().create_preview(property, &property->items[row]));
 			}
@@ -164,10 +164,16 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 		}
 	}
 
-	indigo_property* p = new indigo_property;
-	strcpy(p->device, property->device);
-	strcpy(p->group, property->group);
-	strcpy(p->name, property->name);
+	//  Value-initialise so the receiver doesn't read garbage from
+	//  type/state/perm/count/items/access_token. The receiver only needs the
+	//  device/group/name to identify which subtree to remove, plus type to
+	//  decide whether to emit BLOB previews. count must stay 0 because
+	//  `new indigo_property` does not allocate room for any items[].
+	indigo_property* p = new indigo_property{};
+	p->type = property->type;
+	indigo_copy_name(p->device, property->device);
+	indigo_copy_name(p->group, property->group);
+	indigo_copy_name(p->name, property->name);
 
 	if (message) {
 		char *msg = (char*)malloc(INDIGO_VALUE_SIZE);

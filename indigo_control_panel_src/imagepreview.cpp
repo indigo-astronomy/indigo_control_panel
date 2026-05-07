@@ -306,6 +306,7 @@ preview_image* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_
 	int rc = jpeg_read_header(&cinfo, TRUE);
 	if (rc != 1) {
 		indigo_error("JPEG: Data does not seem to be JPEG");
+		jpeg_destroy_decompress(&cinfo);
 		return nullptr;
 	}
 	jpeg_start_decompress(&cinfo);
@@ -316,8 +317,18 @@ preview_image* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_
 	color_space = cinfo.out_color_space;
 	indigo_debug("JPEG: Image is %d x %d (BPP: %d CS: %d)", width, height, pixel_size*8, color_space);
 
-	bmp_size = width * height * pixel_size;
+	if (width <= 0 || height <= 0 || width > 65535 || height > 65535 || pixel_size <= 0) {
+		indigo_error("JPEG: invalid dimensions %dx%d", width, height);
+		jpeg_destroy_decompress(&cinfo);
+		return nullptr;
+	}
+	bmp_size = (size_t)width * (size_t)height * (size_t)pixel_size;
 	bmp_buffer = (unsigned char*)malloc(bmp_size);
+	if (!bmp_buffer) {
+		indigo_error("JPEG: out of memory (%lu bytes)", (unsigned long)bmp_size);
+		jpeg_destroy_decompress(&cinfo);
+		return nullptr;
+	}
 	row_stride = width * pixel_size;
 
 	while (cinfo.output_scanline < cinfo.output_height) {
@@ -335,6 +346,7 @@ preview_image* create_jpeg_preview(unsigned char *jpg_buffer, unsigned long jpg_
 		img = new preview_image(width, height, QImage::Format_RGB888);
 	} else {
 		indigo_error("JPEG: Unsupported colour space (CS: %d)", color_space);
+		free(bmp_buffer);
 		return nullptr;
 	}
 
@@ -372,11 +384,17 @@ preview_image* create_fits_preview(unsigned char *raw_fits_buffer, unsigned long
 		return nullptr;
 	}
 
-	char *fits_data = (char*)malloc(fits_get_buffer_size(&header));
+	size_t fits_buf_size = fits_get_buffer_size(&header);
+	char *fits_data = (char*)malloc(fits_buf_size);
+	if (!fits_data) {
+		indigo_error("FITS: out of memory (%zu bytes)", fits_buf_size);
+		return nullptr;
+	}
 
 	res = fits_process_data(raw_fits_buffer, fits_size, &header, fits_data);
 	if (res != FITS_OK) {
 		indigo_error("FITS: Error processing data");
+		free(fits_data);
 		return nullptr;
 	}
 
@@ -432,11 +450,22 @@ preview_image* create_raw_preview(unsigned char *raw_image_buffer, unsigned long
 }
 
 preview_image* create_preview(int width, int height, int pix_format, char *image_data, const stretch_config_t sconfig) {
+	if (width <= 0 || height <= 0 || width > 65535 || height > 65535) {
+		indigo_error("%s(): invalid dimensions %dx%d", __FUNCTION__, width, height);
+		return nullptr;
+	}
+	const size_t pixels = (size_t)width * (size_t)height;
+
 	preview_image* img = new preview_image(width, height, QImage::Format_RGB32);
 	if (pix_format == PIX_FMT_Y8) {
 		uint8_t* buf = (uint8_t*)image_data;
-		uint8_t* pixmap_data = (uint8_t*)malloc(sizeof(uint8_t) * height * width);
-		memcpy(pixmap_data, buf, sizeof(uint8_t) * height * width);
+		uint8_t* pixmap_data = (uint8_t*)malloc(sizeof(uint8_t) * pixels);
+		if (!pixmap_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, sizeof(uint8_t) * pixels);
+			delete img;
+			return nullptr;
+		}
+		memcpy(pixmap_data, buf, sizeof(uint8_t) * pixels);
 		img->m_raw_data = (char*)pixmap_data;
 		img->m_pix_format = PIX_FMT_Y8;
 		img->m_height = height;
@@ -445,8 +474,13 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 		stretch_preview(img, sconfig);
 	} else if (pix_format == PIX_FMT_Y16) {
 		uint16_t* buf = (uint16_t*)image_data;
-		uint16_t* pixmap_data = (uint16_t*)malloc(sizeof(uint16_t) * height * width);
-		memcpy(pixmap_data, buf, sizeof(uint16_t) * height * width);
+		uint16_t* pixmap_data = (uint16_t*)malloc(sizeof(uint16_t) * pixels);
+		if (!pixmap_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, sizeof(uint16_t) * pixels);
+			delete img;
+			return nullptr;
+		}
+		memcpy(pixmap_data, buf, sizeof(uint16_t) * pixels);
 		img->m_raw_data = (char*)pixmap_data;
 		img->m_pix_format = PIX_FMT_Y16;
 		img->m_height = height;
@@ -454,11 +488,16 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 
 		stretch_preview(img, sconfig);
 	} else if (pix_format == PIX_FMT_3RGB24) {
-		int channel_offest = width * height;
+		size_t channel_offest = pixels;
 		uint8_t* buf = (uint8_t*)image_data;
-		uint8_t* pixmap_data = (uint8_t*)malloc(sizeof(uint8_t) * height * width * 3);
-		int index = 0;
-		int index2 = 0;
+		uint8_t* pixmap_data = (uint8_t*)malloc(sizeof(uint8_t) * pixels * 3);
+		if (!pixmap_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, sizeof(uint8_t) * pixels * 3);
+			delete img;
+			return nullptr;
+		}
+		size_t index = 0;
+		size_t index2 = 0;
 		for (int y = 0; y < height; ++y) {
 			QCoreApplication::processEvents();
 			for (int x = 0; x < width; ++x) {
@@ -476,11 +515,16 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 
 		stretch_preview(img, sconfig);
 	} else if (pix_format == PIX_FMT_3RGB48) {
-		int channel_offest = width * height;
+		size_t channel_offest = pixels;
 		uint16_t* buf = (uint16_t*)image_data;
-		uint16_t* pixmap_data = (uint16_t*)malloc(sizeof(uint16_t) * height * width * 3);
-		int index = 0;
-		int index2 = 0;
+		uint16_t* pixmap_data = (uint16_t*)malloc(sizeof(uint16_t) * pixels * 3);
+		if (!pixmap_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, sizeof(uint16_t) * pixels * 3);
+			delete img;
+			return nullptr;
+		}
+		size_t index = 0;
+		size_t index2 = 0;
 		for (int y = 0; y < height; ++y) {
 			QCoreApplication::processEvents();
 			for (int x = 0; x < width; ++x) {
@@ -499,9 +543,14 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 		stretch_preview(img, sconfig);
 	} else if (pix_format == PIX_FMT_RGB24) {
 		uint8_t* buf = (uint8_t*)image_data;
-		uint8_t* pixmap_data = (uint8_t*)malloc(sizeof(uint8_t) * height * width * 3);
+		uint8_t* pixmap_data = (uint8_t*)malloc(sizeof(uint8_t) * pixels * 3);
+		if (!pixmap_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, sizeof(uint8_t) * pixels * 3);
+			delete img;
+			return nullptr;
+		}
 
-		memcpy(pixmap_data, buf, sizeof(uint8_t) * height * width * 3);
+		memcpy(pixmap_data, buf, sizeof(uint8_t) * pixels * 3);
 
 		img->m_raw_data = (char*)pixmap_data;
 		img->m_pix_format = PIX_FMT_RGB24;
@@ -511,9 +560,14 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 		stretch_preview(img, sconfig);
 	} else if (pix_format == PIX_FMT_RGB48) {
 		uint16_t* buf = (uint16_t*)image_data;
-		uint16_t* pixmap_data = (uint16_t*)malloc(sizeof(uint16_t) * height * width * 3);
+		uint16_t* pixmap_data = (uint16_t*)malloc(sizeof(uint16_t) * pixels * 3);
+		if (!pixmap_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, sizeof(uint16_t) * pixels * 3);
+			delete img;
+			return nullptr;
+		}
 
-		memcpy(pixmap_data, buf, sizeof(uint16_t) * height * width * 3);
+		memcpy(pixmap_data, buf, sizeof(uint16_t) * pixels * 3);
 
 		img->m_raw_data = (char*)pixmap_data;
 		img->m_pix_format = PIX_FMT_RGB48;
@@ -523,7 +577,12 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 		stretch_preview(img, sconfig);
 	} else if ((pix_format == PIX_FMT_SBGGR8) || (pix_format == PIX_FMT_SGBRG8) ||
 		       (pix_format == PIX_FMT_SGRBG8) || (pix_format == PIX_FMT_SRGGB8)) {
-		uint8_t* rgb_data = (uint8_t*)malloc(width*height*3);
+		uint8_t* rgb_data = (uint8_t*)malloc(pixels * 3);
+		if (!rgb_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, pixels * 3);
+			delete img;
+			return nullptr;
+		}
 		parallel_debayer((uint8_t*)image_data, width, height, get_bayer_offsets(pix_format), rgb_data);
 
 		img->m_raw_data = (char*)rgb_data;
@@ -534,7 +593,12 @@ preview_image* create_preview(int width, int height, int pix_format, char *image
 		stretch_preview(img, sconfig);
 	} else if ((pix_format == PIX_FMT_SBGGR16) || (pix_format == PIX_FMT_SGBRG16) ||
 		       (pix_format == PIX_FMT_SGRBG16) || (pix_format == PIX_FMT_SRGGB16)) {
-		uint16_t* rgb_data = (uint16_t*)malloc(width*height*6);
+		uint16_t* rgb_data = (uint16_t*)malloc(pixels * 6);
+		if (!rgb_data) {
+			indigo_error("%s(): out of memory (%zu bytes)", __FUNCTION__, pixels * 6);
+			delete img;
+			return nullptr;
+		}
 		parallel_debayer((uint16_t*)image_data, width, height, get_bayer_offsets(pix_format), rgb_data);
 
 		img->m_raw_data = (char*)rgb_data;
