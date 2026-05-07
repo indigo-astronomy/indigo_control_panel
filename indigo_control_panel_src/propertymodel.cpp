@@ -66,13 +66,79 @@ ItemNode::~ItemNode() {
 	indigo_debug("CALLED: %s\n", __FUNCTION__);
 }
 
+
 RootNode::~RootNode() {
 	indigo_debug("CALLED: %s\n", __FUNCTION__);
 }
 
+
 PropertyModel::PropertyModel() {
 	no_repaint_flag = false;
 	indigo_debug("CALLED: %s\n", __FUNCTION__);
+}
+
+
+PropertyModel::~PropertyModel() {
+	indigo_debug("CALLED: %s — releasing %d deferred wrappers\n", __FUNCTION__, (int)m_dead_wrappers.size());
+
+	const QModelIndexList persistent = persistentIndexList();
+	QModelIndexList invalid;
+	invalid.reserve(persistent.size());
+	for (int i = 0; i < persistent.size(); ++i) invalid.append(QModelIndex());
+	changePersistentIndexList(persistent, invalid);
+
+	//  Free wrappers we couldn't delete safely during runtime. Their
+	//  indigo_property contents were already freed by release_owned_in_subtree at take_at time.
+	qDeleteAll(m_dead_wrappers);
+	m_dead_wrappers.clear();
+}
+
+
+//  Release the indigo_property objects owned by a removed subtree without
+//  destroying the TreeNode wrappers themselves. We can't safely `delete` the
+//  TreeNodes here because Qt's view layer may hold raw QModelIndex / cached
+//  state (not just QPersistentModelIndex) referencing them, and deleting
+//  would crash later when those references are walked.
+static void release_owned_in_subtree(TreeNode* node) {
+	if (!node) return;
+	switch (node->node_type) {
+		case TREE_NODE_DEVICE: {
+			DeviceNode* dev = static_cast<DeviceNode*>(node);
+			for (int i = 0; i < dev->children.size(); i++) {
+				release_owned_in_subtree(dev->children[i]);
+			}
+			break;
+		}
+		case TREE_NODE_GROUP: {
+			GroupNode* grp = static_cast<GroupNode*>(node);
+			for (int i = 0; i < grp->children.size(); i++) {
+				release_owned_in_subtree(grp->children[i]);
+			}
+			break;
+		}
+		case TREE_NODE_PROPERTY: {
+			PropertyNode* pn = static_cast<PropertyNode*>(node);
+			//  ItemNodes have no QPersistentModelIndex (PropertyNode::size()
+			//  returns 0, so the view never navigates into them). Safe to
+			//  delete the wrappers here; otherwise they accumulate as
+			//  thousands of small indirect leaks.
+			for (int i = 0; i < pn->children.count; i++) {
+				delete pn->children.nodes[i];
+				pn->children.nodes[i] = nullptr;
+			}
+			pn->children.count = 0;
+			if (pn->property) {
+				//  Same caveat as ~PropertyNode: do NOT free blob.value here.
+				//  Our cached pointer may have already been freed by the SDK's
+				//  set_property in indigo_xml.c.
+				indigo_release_property(pn->property);
+				pn->property = nullptr;
+			}
+			break;
+		}
+		default:
+			break;
+	}
 }
 
 
@@ -146,27 +212,44 @@ void PropertyModel::define_property(indigo_property* property, char *message) {
 			}
 		}
 		emit(property_defined(property, message));
+	} else {
+		//  Property is a redefine — the cache already owns one. The
+		//  caller (client_define_property) handed us a fresh deep-copy
+		//  via indigo_init_*_property and a malloc'd message; if we
+		//  don't take ownership they leak.
+		indigo_release_property(property);
+		free(message);
 	}
 	//indigo_debug("Defined device [%s],  group [%s],  property [%s]\n", property->device, property->group, property->name);
 }
 
 
 void PropertyModel::update_property(indigo_property* property, char *message) {
-	//  Find TreeNode for property->device
+	//  Find TreeNode for property->device. If we cannot route the update
+	//  to a cached PropertyNode (device/group/property not yet defined,
+	//  or already deleted), we still own the deep-copy property and the
+	//  malloc'd message handed to us by client_update_property and must
+	//  release them — there is no other receiver downstream.
 	int device_row = 0;
 	DeviceNode* device = root.children.find_by_name_with_index(property->device, device_row);
 	if (device == nullptr) {
+		indigo_release_property(property);
+		free(message);
 		return;
 	}
 	//  Find TreeNode within device for property->group
 	GroupNode* group = device->children.find_by_name(property->group);
 	if (group == nullptr) {
+		indigo_release_property(property);
+		free(message);
 		return;
 	}
 	//  Find TreeNode within group for property->name
 	int row = 0;
 	PropertyNode* p = group->children.find_by_name_with_index(property->name, row);
 	if (p == nullptr) {
+		indigo_release_property(property);
+		free(message);
 		return;
 	}
 	//  Update property
@@ -211,8 +294,10 @@ void PropertyModel::delete_property(indigo_property* property, char *message) {
 	if ((property) && (strlen(property->group) == 0)) {
 		no_repaint_flag = true;
 		beginRemoveRows(QModelIndex(), device_row, device_row);
-		root.children.remove_index(device_row);
+		DeviceNode* removed = root.children.take_at(device_row);
 		endRemoveRows();
+		release_owned_in_subtree(removed);
+		schedule_wrapper_deletion(removed);
 		emit(property_deleted(property, message));
 		delete property;
 		no_repaint_flag = false;
@@ -234,8 +319,10 @@ void PropertyModel::delete_property(indigo_property* property, char *message) {
 	if (strlen(property->name) == 0) {
 		no_repaint_flag = true;
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
-		device->children.remove_index(group_row);
+		GroupNode* removed = device->children.take_at(group_row);
 		endRemoveRows();
+		release_owned_in_subtree(removed);
+		schedule_wrapper_deletion(removed);
 		emit(property_deleted(property, message));
 		delete property;
 		no_repaint_flag = false;
@@ -257,8 +344,10 @@ void PropertyModel::delete_property(indigo_property* property, char *message) {
 	no_repaint_flag = true;
 	indigo_debug("Erasing property [%s] in %p %p\n", property->name, device, group);
 	beginRemoveRows(createIndex(group_row, 0, group), property_row, property_row);
-	group->children.remove_index(property_row);
+	PropertyNode* removed_property = group->children.take_at(property_row);
 	endRemoveRows();
+	release_owned_in_subtree(removed_property);
+	schedule_wrapper_deletion(removed_property);
 	indigo_debug("Erased property [%s]\n", property->name);
 	no_repaint_flag = false;
 
@@ -272,8 +361,10 @@ void PropertyModel::delete_property(indigo_property* property, char *message) {
 		indigo_debug("--- REMOVING EMPTY GROUP %p -> [%s]\n", group, groupname);
 		no_repaint_flag = true;
 		beginRemoveRows(createIndex(device_row, 0, device), group_row, group_row);
-		device->children.remove_index(group_row);
+		GroupNode* removed_group = device->children.take_at(group_row);
 		endRemoveRows();
+		release_owned_in_subtree(removed_group);
+		schedule_wrapper_deletion(removed_group);
 		no_repaint_flag = false;
 		indigo_debug("--- REMOVED EMPTY GROUP [%s]\n", groupname);
 	}
@@ -283,8 +374,10 @@ void PropertyModel::delete_property(indigo_property* property, char *message) {
 		indigo_debug("--- REMOVING EMPTY DEVICE %p -> [%s]\n", device, devname);
 		no_repaint_flag = true;
 		beginRemoveRows(QModelIndex(), device_row, device_row);
-		root.children.remove_index(device_row);
+		DeviceNode* removed_device = root.children.take_at(device_row);
 		endRemoveRows();
+		release_owned_in_subtree(removed_device);
+		schedule_wrapper_deletion(removed_device);
 		no_repaint_flag = false;
 		indigo_debug("--- REMOVED EMPTY DEVICE [%s]\n", devname);
 	}
@@ -361,6 +454,9 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const {
 		case Qt::DecorationRole: {
 			if (node->node_type == TREE_NODE_PROPERTY) {
 				PropertyNode* p = reinterpret_cast<PropertyNode*>(node);
+				//  property may be nullptr after release_owned_in_subtree
+				//  on a removed-but-not-deleted PropertyNode wrapper.
+				if (p->property == nullptr) return QVariant();
 				switch (p->property->state) {
 				case INDIGO_IDLE_STATE:
 					return QPixmap(":resource/led-grey.png");

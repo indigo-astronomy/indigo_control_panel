@@ -22,6 +22,7 @@
 
 #include <QAbstractItemModel>
 #include <QLabel>
+#include <QList>
 #include <indigo/indigo_bus.h>
 #include <assert.h>
 
@@ -57,13 +58,34 @@ public:
 	bool empty() const { return count == 0; }
 	T* operator[](int index) const { assert(index >= 0 && index < count); return nodes[index]; }
 
-	void remove_index(int index) {
+	//  Remove a node from the list and return it WITHOUT deleting it. Caller
+	//  owns the returned pointer and is responsible for `delete`-ing it AFTER
+	//  Qt's endRemoveRows() has invalidated any QPersistentModelIndex that
+	//  may reference the removed subtree. Deleting before endRemoveRows()
+	//  causes a use-after-free in QAbstractItemModelPrivate::rowsAboutToBeRemoved
+	//  on a *subsequent* removal because Qt walks parent() through still-
+	//  registered persistent indexes whose nodes have been cascade-destroyed.
+	T* take_at(int index) {
+		assert(index >= 0 && index < count);
+		T* node = nodes[index];
+
 		//  Shift higher items down one
 		for (int i = index; i < count-1; i++)
 			nodes[i] = nodes[i+1];
 
 		//  Reduce count
+		nodes[count-1] = nullptr;
 		count--;
+		return node;
+	}
+
+	//  Remove a node and immediately delete it. SAFE only when no
+	//  QPersistentModelIndex can reference the node or its descendants
+	//  (e.g. during ~OrderedList at process exit). For Qt model callers
+	//  that have wrapped the operation in beginRemoveRows()/endRemoveRows(),
+	//  use take_at() and delete the returned pointer AFTER endRemoveRows().
+	void remove_index(int index) {
+		delete take_at(index);
 	}
 
 	int index_of(T* node) const {
@@ -249,12 +271,14 @@ class PropertyModel : public QAbstractItemModel {
 public:
 	bool no_repaint_flag;
 	PropertyModel();
+	~PropertyModel();
 
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+	void schedule_wrapper_deletion(TreeNode* node) { m_dead_wrappers.append(node); }
 
 signals:
 	void property_updated(indigo_property* property, char *message);
@@ -270,6 +294,14 @@ public slots:
 
 private:
 	RootNode root;
+	//  Wrappers detached via OrderedList::take_at during runtime are kept
+	//  here instead of being deleted immediately — deleting them while the
+	//  view layer might still hold cached state referencing them caused
+	//  use-after-free crashes in QAbstractItemView::rowsAboutToBeRemoved.
+	//  ~PropertyModel runs after the view is destroyed (BrowserWindow's
+	//  dtor deletes mProperties before mPropertyModel), so it's safe to
+	//  free them all there.
+	QList<TreeNode*> m_dead_wrappers;
 };
 
 #endif // PROPERTYMODEL_H
