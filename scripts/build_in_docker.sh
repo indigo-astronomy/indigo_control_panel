@@ -19,7 +19,22 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-echo FROM $1 >Dockerfile
+baseImage="$1"
+# If image contains an architecture prefix like "amd64/debian:...", strip the prefix
+if echo "$baseImage" | grep -q "/"; then
+        baseImage="${baseImage#*/}"
+fi
+
+# Map short arch names to docker platforms
+case "$3" in
+        amd64) platform="linux/amd64" ;;
+        i386)  platform="linux/386" ;;
+        armhf) platform="linux/arm/v7" ;;
+        arm64) platform="linux/arm64" ;;
+        *)     platform="" ;;
+esac
+
+echo FROM $baseImage >Dockerfile
 cat >>Dockerfile <<EOF
 LABEL maintainer="rumenastro@gmail.com"
 RUN apt-get -y update && apt-get -y install wget unzip build-essential autoconf autotools-dev libtool cmake libudev-dev libavahi-compat-libdnssd-dev libusb-1.0-0-dev libcurl4-gnutls-dev libz-dev git curl bsdmainutils qtbase5-dev qtmultimedia5-dev devscripts cdbs apt-transport-https
@@ -34,7 +49,11 @@ WORKDIR indigo-control-panel-$2
 RUN qmake
 RUN scripts/builddeb.sh $2
 EOF
-docker build -t icp .
+if [ -n "$platform" ]; then
+        docker build --platform="$platform" -t icp .
+else
+        docker build -t icp .
+fi
 docker create --name icp icp
 docker cp icp:/indigo-control-panel_$2_$3.deb .
 docker container rm icp
