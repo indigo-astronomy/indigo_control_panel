@@ -25,6 +25,18 @@ if echo "$baseImage" | grep -q "/"; then
         baseImage="${baseImage#*/}"
 fi
 
+# INDIGO flavor to build against: "indigo" (default, v2) or "indigo3" (v3).
+flavor="${4:-indigo}"
+if [ "$flavor" != "indigo" ] && [ "$flavor" != "indigo3" ]; then
+        echo "Invalid INDIGO flavor '$flavor', expected 'indigo' or 'indigo3'"
+        exit 1
+fi
+if [ "$flavor" = "indigo3" ]; then
+        debName="indigo-control-panel-indigo3"
+else
+        debName="indigo-control-panel"
+fi
+
 # Map short arch names to docker platforms
 case "$3" in
         amd64) platform="linux/amd64" ;;
@@ -41,13 +53,14 @@ RUN apt-get -y update && apt-get -y install wget unzip build-essential autoconf 
 RUN apt-get -y remove systemd; exit 0
 RUN echo 'deb [trusted=yes] https://indigo-astronomy.github.io/indigo_ppa/ppa indigo main' >>/etc/apt/sources.list
 RUN apt-get update
-RUN apt-get -y install indigo
+RUN apt-get -y install $flavor
+ENV ICP_INDIGO_FLAVOR=$flavor
 COPY indigo-control-panel-$2.tar.gz .
 RUN tar -zxf indigo-control-panel-$2.tar.gz
 RUN rm indigo-control-panel-$2.tar.gz
 WORKDIR indigo-control-panel-$2
 RUN qmake
-RUN scripts/builddeb.sh $2
+RUN scripts/builddeb.sh $2 $flavor
 EOF
 if [ -n "$platform" ]; then
         docker build --platform="$platform" -t icp .
@@ -55,7 +68,7 @@ else
         docker build -t icp .
 fi
 docker create --name icp icp
-docker cp icp:/indigo-control-panel_$2_$3.deb .
+docker cp icp:/${debName}_$2_$3.deb .
 docker container rm icp
 docker image rm icp
 rm Dockerfile

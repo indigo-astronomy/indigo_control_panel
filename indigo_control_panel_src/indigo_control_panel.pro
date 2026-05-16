@@ -93,6 +93,7 @@ HEADERS += \
 INCLUDEPATH += "$${PWD}/../indigo/indigo_libs"
 
 INDIGO_LIB_DIR = $$PWD/../indigo/build/lib
+INDIGO_FLAVOR = $$(ICP_INDIGO_FLAVOR)
 
 unix:mac {
 	INCLUDEPATH += "$${PWD}/../libjpeg"
@@ -113,14 +114,19 @@ unix:mac {
 unix:!mac {
 	INCLUDEPATH += "$${PWD}/../libjpeg"
 	LIBS += -L"$$PWD/../libjpeg/.libs" -L"$$INDIGO_LIB_DIR"
-	exists($$INDIGO_LIB_DIR/libindigo_client.so) | exists($$INDIGO_LIB_DIR/libindigo_client.a) {
+	# ICP_INDIGO_FLAVOR=indigo3 forces linking against the INDIGO 3 client library.
+	equals(INDIGO_FLAVOR, indigo3) {
 		LIBS += -lindigo_client -ljpeg -ldl
 	} else {
-		INDIGO_SYS = $$system(ls /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/x86_64-linux-gnu 2>/dev/null | grep -q libindigo_client && echo yes || echo no)
-		contains(INDIGO_SYS, yes) {
+		exists($$INDIGO_LIB_DIR/libindigo_client.so) | exists($$INDIGO_LIB_DIR/libindigo_client.a) {
 			LIBS += -lindigo_client -ljpeg -ldl
 		} else {
-			LIBS += -lindigo -ljpeg -ldl
+			INDIGO_SYS = $$system(ls /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/x86_64-linux-gnu 2>/dev/null | grep -q libindigo_client && echo yes || echo no)
+			contains(INDIGO_SYS, yes) {
+				LIBS += -lindigo_client -ljpeg -ldl
+			} else {
+				LIBS += -lindigo -ljpeg -ldl
+			}
 		}
 	}
 }
