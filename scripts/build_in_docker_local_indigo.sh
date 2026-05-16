@@ -76,6 +76,11 @@ if [ -n "$platform" ]; then
 else
         docker build -t icp .
 fi
+if [ $? -ne 0 ]; then
+        echo "docker build failed, aborting"
+        rm -f Dockerfile
+        exit 1
+fi
 docker create --name icp icp
 docker cp icp:/${debName}_$2_$3.deb .
 docker container rm icp

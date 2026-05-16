@@ -58,6 +58,7 @@ sed -i "s/\(PANEL_VERSION \).*/\1\"${VERSION}\"/g" ${VERSION_FILE}
 
 # Finally build the package.
 dpkg-buildpackage \-us \-uc \-I.git \-I\*.out[0-9]\* \-I\*.swp
+BUILD_RESULT=$?
 
 # Cleanup debian/changelog.
 rm -f debian/changelog
@@ -66,4 +67,9 @@ rm -f debian/changelog
 if [ "${FLAVOR}" = "indigo3" ]; then
     mv debian/control.icp-bak debian/control
     rm -f debian/${PACKAGE}.install
+fi
+
+if [ ${BUILD_RESULT} -ne 0 ]; then
+    echo "dpkg-buildpackage failed with exit code ${BUILD_RESULT}"
+    exit ${BUILD_RESULT}
 fi
