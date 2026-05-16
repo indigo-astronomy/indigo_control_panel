@@ -17,6 +17,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <cstring>
 #include <indigo/indigo_client.h>
 #include "indigoclient.h"
 
@@ -171,9 +172,12 @@ static indigo_result client_delete_property(indigo_client *client, indigo_device
 	//  `new indigo_property` does not allocate room for any items[].
 	indigo_property* p = new indigo_property{};
 	p->type = property->type;
-	indigo_copy_name(p->device, property->device);
-	indigo_copy_name(p->group, property->group);
-	indigo_copy_name(p->name, property->name);
+	strncpy(p->device, property->device, sizeof(p->device) - 1);
+	p->device[sizeof(p->device) - 1] = '\0';
+	strncpy(p->group, property->group, sizeof(p->group) - 1);
+	p->group[sizeof(p->group) - 1] = '\0';
+	strncpy(p->name, property->name, sizeof(p->name) - 1);
+	p->name[sizeof(p->name) - 1] = '\0';
 
 	if (message) {
 		char *msg = (char*)malloc(INDIGO_VALUE_SIZE);
