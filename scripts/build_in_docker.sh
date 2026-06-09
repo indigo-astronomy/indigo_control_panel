@@ -33,8 +33,10 @@ if [ "$flavor" != "indigo" ] && [ "$flavor" != "indigo3" ]; then
 fi
 if [ "$flavor" = "indigo3" ]; then
         debName="indigo-control-panel-indigo3"
+        containerName="icp-indigo3"
 else
         debName="indigo-control-panel"
+        containerName="icp"
 fi
 
 # Map short arch names to docker platforms
@@ -63,17 +65,17 @@ RUN qmake
 RUN scripts/builddeb.sh $2 $flavor
 EOF
 if [ -n "$platform" ]; then
-        docker build --platform="$platform" -t icp .
+        docker build --platform="$platform" -t "$containerName" .
 else
-        docker build -t icp .
+        docker build -t "$containerName" .
 fi
 if [ $? -ne 0 ]; then
         echo "docker build failed, aborting"
         rm -f Dockerfile
         exit 1
 fi
-docker create --name icp icp
-docker cp icp:/${debName}_$2_$3.deb .
-docker container rm icp
-docker image rm icp
+docker create --name "$containerName" "$containerName"
+docker cp "$containerName":/${debName}_$2_$3.deb .
+docker container rm "$containerName"
+docker image rm "$containerName"
 rm Dockerfile
