@@ -12,7 +12,6 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, qt5-image-formats-plugins, indigo3
 Conflicts: indigo-control-panel
 Replaces: indigo-control-panel
-Provides: indigo-control-panel
 Description: INDIGO Control Panel
  INDIGO Control Panel is a program for browsing and
  and modifying INDIGO properties.
