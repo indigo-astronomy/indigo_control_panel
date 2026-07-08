@@ -756,7 +756,7 @@ void BrowserWindow::on_about_act() {
 	int major, minor, build;
 	indigo_get_version(&major, &minor, &build);
 	char indigo_version[50];
-	sprintf(indigo_version, "%d.%d-%3d", major, minor, build);
+	sprintf(indigo_version, "%d.%d-%d", major, minor, build);
 
 	QMessageBox msgBox(this);
 	int platform_bits = sizeof(void*) * 8;
