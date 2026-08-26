@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Copyright (c) 2019 Rumen G.Bogdanovski
 # All rights reserved.
@@ -47,6 +48,13 @@ else
         containerName="icp"
 fi
 
+cleanup() {
+        docker container rm "$containerName" 2>/dev/null || true
+        docker image rm "$containerName" 2>/dev/null || true
+        rm -f Dockerfile
+}
+trap cleanup EXIT
+
 # Map short arch names to docker platforms
 case "$3" in
         amd64) platform="linux/amd64" ;;
@@ -78,13 +86,5 @@ if [ -n "$platform" ]; then
 else
         docker build -t "$containerName" .
 fi
-if [ $? -ne 0 ]; then
-        echo "docker build failed, aborting"
-        rm -f Dockerfile
-        exit 1
-fi
 docker create --name "$containerName" "$containerName"
 docker cp "$containerName":/${debName}_$2_$3.deb .
-docker container rm "$containerName"
-docker image rm "$containerName"
-rm Dockerfile
