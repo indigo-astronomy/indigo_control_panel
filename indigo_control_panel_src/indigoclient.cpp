@@ -270,3 +270,13 @@ void IndigoClient::start(char *name) {
 	strncpy(client.name, name, INDIGO_NAME_SIZE);
 	indigo_attach_client(&client);
 }
+
+void IndigoClient::stop() {
+	indigo_debug("Shutting down client...\n");
+	/* Detaching the client stops the property callbacks first, so nothing is
+	   delivered to a window that is being destroyed. indigo_stop() returns
+	   INDIGO_BUSY and keeps the bus running if a server is still connected -
+	   the client is detached in either case. */
+	indigo_detach_client(&client);
+	indigo_stop();
+}

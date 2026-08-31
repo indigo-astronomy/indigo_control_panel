@@ -297,6 +297,8 @@ BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent) {
 
 BrowserWindow::~BrowserWindow () {
 	indigo_debug("CALLED: %s\n", __FUNCTION__);
+	/* Shut the client down before the receivers of its signals are deleted. */
+	IndigoClient::instance().stop();
 	delete mLog;
 	delete mProperties;
 	delete mSelectionLine;

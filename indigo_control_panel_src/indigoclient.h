@@ -47,6 +47,7 @@ public:
 	};
 
 	void start(char *name);
+	void stop();
 
 	Logger* m_logger;
 signals:
