@@ -35,6 +35,7 @@
 #include <QCloseEvent>
 #include <QThread>
 #include <QRegularExpression>
+#include <QStandardPaths>
 
 // Qt5/Qt6 compatibility: Qt::SkipEmptyParts was introduced in Qt 5.14
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
@@ -251,6 +252,11 @@ void IndigoManagerWindow::setupUi() {
 	forkingLayout->addWidget(disableForkingCheck);
 	forkingLayout->addStretch(1);
 	checkboxesLayout->addLayout(forkingLayout);
+#ifdef Q_OS_WIN
+	// indigo_server never forks on Windows and does not accept "--" there
+	forkingSpacerLabel->hide();
+	disableForkingCheck->hide();
+#endif
 
 	checkboxesAndLogoLayout->addLayout(checkboxesLayout);
 
@@ -662,10 +668,17 @@ void IndigoManagerWindow::updateControlsState() {
 
 void IndigoManagerWindow::initializeServerAndDrivers() {
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	const bool isWindows =
+#ifdef Q_OS_WIN
+		true;
+#else
+		false;
+#endif
+	const QString serverExecutableName = isWindows ? "indigo_server.exe" : "indigo_server";
 
 	if (!env.value(INDIGO_INSTALL_PREFIX).isEmpty()) {
 		installationPrefix = env.value(INDIGO_INSTALL_PREFIX);
-		serverExecutablePath = installationPrefix + "/bin/indigo_server";
+		serverExecutablePath = installationPrefix + "/bin/" + serverExecutableName;
 		if (QFile::exists(serverExecutablePath)) {
 			appendToLog("INDIGO Server found at: " + serverExecutablePath, false);
 		} else {
@@ -674,17 +687,52 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 	}
 
 	if (serverExecutablePath.isEmpty()) {
-		QStringList searchPaths = {
-			QDir::homePath() + "/work/indigo.git/build/bin/indigo_server",
-			"/usr/bin/indigo_server",
-			"/bin/indigo_server",
-			"/usr/local/bin/indigo_server"
-		};
+		QStringList searchPaths;
+
+		if (isWindows) {
+			searchPaths << QDir::homePath() + "/work/indigo.git/build/bin/" + serverExecutableName;
+
+			// The INDIGO installer records where it was installed (per-user or per-machine install)
+			const QString uninstallKey = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{9F3E5B8B-9B0B-4E9D-8B90-0B7C3F9E5C21}_is1";
+			for (const QString &root : {QString("HKEY_CURRENT_USER"), QString("HKEY_LOCAL_MACHINE")}) {
+				QSettings uninstallInfo(root + uninstallKey, QSettings::NativeFormat);
+				QString installLocation = QDir::fromNativeSeparators(uninstallInfo.value("InstallLocation").toString());
+				while (installLocation.endsWith("/")) {
+					installLocation.chop(1);
+				}
+				if (!installLocation.isEmpty()) {
+					searchPaths << installLocation + "/bin/" + serverExecutableName;
+				}
+			}
+
+			// The INDIGO installer adds its "bin" folder to PATH by default
+			const QString serverInPath = QStandardPaths::findExecutable("indigo_server");
+			if (!serverInPath.isEmpty()) {
+				searchPaths << serverInPath;
+			}
+
+			// Default per-user and per-machine install locations
+			for (const QString &variable : {QString("LOCALAPPDATA"), QString("ProgramFiles"), QString("ProgramFiles(x86)")}) {
+				const QString dir = QDir::fromNativeSeparators(qEnvironmentVariable(variable.toUtf8().constData()));
+				if (!dir.isEmpty()) {
+					searchPaths << dir + (variable == "LOCALAPPDATA" ? "/Programs" : "") + "/INDIGO/bin/" + serverExecutableName;
+				}
+			}
+			searchPaths << "C:/Program Files/INDIGO/bin/" + serverExecutableName;
+			searchPaths << "C:/Program Files (x86)/INDIGO/bin/" + serverExecutableName;
+		} else {
+			searchPaths = {
+				QDir::homePath() + "/work/indigo.git/build/bin/" + serverExecutableName,
+				"/usr/bin/" + serverExecutableName,
+				"/bin/" + serverExecutableName,
+				"/usr/local/bin/" + serverExecutableName
+			};
+		}
 
 		for (const QString &path : searchPaths) {
 			if (QFile::exists(path)) {
 				serverExecutablePath = path;
-				int binIndex = path.lastIndexOf("/bin/indigo_server");
+				const int binIndex = path.lastIndexOf("/bin/" + serverExecutableName);
 				if (binIndex > 0) {
 					installationPrefix = path.left(binIndex);
 					appendToLog("INDIGO Server found at: " + path, false);
@@ -695,7 +743,7 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 	}
 
 	if (!installationPrefix.isEmpty()) {
-		QString driverPath = installationPrefix + "/share/indigo/";
+		const QString driverPath = isWindows ? installationPrefix + "/share/" : installationPrefix + "/share/indigo/";
 
 		if (QFile::exists(driverPath + "indigo_drivers")) {
 			driverFilePaths << driverPath + "indigo_drivers";

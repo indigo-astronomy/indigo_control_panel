@@ -23,3 +23,7 @@ HEADERS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /usr/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32 {
+	RC_ICONS = $$PWD/../windows/server_manager.ico
+}
