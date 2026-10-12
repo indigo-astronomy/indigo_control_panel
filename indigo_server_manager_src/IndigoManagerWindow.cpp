@@ -36,6 +36,8 @@
 #include <QThread>
 #include <QRegularExpression>
 #include <QStandardPaths>
+#include <QTcpSocket>
+#include <QHostAddress>
 
 // Qt5/Qt6 compatibility: Qt::SkipEmptyParts was introduced in Qt 5.14
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
@@ -93,9 +95,7 @@ IndigoManagerWindow::IndigoManagerWindow(QWidget *parent) : QMainWindow(parent)
 IndigoManagerWindow::~IndigoManagerWindow() {
 	// Process termination (only needed if closeEvent didn't handle it)
 	if (indigoServer->state() != QProcess::NotRunning) {
-		indigoServer->terminate();
-		indigoServer->waitForFinished(5000);
-		if (indigoServer->state() != QProcess::NotRunning) {
+		if (!stopServerGracefully(5000)) {
 			indigoServer->kill();
 		}
 	}
@@ -125,8 +125,7 @@ void IndigoManagerWindow::closeEvent(QCloseEvent *event) {
 		// Process events to ensure the UI is responsive
 		QApplication::processEvents();
 
-		indigoServer->terminate();
-		if (!indigoServer->waitForFinished(5000)) {
+		if (!stopServerGracefully(5000)) {
 			appendToLog("* Server not responding, forcing termination!", true);
 			indigoServer->kill();
 			if (!indigoServer->waitForFinished(1000)) {
@@ -341,6 +340,9 @@ void IndigoManagerWindow::setupUi() {
 	QWidget* leftSpacer = new QWidget(this);
 	leftSpacer->setFixedWidth(2);
 
+	// Remove the per-item separator frames drawn by non-Windows styles
+	statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
+
 	// Add permanent widgets to status bar
 	statusBar()->addPermanentWidget(leftSpacer);
 	statusBar()->addPermanentWidget(statusIconLabel);
@@ -400,8 +402,7 @@ void IndigoManagerWindow::startStopServer() {
 		// Force UI update to make the orange LED visible immediately
 		QApplication::processEvents();
 
-		indigoServer->terminate();
-		if (!indigoServer->waitForFinished(3000)) {
+		if (!stopServerGracefully(5000)) {
 			appendToLog("* Server not responding, forcing termination!", true);
 			indigoServer->kill();
 		}
@@ -638,6 +639,37 @@ QString IndigoManagerWindow::formatServiceAddress() {
 	return QString("<b>%1.local:%2</b>").arg(hostname).arg(portSpinBox->value());
 }
 
+// Returns true if the server process exited within timeoutMs.
+bool IndigoManagerWindow::stopServerGracefully(int timeoutMs) {
+#ifdef Q_OS_WIN
+	// indigo_server has no signal handling on Windows and terminate() only posts WM_CLOSE,
+	// which a console process ignores. Use the server's own RESTART property instead: it
+	// shuts the server down cleanly and exits.
+	int port = portSpinBox->value();
+	const QStringList tokens = additionalParamsEdit->text().split(QRegularExpression("\\s+"), QT_SKIP_EMPTY_PARTS);
+	const int portIndex = tokens.indexOf("-p");
+	if (portIndex >= 0 && portIndex + 1 < tokens.size()) {
+		bool ok = false;
+		const int customPort = tokens.at(portIndex + 1).toInt(&ok);
+		if (ok) {
+			port = customPort;
+		}
+	}
+
+	QTcpSocket socket;
+	socket.connectToHost(QHostAddress::LocalHost, static_cast<quint16>(port));
+	if (socket.waitForConnected(1000)) {
+		socket.write("<getProperties version='2.0'/>"
+		             "<newSwitchVector device='Server' name='RESTART'><oneSwitch name='RESTART'>On</oneSwitch></newSwitchVector>");
+		socket.flush();
+		socket.waitForBytesWritten(1000);
+	}
+#else
+	indigoServer->terminate();
+#endif
+	return indigoServer->waitForFinished(timeoutMs);
+}
+
 bool IndigoManagerWindow::isOptionInAdditionalParams(const QString &option) {
 	QString currentText = additionalParamsEdit->text().trimmed();
 	if (currentText.isEmpty()) {
@@ -721,12 +753,10 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 			searchPaths << "C:/Program Files/INDIGO/bin/" + serverExecutableName;
 			searchPaths << "C:/Program Files (x86)/INDIGO/bin/" + serverExecutableName;
 		} else {
-			searchPaths = {
-				QDir::homePath() + "/work/indigo.git/build/bin/" + serverExecutableName,
-				"/usr/bin/" + serverExecutableName,
-				"/bin/" + serverExecutableName,
-				"/usr/local/bin/" + serverExecutableName
-			};
+			searchPaths << QDir::homePath() + "/work/indigo.git/build/bin/" + serverExecutableName
+			            << "/usr/bin/" + serverExecutableName
+			            << "/bin/" + serverExecutableName
+			            << "/usr/local/bin/" + serverExecutableName;
 		}
 
 		for (const QString &path : searchPaths) {
@@ -743,7 +773,7 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 	}
 
 	if (!installationPrefix.isEmpty()) {
-		const QString driverPath = isWindows ? installationPrefix + "/share/" : installationPrefix + "/share/indigo/";
+		const QString driverPath = isWindows ? installationPrefix + "/bin/" : installationPrefix + "/share/indigo/";
 
 		if (QFile::exists(driverPath + "indigo_drivers")) {
 			driverFilePaths << driverPath + "indigo_drivers";
@@ -784,9 +814,11 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 		serverAndDriversInitialized = true;
 	} else {
 		appendToLog("* Warning: INDIGO server or driver definitions could not be fully initialized", true);
-		appendToLog("\n* INDIGO Server not found in standard locations.", true);
-		appendToLog("* If installed in a custom location, please set the " + INDIGO_INSTALL_PREFIX + " environment variable.", true);
-		appendToLog("* The server executable should be located at $" + INDIGO_INSTALL_PREFIX + "/bin/indigo_server", true);
+		if (serverExecutablePath.isEmpty()) {
+			appendToLog("\n* INDIGO Server not found in standard locations.", true);
+			appendToLog("* If installed in a custom location, please set the " + INDIGO_INSTALL_PREFIX + " environment variable.", true);
+			appendToLog("* The server executable should be located at $" + INDIGO_INSTALL_PREFIX + "/bin/indigo_server", true);
+		}
 	}
 }
 
