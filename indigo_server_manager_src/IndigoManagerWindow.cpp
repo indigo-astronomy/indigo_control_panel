@@ -773,7 +773,7 @@ void IndigoManagerWindow::initializeServerAndDrivers() {
 	}
 
 	if (!installationPrefix.isEmpty()) {
-		const QString driverPath = isWindows ? installationPrefix + "/bin/" : installationPrefix + "/share/indigo/";
+		const QString driverPath = isWindows ? installationPrefix + "/share/" : installationPrefix + "/share/indigo/";
 
 		if (QFile::exists(driverPath + "indigo_drivers")) {
 			driverFilePaths << driverPath + "indigo_drivers";
