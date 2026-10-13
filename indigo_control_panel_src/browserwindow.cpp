@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QActionGroup>
 #include <QFileDialog>
+#include <QSignalBlocker>
 #include <sys/time.h>
 #include "browserwindow.h"
 #include "qservicemodel.h"
@@ -426,13 +427,34 @@ void BrowserWindow::property_define_delete(indigo_property* property, char *mess
 	if (current_path->type == TREE_NODE_ROOT) return;
 
 	if (current_path->type == TREE_NODE_PROPERTY) {
-		/* We can not have selected property to be defined -> so just clean window */
 		if (!strcmp(current_path->property, property->name) &&
-		    !strcmp(current_path->device, property->device) &&
-		    !strcmp(current_path->group, property->group)) {
+		    !strcmp(current_path->device, property->device)) {
 			if (action_deleted) {
 				indigo_debug("SELECTED PROPERTY deleted\n");
+				current_path->node = nullptr;
 				clear_window();
+			} else {
+				for (int device_row = 0; device_row < mPropertyModel->rowCount(); device_row++) {
+					QModelIndex device_index = mPropertyModel->index(device_row, 0);
+					TreeNode *device_node = static_cast<TreeNode*>(device_index.internalPointer());
+					if (strcmp(device_node->name(), property->device)) continue;
+					for (int group_row = 0; group_row < mPropertyModel->rowCount(device_index); group_row++) {
+						QModelIndex group_index = mPropertyModel->index(group_row, 0, device_index);
+						TreeNode *group_node = static_cast<TreeNode*>(group_index.internalPointer());
+						if (strcmp(group_node->name(), property->group)) continue;
+						for (int property_row = 0; property_row < mPropertyModel->rowCount(group_index); property_row++) {
+							QModelIndex property_index = mPropertyModel->index(property_row, 0, group_index);
+							PropertyNode *property_node = static_cast<PropertyNode*>(property_index.internalPointer());
+							if (strcmp(property_node->name(), property->name)) continue;
+							const QSignalBlocker blocker(mProperties->selectionModel());
+							mProperties->selectionModel()->setCurrentIndex(property_index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+							current_path->select(property_node);
+							clear_window();
+							repaint_property_window(property_node);
+							return;
+						}
+					}
+				}
 			}
 			return;
 		}
