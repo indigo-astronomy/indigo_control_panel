@@ -73,6 +73,7 @@ private:
 
 	QString formatServiceAddress();
 	bool isOptionInAdditionalParams(const QString &option);
+	bool stopServerGracefully(int timeoutMs);
 
 	QProcess *indigoServer;
 	bool serverRunning;

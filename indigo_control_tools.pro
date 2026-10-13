@@ -3,8 +3,12 @@ TEMPLATE = subdirs
 # Always build the control panel
 SUBDIRS += indigo_control_panel_src
 
-# Build server manager on Linux only
+# Build server manager on desktop platforms
 unix: {
+	SUBDIRS += indigo_server_manager_src
+}
+
+win32: {
 	SUBDIRS += indigo_server_manager_src
 }
 

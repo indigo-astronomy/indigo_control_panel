@@ -13,6 +13,8 @@
 #define MyAppPublisher "INDIGO Initiative"
 #define MyAppURL "http://www.indigo-astronomy.org"
 #define MyAppExeName "indigo_control_panel.exe"
+#define MyManagerName "INDIGO Server Manager"
+#define MyManagerExeName "indigo_server_manager.exe"
 #define MySourcePrefix "indigo_control_panel_" + Arch + "\indigo_control_panel"
 
 [Setup]
@@ -46,13 +48,17 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#MySourcePrefix}\indigo_control_panel.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MySourcePrefix}\indigo_server_manager.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "appicon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "server_manager.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MySourcePrefix}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\appicon.ico"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\appicon.ico"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyManagerName}"; Filename: "{app}\{#MyManagerExeName}"; IconFilename: "{app}\server_manager.ico"
+Name: "{autodesktop}\{#MyManagerName}"; Filename: "{app}\{#MyManagerExeName}"; IconFilename: "{app}\server_manager.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

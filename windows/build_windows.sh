@@ -3,6 +3,7 @@
 set -x
 
 APP=indigo_control_panel
+MANAGER_APP=indigo_server_manager
 QT_VER=5.15.2
 MINGW_VER=81
 
@@ -50,6 +51,18 @@ cd ${APP}
 cp ../release/${APP}.exe .
 cp ../../../external/indigo_sdk/lib/libindigo_client.dll .
 windeployqt ${APP}.exe
+popd
+
+pushd .
+[ ! -d "${MANAGER_APP}_64" ] && mkdir ${MANAGER_APP}_64
+cd ${MANAGER_APP}_64
+qmake ../../${MANAGER_APP}_src/${MANAGER_APP}.pro
+mingw32-make -f Makefile.release
+
+# the server manager is shipped in the control panel installer
+cd ../${APP}_64/${APP}
+cp ../../${MANAGER_APP}_64/release/${MANAGER_APP}.exe .
+windeployqt ${MANAGER_APP}.exe
 popd
 
 APP_VERSION=`grep "VERSION " ../indigo_control_panel_src/version.h | sed 's/"//g' |awk '{ print $3 }'`
