@@ -316,6 +316,19 @@ void QIndigoProperty::build_blob_property_form(QVBoxLayout* layout) {
 		hbox->setSpacing(10);
 		hbox->setContentsMargins(0,0,0,0);
 
+		if (m_property->perm == INDIGO_WO_PERM) {
+			//  Write only BLOBs can not be viewed or saved, only uploaded
+			QPushButton* uploadb = new QPushButton("&Upload...");
+			uploadb->setToolTip("Upload a file as BLOB");
+			uploadb->setObjectName("INDIGO_property");
+			uploadb->setDefault(true);
+			uploadb->setMinimumWidth(75);
+			hbox->addWidget(uploadb);
+
+			connect(uploadb, &QPushButton::clicked, blob, &QIndigoBLOB::upload_blob_item);
+			continue;
+		}
+
 		//  Add Display button
 		QPushButton *displayb = new QPushButton("&View...");
 		displayb->setToolTip("View BLOB with the default viewer");

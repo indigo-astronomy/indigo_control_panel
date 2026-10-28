@@ -26,6 +26,10 @@
 #include <QStandardPaths>
 #include <QHBoxLayout>
 #include <QPixmap>
+#include <QFile>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QtConcurrentRun>
 #include "qindigoblob.h"
 #include "conf.h"
 #include "blobpreview.h"
@@ -38,8 +42,12 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	label = new QLabel(m_item->label);
 	label->setObjectName("INDIGO_property");
 
-	image = new QLabel();
-	image->setObjectName("INDIGO_property");
+	// nothing comes back from a write only BLOB, so there is nothing to preview
+	image = nullptr;
+	if (m_property->perm != INDIGO_WO_PERM) {
+		image = new QLabel();
+		image->setObjectName("INDIGO_property");
+	}
 
 	text = new QLineEdit();
 	char tooltip[1600];
@@ -67,8 +75,10 @@ QIndigoBLOB::QIndigoBLOB(QIndigoProperty* p, indigo_property* property, indigo_i
 	vbox->setAlignment(Qt::AlignHCenter);
 	vbox->setContentsMargins(0, 0, 0, 0);
 	vbox->setSpacing(10);
-	vbox->addWidget(image);
-	vbox->setAlignment(image, Qt::AlignHCenter);
+	if (image) {
+		vbox->addWidget(image);
+		vbox->setAlignment(image, Qt::AlignHCenter);
+	}
 	vbox->addWidget(base);
 
 	connect(text, &QLineEdit::textEdited, this, &QIndigoBLOB::dirty);
@@ -85,6 +95,10 @@ void QIndigoBLOB::update() {
 	//  Apply update from indigo bus only if not being edited
 	if (*m_item->blob.url) {
 		text->setText(m_item->blob.url);
+	}
+
+	if (image == nullptr) {
+		return;
 	}
 
 	QImage *preview = preview_cache.get(m_property, m_item);
@@ -177,6 +191,57 @@ void QIndigoBLOB::view_blob_item() {
 		}
 		indigo_error("Can not display image '%s'", file_name);
 	}
+}
+
+
+void QIndigoBLOB::upload_blob_item() {
+	static QString last_dir = QDir::homePath();
+	char message[PATH_LEN+100];
+
+	QString file_name = QFileDialog::getOpenFileName(this, tr("Upload BLOB"), last_dir, tr("All Files (*)"));
+	if (file_name.isNull()) {
+		return;
+	}
+	last_dir = QFileInfo(file_name).absolutePath();
+
+	QFile file(file_name);
+	if (!file.open(QIODevice::ReadOnly)) {
+		snprintf(message, sizeof(message), "Can not open '%s'", QDir::toNativeSeparators(file_name).toUtf8().constData());
+		m_logger->log(NULL, message);
+		return;
+	}
+	QByteArray data = file.readAll();
+	file.close();
+
+	// The format is the file extension, e.g. ".fits"
+	QString suffix = QFileInfo(file_name).suffix().toLower();
+	QByteArray format = suffix.isEmpty() ? QByteArray() : ("." + suffix).toUtf8();
+
+	// Copy everything needed - the property may be redefined while uploading
+	QByteArray device(m_property->device);
+	QByteArray property_name(m_property->name);
+	QByteArray item_name(m_item->name);
+	QByteArray url(m_item->blob.url);
+	QByteArray native_name = QDir::toNativeSeparators(file_name).toUtf8();
+	QtConcurrent::run([=]() {
+		char message[PATH_LEN+100];
+		indigo_result res = indigo_change_blob_property_1(
+			nullptr,
+			device.constData(),
+			property_name.constData(),
+			item_name.constData(),
+			(void *)data.constData(),
+			data.size(),
+			format.constData(),
+			url.constData()
+		);
+		if (res == INDIGO_OK) {
+			snprintf(message, sizeof(message), "'%s' uploaded (%lld bytes)", native_name.constData(), (long long)data.size());
+		} else {
+			snprintf(message, sizeof(message), "Failed to upload '%s'", native_name.constData());
+		}
+		Logger::instance().log(NULL, message);
+	});
 }
 
 

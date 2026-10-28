@@ -38,6 +38,7 @@ public slots:
 	void dirty();
 	void save_blob_item();
 	void view_blob_item();
+	void upload_blob_item();
 
 private:
 	Logger* m_logger;
