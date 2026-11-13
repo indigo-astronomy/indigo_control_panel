@@ -21,11 +21,16 @@
 #include <QVBoxLayout>
 #include "qindigotext.h"
 
+// items holding multi-line text: Scripting Agent scripts and Scheduler Agent tasks
+static bool is_multiline_item(const indigo_item *item) {
+	return !strncmp(item->name, "SCRIPT", INDIGO_NAME_SIZE) || !strncmp(item->name, "TASK", INDIGO_NAME_SIZE);
+}
+
 
 QIndigoText::QIndigoText(QIndigoProperty* p, indigo_property* property, indigo_item* item, QWidget *parent)
 	: QWidget(parent), QIndigoItem(p, property, item), m_dirty(false) {
 
-	if (strncmp(item->name, "SCRIPT", INDIGO_NAME_SIZE)) {
+	if (!is_multiline_item(item)) {
 		label = new QLabel(m_item->label);
 		label->setObjectName("INDIGO_property");
 		QHBoxLayout* hbox = new QHBoxLayout();
