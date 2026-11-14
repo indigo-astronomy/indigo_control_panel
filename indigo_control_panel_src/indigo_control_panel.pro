@@ -40,7 +40,8 @@ SOURCES += \
 	fits/fits.c \
 	imagepreview.cpp \
 	stretcher.cpp \
-	utils.cpp
+	utils.cpp \
+	propertycopy.cpp
 
 
 RESOURCES += \
@@ -82,7 +83,8 @@ HEADERS += \
 	image_preview_lut.h \
 	stretcher.h \
 	utils.h \
-	conf.h
+	conf.h \
+	propertycopy.h
 
 
 #unix:!mac {

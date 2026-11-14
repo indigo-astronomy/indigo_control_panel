@@ -1,0 +1,6 @@
+Makefile
+object/
+moc/
+tst_propertycopy
+target_wrapper.sh
+.qmake.stash

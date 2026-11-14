@@ -20,6 +20,7 @@
 #include <cstring>
 #include <indigo/indigo_client.h>
 #include "indigoclient.h"
+#include "propertycopy.h"
 
 
 static indigo_result client_attach(indigo_client *client) {
@@ -33,18 +34,6 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 	//  Deep copy the property so it won't disappear on us later.
 	indigo_property* p = nullptr;
 	switch (property->type) {
-	case INDIGO_TEXT_VECTOR:
-		p = indigo_init_text_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
-		break;
-	case INDIGO_NUMBER_VECTOR:
-		p = indigo_init_number_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
-		break;
-	case INDIGO_SWITCH_VECTOR:
-		p = indigo_init_switch_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->rule, property->count);
-		break;
-	case INDIGO_LIGHT_VECTOR:
-		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
-		break;
 	case INDIGO_BLOB_VECTOR:
 		if (device->version < INDIGO_VERSION_2_0)
 			IndigoClient::instance().m_logger->log(property, "BLOB can be used in INDI legacy mode");
@@ -66,18 +55,14 @@ static indigo_result client_define_property(indigo_client *client, indigo_device
 				emit(IndigoClient::instance().no_preview(property, &property->items[row]));
 			}
 		}
-		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
+		break;
+	default:
 		break;
 	}
 
-	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
-	if(property->type == INDIGO_TEXT_VECTOR) {
-		for (int i = 0; i < property->count; i++) {
-			if (property->items[i].text.long_value) {
-				p->items[i].text.long_value = (char*)indigo_safe_malloc(property->items[i].text.length);
-				memcpy(p->items[i].text.long_value, property->items[i].text.long_value, property->items[i].text.length);
-			}
-		}
+	p = copy_property(property);
+	if (p == nullptr) {
+		return INDIGO_OK;
 	}
 
 	if (message) {
@@ -98,18 +83,6 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 	Q_UNUSED(device);
 	indigo_property* p = nullptr;
 	switch (property->type) {
-	case INDIGO_TEXT_VECTOR:
-		p = indigo_init_text_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
-		break;
-	case INDIGO_NUMBER_VECTOR:
-		p = indigo_init_number_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->count);
-		break;
-	case INDIGO_SWITCH_VECTOR:
-		p = indigo_init_switch_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->perm, property->rule, property->count);
-		break;
-	case INDIGO_LIGHT_VECTOR:
-		p = indigo_init_light_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
-		break;
 	case INDIGO_BLOB_VECTOR:
 		if (property->state == INDIGO_OK_STATE && property->perm != INDIGO_WO_PERM) {
 			for (int row = 0; row < property->count; row++) {
@@ -127,18 +100,14 @@ static indigo_result client_update_property(indigo_client *client, indigo_device
 				emit(IndigoClient::instance().no_preview(property, &property->items[row]));
 			}
 		}
-		p = indigo_init_blob_property(nullptr, property->device, property->name, property->group, property->label, property->state, property->count);
+		break;
+	default:
 		break;
 	}
 
-	memcpy(p, property, sizeof(indigo_property) + property->count * sizeof(indigo_item));
-	if(property->type == INDIGO_TEXT_VECTOR) {
-		for (int i = 0; i < property->count; i++) {
-			if (property->items[i].text.long_value) {
-				p->items[i].text.long_value = (char*)indigo_safe_malloc(property->items[i].text.length);
-				memcpy(p->items[i].text.long_value, property->items[i].text.long_value, property->items[i].text.length);
-			}
-		}
+	p = copy_property(property);
+	if (p == nullptr) {
+		return INDIGO_OK;
 	}
 
 	if (message) {

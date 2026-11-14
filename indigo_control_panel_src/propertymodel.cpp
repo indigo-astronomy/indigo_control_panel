@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include "blobpreview.h"
 #include "propertymodel.h"
+#include "propertycopy.h"
 #include "qindigoproperty.h"
 #include <indigo/indigo_names.h>
 #include "conf.h"
@@ -254,7 +255,7 @@ void PropertyModel::update_property(indigo_property* property, char *message) {
 	}
 	//  Update property
 	p->property->state = property->state;
-	memcpy(p->property->items, property->items, sizeof(indigo_item) * property->count);
+	merge_property_items(p->property, property);
 
 	//  If there is a property widget attached, update it
 	emit(property_updated(p->property, message));
